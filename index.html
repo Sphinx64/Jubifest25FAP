@@ -142,11 +142,10 @@
     <script type="module">
         // Firebase SDKs importieren
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Globale Variablen (werden von der Umgebung bereitgestellt) ---
-        // Diese Konfiguration verbindet den Code automatisch mit deinem Firebase-Projekt.
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "...", authDomain: "...", projectId: "..." };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-jubilaeum-app';
 
@@ -164,7 +163,7 @@
         const dessertListe = document.getElementById('dessert-liste');
         const erfolgsmeldung = document.getElementById('erfolgsmeldung');
         
-        // --- Hilfsfunktion für Animationen ---
+        // --- Hilfsfunktionen für Animationen ---
         function toggleSection(element, show) {
             if (show) {
                 element.classList.remove('hidden');
@@ -183,7 +182,17 @@
             }
         }
 
-        // --- Event Listener für bedingte Logik (UI-Animationen) ---
+        // KORREKTUR: Hilfsfunktion, um die Höhe des Eltern-Containers zu aktualisieren.
+        function updateParentHeight(parent) {
+             if (parent.style.maxHeight !== '0px' && parent.style.maxHeight !== '') {
+                // Kurze Verzögerung, um sicherzustellen, dass die Kind-Animation abgeschlossen ist.
+                setTimeout(() => {
+                    parent.style.maxHeight = parent.scrollHeight + 'px';
+                }, 510); // Muss etwas länger als die CSS-Transition sein.
+            }
+        }
+
+        // --- Event Listener für UI-Logik ---
         anmeldeFormular.elements.teilnahme.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const showDetails = e.target.value === 'ja';
@@ -192,91 +201,84 @@
                 else dessertListeContainer.classList.add('hidden');
             });
         });
-
         anmeldeFormular.elements.begleitung.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 toggleSection(begleitungDetails, e.target.value === 'ja');
+                updateParentHeight(detailsContainer); // Höhe des Elternteils aktualisieren
             });
         });
-
         anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
             radio.addEventListener('change', (e) => {
                 toggleSection(dessertDetails, e.target.value === 'ja');
+                updateParentHeight(detailsContainer); // Höhe des Elternteils aktualisieren
             });
         });
 
-        // --- Hauptfunktion der Anwendung ---
-        async function main() {
-            try {
-                // Schritt 1: Anonyme Anmeldung abwarten.
-                // Dies ist entscheidend, um Leserechte für die Datenbank zu erhalten.
-                await signInAnonymously(auth);
-                console.log("Anonyme Anmeldung erfolgreich. Firebase ist bereit.");
-
-                // Schritt 2: Listener für die Dessert-Liste einrichten.
-                // Da wir jetzt angemeldet sind, haben wir die Berechtigung, die Daten zu lesen.
-                const dessertsRef = collection(db, `/artifacts/${appId}/public/data/desserts`);
-                const q = query(dessertsRef);
-
-                onSnapshot(q, (querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        dessertListe.innerHTML = '<p class="text-center text-gray-500">Noch keine Desserts eingetragen. Sei der/die Erste!</p>';
-                        return;
-                    }
-                    
-                    dessertListe.innerHTML = '';
-                    querySnapshot.forEach((doc) => {
-                        const dessertData = doc.data();
-                        const eintrag = document.createElement('div');
-                        eintrag.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-lg border';
-                        eintrag.innerHTML = `
-                            <span class="font-medium text-gray-800">${dessertData.dessert}</span>
-                            <span class="text-sm text-gray-500">von ${dessertData.name}</span>
-                        `;
-                        dessertListe.appendChild(eintrag);
-                    });
-                }, (error) => {
-                    console.error("Fehler beim Abrufen der Dessert-Liste:", error);
-                    dessertListe.innerHTML = '<p class="text-center text-red-500">Fehler beim Laden der Liste.</p>';
+        // --- Funktion, die die Kernlogik der App initialisiert ---
+        function initializeAppLogic() {
+            // Listener für die Dessert-Liste einrichten
+            const dessertsRef = collection(db, `/artifacts/${appId}/public/data/desserts`);
+            const q = query(dessertsRef);
+            onSnapshot(q, (querySnapshot) => {
+                if (querySnapshot.empty) {
+                    dessertListe.innerHTML = '<p class="text-center text-gray-500">Noch keine Desserts eingetragen. Sei der/die Erste!</p>';
+                    return;
+                }
+                dessertListe.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const dessertData = doc.data();
+                    const eintrag = document.createElement('div');
+                    eintrag.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-lg border';
+                    eintrag.innerHTML = `
+                        <span class="font-medium text-gray-800">${dessertData.dessert}</span>
+                        <span class="text-sm text-gray-500">von ${dessertData.name}</span>
+                    `;
+                    dessertListe.appendChild(eintrag);
                 });
+            }, (error) => {
+                console.error("Fehler beim Abrufen der Dessert-Liste:", error);
+                dessertListe.innerHTML = '<p class="text-center text-red-500">Fehler beim Laden der Liste.</p>';
+            });
 
-                // Schritt 3: Listener für das Absenden des Formulars einrichten.
-                anmeldeFormular.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const formData = new FormData(anmeldeFormular);
-                    const data = Object.fromEntries(formData.entries());
+            // Listener für das Absenden des Formulars einrichten
+            anmeldeFormular.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(anmeldeFormular);
+                const data = Object.fromEntries(formData.entries());
 
-                    try {
-                        // Speichere die Anmelde- und Dessert-Daten
-                        await addDoc(collection(db, `/artifacts/${appId}/public/data/anmeldungen`), { ...data, timestamp: new Date() });
-
-                        if (data.teilnahme === 'ja' && data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
-                            await addDoc(collection(db, `/artifacts/${appId}/public/data/desserts`), {
-                                name: data.name,
-                                dessert: data['dessert-was'],
-                                timestamp: new Date()
-                            });
-                        }
-                        
-                        // KORREKTUR: Formular ausblenden und Erfolgsmeldung einblenden.
-                        // Die Dessert-Liste bleibt unberührt und somit sichtbar.
-                        anmeldeFormular.classList.add('hidden');
-                        erfolgsmeldung.classList.remove('hidden');
-
-                    } catch (error) {
-                        console.error("Fehler beim Speichern der Anmeldung: ", error);
-                        alert("Es ist ein Fehler aufgetreten. Bitte versuche es erneut.");
+                try {
+                    await addDoc(collection(db, `/artifacts/${appId}/public/data/anmeldungen`), { ...data, timestamp: new Date() });
+                    if (data.teilnahme === 'ja' && data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
+                        await addDoc(collection(db, `/artifacts/${appId}/public/data/desserts`), {
+                            name: data.name,
+                            dessert: data['dessert-was'],
+                            timestamp: new Date()
+                        });
                     }
-                });
-
-            } catch (error) {
-                console.error("Kritischer Fehler bei der App-Initialisierung:", error);
-                alert("Die Anwendung konnte nicht geladen werden. Bitte überprüfe deine Verbindung.");
-            }
+                    anmeldeFormular.classList.add('hidden');
+                    erfolgsmeldung.classList.remove('hidden');
+                } catch (error) {
+                    console.error("Fehler beim Speichern der Anmeldung: ", error);
+                    alert("Es ist ein Fehler aufgetreten. Bitte versuche es erneut.");
+                }
+            });
         }
-        
-        // App starten
-        main();
+
+        // --- Auth State Observer: Der Einstiegspunkt der App ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Ein Benutzer ist angemeldet (in diesem Fall anonym).
+                console.log("Auth-Status bestätigt für Benutzer:", user.uid);
+                initializeAppLogic();
+            } else {
+                // Kein Benutzer angemeldet. Versuche, sich anonym anzumelden.
+                console.log("Kein Benutzer gefunden, versuche anonyme Anmeldung...");
+                signInAnonymously(auth).catch((error) => {
+                    console.error("Anonyme Anmeldung fehlgeschlagen:", error);
+                    alert("Verbindung zum Service konnte nicht hergestellt werden. Bitte später erneut versuchen.");
+                });
+            }
+        });
 
     </script>
 </body>
