@@ -6,164 +6,188 @@
     <title>Anmeldung zum 25-jährigen Jubiläum | Fun Agility People</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f8f9fa;
         }
         .form-section {
             transition: all 0.5s ease-in-out;
             overflow: hidden;
         }
+        /* Custom scrollbar for the dessert list */
+        #dessert-liste::-webkit-scrollbar {
+            width: 8px;
+        }
+        #dessert-liste::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        #dessert-liste::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+        #dessert-liste::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+        .fap-green {
+            background-color: #99cc33;
+        }
+        .fap-green-text {
+            color: #99cc33;
+        }
+        .fap-green-border-focus:focus {
+            --tw-ring-color: #99cc33;
+            border-color: #99cc33;
+        }
+        .fap-green-ring-focus:focus {
+             --tw-ring-color: #99cc33;
+        }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4 sm:p-6">
-    <div class="w-full max-w-3xl mx-auto">
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
+    <div class="w-full max-w-4xl mx-auto">
         <div id="anmeldung-container" class="bg-white rounded-xl shadow-lg p-6 sm:p-10">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">25 Jahre Fun Agility People</h1>
-                <p class="text-gray-600 mt-2">Herzlich willkommen zur Anmeldung für unser Jubiläumsfest!</p>
+            <div class="text-center mb-10">
+                <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-20 w-auto mb-4">
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Anmeldung zum Jubiläumsfest</h1>
+                <p class="text-gray-600 mt-2">Wir feiern 25 Jahre – sei dabei!</p>
             </div>
 
             <form id="anmelde-formular">
-                <!-- Abschnitt 1: Grundlegende Informationen -->
-                <div class="mb-6">
-                    <label for="name" class="block text-lg font-medium text-gray-700 mb-2">Dein Name</label>
-                    <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="Max Mustermann">
-                </div>
-
-                <!-- Abschnitt 2: Teilnahmebestätigung -->
-                <div class="mb-6">
-                    <fieldset>
-                        <legend class="block text-lg font-medium text-gray-700 mb-2">Nimmst du am Fest teil?</legend>
-                        <div class="flex items-center gap-x-6">
-                            <label class="flex items-center">
-                                <input type="radio" name="teilnahme" value="ja" required class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
-                                <span class="ml-2 text-gray-800">Ja, ich bin dabei!</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="teilnahme" value="nein" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
-                                <span class="ml-2 text-gray-800">Nein, leider nicht.</span>
-                            </label>
-                        </div>
-                    </fieldset>
+                <!-- Abschnitt 1 & 2: Grundlegende Informationen -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
+                    <div>
+                        <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
+                        <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg fap-green-border-focus focus:ring-2" placeholder="Max Mustermann">
+                    </div>
+                    <div>
+                        <fieldset>
+                            <legend class="block text-lg font-semibold text-gray-700 mb-2">Nimmst du teil?</legend>
+                            <div class="flex items-center gap-x-6 h-full">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="teilnahme" value="ja" required class="h-4 w-4 text-[#99cc33] border-gray-300 fap-green-ring-focus">
+                                    <span class="ml-2 text-gray-800">Ja, ich bin dabei!</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="teilnahme" value="nein" class="h-4 w-4 text-[#99cc33] border-gray-300 fap-green-ring-focus">
+                                    <span class="ml-2 text-gray-800">Nein, leider nicht.</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
                 </div>
                 
                 <!-- Container für bedingte Fragen -->
-                <div id="details-container" class="form-section hidden opacity-0 max-h-0">
-                    <!-- Abschnitt 3: Details zur Teilnahme -->
-                    <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
+                <div id="details-container" class="form-section hidden opacity-0 max-h-0 space-y-6">
+                    <!-- Abschnitt 3: Begleitpersonen -->
+                    <div class="p-4 bg-gray-50 rounded-lg border">
                         <fieldset>
-                            <legend class="block text-md font-medium text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
+                            <legend class="block text-md font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
                             <div class="flex items-center gap-x-6">
-                                <label class="flex items-center">
-                                    <input type="radio" name="begleitung" value="ja" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="begleitung" value="ja" class="h-4 w-4 text-[#99cc33] border-gray-300 fap-green-ring-focus">
                                     <span class="ml-2 text-gray-800">Ja</span>
                                 </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-[#99cc33] border-gray-300 fap-green-ring-focus">
                                     <span class="ml-2 text-gray-800">Nein</span>
                                 </label>
                             </div>
                         </fieldset>
                         <div id="begleitung-details" class="form-section hidden opacity-0 max-h-0 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label for="erwachsene" class="block text-sm font-medium text-gray-700">Anzahl Erwachsene</label>
-                                <input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <label for="erwachsene" class="block text-sm font-medium text-gray-700">Anzahl zus. Erwachsene</label>
+                                <input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-green-border-focus focus:ring-2">
                             </div>
                             <div>
                                 <label for="kinder" class="block text-sm font-medium text-gray-700">Anzahl Kinder</label>
-                                <input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-green-border-focus focus:ring-2">
                             </div>
                         </div>
                     </div>
 
                     <!-- Abschnitt 4: Essenswahl -->
-                    <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
-                        <p class="block text-md font-medium text-gray-700 mb-2">Was möchtet ihr essen?</p>
-                        <p class="text-sm text-gray-500 mb-3">Bitte trage die Gesamtzahl der Personen pro Gericht ein.</p>
+                    <div class="p-4 bg-gray-50 rounded-lg border">
+                        <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
+                        <p class="text-sm text-gray-500 mb-3">Bitte trage die Gesamtzahl der Personen pro Gericht ein (inkl. dir).</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="raclette" class="block text-sm font-medium text-gray-700">Anzahl Personen für Raclette</label>
-                                <input type="number" id="raclette" name="raclette" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <input type="number" id="raclette" name="raclette" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-green-border-focus focus:ring-2">
                             </div>
                             <div>
                                 <label for="fondue" class="block text-sm font-medium text-gray-700">Anzahl Personen für Fondue</label>
-                                <input type="number" id="fondue" name="fondue" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <input type="number" id="fondue" name="fondue" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-green-border-focus focus:ring-2">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Abschnitt 5: Dessertbuffet -->
-                    <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
-                        <fieldset>
-                            <legend class="block text-md font-medium text-gray-700 mb-2">Möchtest du etwas zum Dessertbuffet beitragen?</legend>
-                            <div class="flex items-center gap-x-6">
-                                <label class="flex items-center">
-                                    <input type="radio" name="dessert-beitrag" value="ja" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
-                                    <span class="ml-2 text-gray-800">Ja, gerne!</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="dessert-beitrag" value="nein" checked class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
-                                    <span class="ml-2 text-gray-800">Nein, diesmal nicht.</span>
-                                </label>
+                    <!-- Abschnitt 5: Dessertbuffet (NEUES LAYOUT) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Linke Spalte: Frage -->
+                        <div class="p-4 bg-gray-50 rounded-lg border">
+                            <fieldset>
+                                <legend class="block text-md font-semibold text-gray-700 mb-2">Möchtest du etwas zum Dessertbuffet beitragen?</legend>
+                                <div class="flex items-center gap-x-6">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="dessert-beitrag" value="ja" class="h-4 w-4 text-[#99cc33] border-gray-300 fap-green-ring-focus">
+                                        <span class="ml-2 text-gray-800">Ja, gerne!</span>
+                                    </label>
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="dessert-beitrag" value="nein" checked class="h-4 w-4 text-[#99cc33] border-gray-300 fap-green-ring-focus">
+                                        <span class="ml-2 text-gray-800">Nein, danke.</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                            <div id="dessert-details" class="form-section hidden opacity-0 max-h-0 mt-4">
+                                <label for="dessert-was" class="block text-sm font-medium text-gray-700">Was für ein Dessert bringst du mit?</label>
+                                <input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-green-border-focus focus:ring-2" placeholder="z.B. Schokoladenkuchen">
                             </div>
-                        </fieldset>
-                        <div id="dessert-details" class="form-section hidden opacity-0 max-h-0 mt-4">
-                            <label for="dessert-was" class="block text-sm font-medium text-gray-700">Was für ein Dessert bringst du mit?</label>
-                            <input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="z.B. Schokoladenkuchen">
+                        </div>
+                        <!-- Rechte Spalte: Live-Liste -->
+                        <div id="dessert-liste-container" class="bg-white rounded-lg border p-4">
+                             <h3 class="text-md font-semibold text-gray-800 text-center mb-3">Live Dessert-Liste</h3>
+                             <div id="dessert-liste" class="space-y-2 max-h-32 overflow-y-auto pr-2">
+                                <p class="text-center text-gray-500 text-sm">Lade...</p>
+                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-8">
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300">
+                    <button type="submit" class="w-full fap-green text-white font-bold py-3 px-4 rounded-lg hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#99cc33] transition-all duration-300 text-lg">
                         Anmeldung abschicken
                     </button>
                 </div>
             </form>
             
-            <!-- Erfolgsmeldung, wird anstelle des Formulars angezeigt -->
-            <div id="erfolgsmeldung" class="hidden text-center">
-                <h2 class="text-3xl font-bold text-green-600">Vielen Dank!</h2>
+            <div id="erfolgsmeldung" class="hidden text-center py-10">
+                <h2 class="text-3xl font-bold fap-green-text">Vielen Dank!</h2>
                 <p class="text-gray-700 mt-4 text-lg">Deine Anmeldung war erfolgreich. Wir freuen uns auf dich!</p>
             </div>
         </div>
-        
-        <!-- Live Dessert-Liste -->
-        <div id="dessert-liste-container" class="mt-8 bg-white rounded-xl shadow-lg p-6 sm:p-10 hidden">
-             <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Live Dessert-Liste</h2>
-             <div id="dessert-liste" class="space-y-3">
-                <p class="text-center text-gray-500">Lade...</p>
-             </div>
-        </div>
-
     </div>
 
     <script type="module">
-        // Firebase SDKs importieren
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Globale Variablen (werden von der Umgebung bereitgestellt) ---
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "...", authDomain: "...", projectId: "..." };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-jubilaeum-app';
 
-        // --- Firebase initialisieren ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- DOM-Elemente abrufen ---
         const anmeldeFormular = document.getElementById('anmelde-formular');
         const detailsContainer = document.getElementById('details-container');
         const begleitungDetails = document.getElementById('begleitung-details');
         const dessertDetails = document.getElementById('dessert-details');
-        const dessertListeContainer = document.getElementById('dessert-liste-container');
         const dessertListe = document.getElementById('dessert-liste');
         const erfolgsmeldung = document.getElementById('erfolgsmeldung');
         
-        // --- Hilfsfunktionen für Animationen ---
         function toggleSection(element, show) {
             if (show) {
                 element.classList.remove('hidden');
@@ -182,65 +206,54 @@
             }
         }
 
-        // KORREKTUR: Hilfsfunktion, um die Höhe des Eltern-Containers zu aktualisieren.
         function updateParentHeight(parent) {
              if (parent.style.maxHeight !== '0px' && parent.style.maxHeight !== '') {
-                // Kurze Verzögerung, um sicherzustellen, dass die Kind-Animation abgeschlossen ist.
                 setTimeout(() => {
                     parent.style.maxHeight = parent.scrollHeight + 'px';
-                }, 510); // Muss etwas länger als die CSS-Transition sein.
+                }, 510);
             }
         }
 
-        // --- Event Listener für UI-Logik ---
         anmeldeFormular.elements.teilnahme.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const showDetails = e.target.value === 'ja';
-                toggleSection(detailsContainer, showDetails);
-                if(showDetails) dessertListeContainer.classList.remove('hidden');
-                else dessertListeContainer.classList.add('hidden');
-            });
+            radio.addEventListener('change', (e) => toggleSection(detailsContainer, e.target.value === 'ja'));
         });
         anmeldeFormular.elements.begleitung.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 toggleSection(begleitungDetails, e.target.value === 'ja');
-                updateParentHeight(detailsContainer); // Höhe des Elternteils aktualisieren
+                updateParentHeight(detailsContainer);
             });
         });
         anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
             radio.addEventListener('change', (e) => {
                 toggleSection(dessertDetails, e.target.value === 'ja');
-                updateParentHeight(detailsContainer); // Höhe des Elternteils aktualisieren
+                updateParentHeight(detailsContainer);
             });
         });
 
-        // --- Funktion, die die Kernlogik der App initialisiert ---
         function initializeAppLogic() {
-            // Listener für die Dessert-Liste einrichten
             const dessertsRef = collection(db, `/artifacts/${appId}/public/data/desserts`);
             const q = query(dessertsRef);
             onSnapshot(q, (querySnapshot) => {
                 if (querySnapshot.empty) {
-                    dessertListe.innerHTML = '<p class="text-center text-gray-500">Noch keine Desserts eingetragen. Sei der/die Erste!</p>';
+                    dessertListe.innerHTML = '<p class="text-center text-gray-500 text-sm">Sei der/die Erste!</p>';
                     return;
                 }
                 dessertListe.innerHTML = '';
                 querySnapshot.forEach((doc) => {
                     const dessertData = doc.data();
                     const eintrag = document.createElement('div');
-                    eintrag.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-lg border';
+                    eintrag.className = 'flex justify-between items-center bg-gray-50 p-2 rounded-md';
                     eintrag.innerHTML = `
-                        <span class="font-medium text-gray-800">${dessertData.dessert}</span>
-                        <span class="text-sm text-gray-500">von ${dessertData.name}</span>
+                        <span class="text-sm font-medium text-gray-800">${dessertData.dessert}</span>
+                        <span class="text-xs text-gray-500">${dessertData.name}</span>
                     `;
                     dessertListe.appendChild(eintrag);
                 });
             }, (error) => {
                 console.error("Fehler beim Abrufen der Dessert-Liste:", error);
-                dessertListe.innerHTML = '<p class="text-center text-red-500">Fehler beim Laden der Liste.</p>';
+                dessertListe.innerHTML = '<p class="text-center text-red-500 text-sm">Fehler beim Laden.</p>';
             });
 
-            // Listener für das Absenden des Formulars einrichten
             anmeldeFormular.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(anmeldeFormular);
@@ -264,18 +277,15 @@
             });
         }
 
-        // --- Auth State Observer: Der Einstiegspunkt der App ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Ein Benutzer ist angemeldet (in diesem Fall anonym).
                 console.log("Auth-Status bestätigt für Benutzer:", user.uid);
                 initializeAppLogic();
             } else {
-                // Kein Benutzer angemeldet. Versuche, sich anonym anzumelden.
                 console.log("Kein Benutzer gefunden, versuche anonyme Anmeldung...");
                 signInAnonymously(auth).catch((error) => {
                     console.error("Anonyme Anmeldung fehlgeschlagen:", error);
-                    alert("Verbindung zum Service konnte nicht hergestellt werden. Bitte später erneut versuchen.");
+                    alert("Verbindung zum Service konnte nicht hergestellt werden.");
                 });
             }
         });
