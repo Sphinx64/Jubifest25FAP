@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anmeldung zum 25-jährigen Jubiläum | Fun Agility People</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-section {
+            transition: all 0.5s ease-in-out;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4 sm:p-6">
+    <div class="w-full max-w-3xl mx-auto">
+        <div id="anmeldung-container" class="bg-white rounded-xl shadow-lg p-6 sm:p-10">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">25 Jahre Fun Agility People</h1>
+                <p class="text-gray-600 mt-2">Herzlich willkommen zur Anmeldung für unser Jubiläumsfest!</p>
+            </div>
+
+            <form id="anmelde-formular">
+                <!-- Abschnitt 1: Grundlegende Informationen -->
+                <div class="mb-6">
+                    <label for="name" class="block text-lg font-medium text-gray-700 mb-2">Dein Name</label>
+                    <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="Max Mustermann">
+                </div>
+
+                <!-- Abschnitt 2: Teilnahmebestätigung -->
+                <div class="mb-6">
+                    <fieldset>
+                        <legend class="block text-lg font-medium text-gray-700 mb-2">Nimmst du am Fest teil?</legend>
+                        <div class="flex items-center gap-x-6">
+                            <label class="flex items-center">
+                                <input type="radio" name="teilnahme" value="ja" required class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                <span class="ml-2 text-gray-800">Ja, ich bin dabei!</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="teilnahme" value="nein" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                <span class="ml-2 text-gray-800">Nein, leider nicht.</span>
+                            </label>
+                        </div>
+                    </fieldset>
+                </div>
+                
+                <!-- Container für bedingte Fragen -->
+                <div id="details-container" class="form-section hidden opacity-0 max-h-0">
+                    <!-- Abschnitt 3: Details zur Teilnahme -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
+                        <fieldset>
+                            <legend class="block text-md font-medium text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
+                            <div class="flex items-center gap-x-6">
+                                <label class="flex items-center">
+                                    <input type="radio" name="begleitung" value="ja" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-2 text-gray-800">Ja</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-2 text-gray-800">Nein</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                        <div id="begleitung-details" class="form-section hidden opacity-0 max-h-0 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="erwachsene" class="block text-sm font-medium text-gray-700">Anzahl Erwachsene</label>
+                                <input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label for="kinder" class="block text-sm font-medium text-gray-700">Anzahl Kinder</label>
+                                <input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Abschnitt 4: Essenswahl -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
+                        <p class="block text-md font-medium text-gray-700 mb-2">Was möchtet ihr essen?</p>
+                        <p class="text-sm text-gray-500 mb-3">Bitte trage die Gesamtzahl der Personen pro Gericht ein.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="raclette" class="block text-sm font-medium text-gray-700">Anzahl Personen für Raclette</label>
+                                <input type="number" id="raclette" name="raclette" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label for="fondue" class="block text-sm font-medium text-gray-700">Anzahl Personen für Fondue</label>
+                                <input type="number" id="fondue" name="fondue" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Abschnitt 5: Dessertbuffet -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
+                        <fieldset>
+                            <legend class="block text-md font-medium text-gray-700 mb-2">Möchtest du etwas zum Dessertbuffet beitragen?</legend>
+                            <div class="flex items-center gap-x-6">
+                                <label class="flex items-center">
+                                    <input type="radio" name="dessert-beitrag" value="ja" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-2 text-gray-800">Ja, gerne!</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="dessert-beitrag" value="nein" checked class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-2 text-gray-800">Nein, diesmal nicht.</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                        <div id="dessert-details" class="form-section hidden opacity-0 max-h-0 mt-4">
+                            <label for="dessert-was" class="block text-sm font-medium text-gray-700">Was für ein Dessert bringst du mit?</label>
+                            <input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="z.B. Schokoladenkuchen">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300">
+                        Anmeldung abschicken
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Erfolgsmeldung, wird anstelle des Formulars angezeigt -->
+            <div id="erfolgsmeldung" class="hidden text-center">
+                <h2 class="text-3xl font-bold text-green-600">Vielen Dank!</h2>
+                <p class="text-gray-700 mt-4 text-lg">Deine Anmeldung war erfolgreich. Wir freuen uns auf dich!</p>
+            </div>
+        </div>
+        
+        <!-- Live Dessert-Liste -->
+        <div id="dessert-liste-container" class="mt-8 bg-white rounded-xl shadow-lg p-6 sm:p-10 hidden">
+             <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Live Dessert-Liste</h2>
+             <div id="dessert-liste" class="space-y-3">
+                <p class="text-center text-gray-500">Lade...</p>
+             </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // Firebase SDKs importieren
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Globale Variablen (werden von der Umgebung bereitgestellt) ---
+        // Diese Konfiguration verbindet den Code automatisch mit deinem Firebase-Projekt.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "...", authDomain: "...", projectId: "..." };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-jubilaeum-app';
+
+        // --- Firebase initialisieren ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM-Elemente abrufen ---
+        const anmeldeFormular = document.getElementById('anmelde-formular');
+        const detailsContainer = document.getElementById('details-container');
+        const begleitungDetails = document.getElementById('begleitung-details');
+        const dessertDetails = document.getElementById('dessert-details');
+        const dessertListeContainer = document.getElementById('dessert-liste-container');
+        const dessertListe = document.getElementById('dessert-liste');
+        const erfolgsmeldung = document.getElementById('erfolgsmeldung');
+        
+        // --- Hilfsfunktion für Animationen ---
+        function toggleSection(element, show) {
+            if (show) {
+                element.classList.remove('hidden');
+                setTimeout(() => {
+                    element.classList.remove('opacity-0', 'max-h-0');
+                    element.style.maxHeight = element.scrollHeight + 'px';
+                }, 10);
+            } else {
+                element.style.maxHeight = '0px';
+                element.classList.add('opacity-0');
+                 setTimeout(() => {
+                    if (element.style.maxHeight === '0px') {
+                         element.classList.add('hidden');
+                    }
+                }, 500);
+            }
+        }
+
+        // --- Event Listener für bedingte Logik (UI-Animationen) ---
+        anmeldeFormular.elements.teilnahme.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const showDetails = e.target.value === 'ja';
+                toggleSection(detailsContainer, showDetails);
+                if(showDetails) dessertListeContainer.classList.remove('hidden');
+                else dessertListeContainer.classList.add('hidden');
+            });
+        });
+
+        anmeldeFormular.elements.begleitung.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                toggleSection(begleitungDetails, e.target.value === 'ja');
+            });
+        });
+
+        anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                toggleSection(dessertDetails, e.target.value === 'ja');
+            });
+        });
+
+        // --- Hauptfunktion der Anwendung ---
+        async function main() {
+            try {
+                // Schritt 1: Anonyme Anmeldung abwarten.
+                // Dies ist entscheidend, um Leserechte für die Datenbank zu erhalten.
+                await signInAnonymously(auth);
+                console.log("Anonyme Anmeldung erfolgreich. Firebase ist bereit.");
+
+                // Schritt 2: Listener für die Dessert-Liste einrichten.
+                // Da wir jetzt angemeldet sind, haben wir die Berechtigung, die Daten zu lesen.
+                const dessertsRef = collection(db, `/artifacts/${appId}/public/data/desserts`);
+                const q = query(dessertsRef);
+
+                onSnapshot(q, (querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        dessertListe.innerHTML = '<p class="text-center text-gray-500">Noch keine Desserts eingetragen. Sei der/die Erste!</p>';
+                        return;
+                    }
+                    
+                    dessertListe.innerHTML = '';
+                    querySnapshot.forEach((doc) => {
+                        const dessertData = doc.data();
+                        const eintrag = document.createElement('div');
+                        eintrag.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-lg border';
+                        eintrag.innerHTML = `
+                            <span class="font-medium text-gray-800">${dessertData.dessert}</span>
+                            <span class="text-sm text-gray-500">von ${dessertData.name}</span>
+                        `;
+                        dessertListe.appendChild(eintrag);
+                    });
+                }, (error) => {
+                    console.error("Fehler beim Abrufen der Dessert-Liste:", error);
+                    dessertListe.innerHTML = '<p class="text-center text-red-500">Fehler beim Laden der Liste.</p>';
+                });
+
+                // Schritt 3: Listener für das Absenden des Formulars einrichten.
+                anmeldeFormular.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(anmeldeFormular);
+                    const data = Object.fromEntries(formData.entries());
+
+                    try {
+                        // Speichere die Anmelde- und Dessert-Daten
+                        await addDoc(collection(db, `/artifacts/${appId}/public/data/anmeldungen`), { ...data, timestamp: new Date() });
+
+                        if (data.teilnahme === 'ja' && data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
+                            await addDoc(collection(db, `/artifacts/${appId}/public/data/desserts`), {
+                                name: data.name,
+                                dessert: data['dessert-was'],
+                                timestamp: new Date()
+                            });
+                        }
+                        
+                        // KORREKTUR: Formular ausblenden und Erfolgsmeldung einblenden.
+                        // Die Dessert-Liste bleibt unberührt und somit sichtbar.
+                        anmeldeFormular.classList.add('hidden');
+                        erfolgsmeldung.classList.remove('hidden');
+
+                    } catch (error) {
+                        console.error("Fehler beim Speichern der Anmeldung: ", error);
+                        alert("Es ist ein Fehler aufgetreten. Bitte versuche es erneut.");
+                    }
+                });
+
+            } catch (error) {
+                console.error("Kritischer Fehler bei der App-Initialisierung:", error);
+                alert("Die Anwendung konnte nicht geladen werden. Bitte überprüfe deine Verbindung.");
+            }
+        }
+        
+        // App starten
+        main();
+
+    </script>
+</body>
+</html>
+
