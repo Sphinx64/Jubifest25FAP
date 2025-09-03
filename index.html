@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anmeldung zum 25-jährigen Jubiläum | Fun Agility People</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Referenz zur separaten Konfigurationsdatei -->
+    <script src="firebase-config.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
         body {
@@ -25,6 +27,9 @@
         .fap-focus-ring:focus {
             --tw-ring-color: #005a6a;
             border-color: #005a6a;
+        }
+        #eckdaten-toggle-icon {
+            transition: transform 0.3s ease-in-out;
         }
     </style>
 </head>
@@ -51,17 +56,24 @@
         </div>
 
         <div id="anmeldung-container" class="p-6 sm:p-10">
-            <div class="bg-gray-50 border-l-4 border-[#005a6a] p-4 rounded-r-lg mb-8">
-                <h3 class="text-lg font-bold fap-teal-text">Eckdaten zum Fest</h3>
-                <ul class="list-disc list-inside mt-2 text-gray-700 space-y-1">
-                    <li><strong>Datum:</strong> [Datum hier eintragen], ab [Uhrzeit] Uhr</li>
-                    <li><strong>Ort:</strong> Schützenhaus Schönenbuch, [Adresse für Navi]</li>
-                    <li><strong>Kosten:</strong> Mitglieder gratis. Begleitpersonen: Erwachsene [Betrag] CHF, Kinder [Betrag] CHF.</li>
-                    <li><strong>Programm:</strong> Apéro, Spaziergang, Essen (Raclette/Fondue), Quiz & gemütliches Beisammensein.</li>
-                    <li><strong>Anmeldeschluss:</strong> [Datum für Anmeldeschluss]</li>
-                    <li><strong>Bezahlung Gäste:</strong> [Hinweis zur Bezahlung, z.B. bar vor Ort]</li>
-                    <li><strong>Fragen an:</strong> [Ansprechperson], [Kontakt E-Mail/Tel]</li>
-                </ul>
+            <div class="bg-gray-50 rounded-lg border mb-8 overflow-hidden">
+                <button type="button" id="eckdaten-toggle" class="w-full text-left p-4 flex justify-between items-center cursor-pointer focus:outline-none">
+                    <h3 class="text-lg font-bold fap-teal-text">Eckdaten zum Fest</h3>
+                    <svg id="eckdaten-toggle-icon" class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div id="eckdaten-details" class="form-section hidden opacity-0 max-h-0 px-4 pb-4">
+                    <ul class="list-disc list-inside mt-2 text-gray-700 space-y-1">
+                        <li><strong>Datum:</strong> [Datum hier eintragen], ab [Uhrzeit] Uhr</li>
+                        <li><strong>Ort:</strong> Schützenhaus Schönenbuch, [Adresse für Navi]</li>
+                        <li><strong>Kosten:</strong> Mitglieder gratis. Begleitpersonen: Erwachsene [Betrag] CHF, Kinder [Betrag] CHF.</li>
+                        <li><strong>Programm:</strong> Apéro, Spaziergang, Essen (Raclette/Fondue), Quiz & gemütliches Beisammensein.</li>
+                        <li><strong>Anmeldeschluss:</strong> [Datum für Anmeldeschluss]</li>
+                        <li><strong>Bezahlung Gäste:</strong> [Hinweis zur Bezahlung, z.B. bar vor Ort]</li>
+                        <li><strong>Fragen an:</strong> [Ansprechperson], [Kontakt E-Mail/Tel]</li>
+                    </ul>
+                </div>
             </div>
 
             <form id="anmelde-formular">
@@ -88,7 +100,6 @@
                 </div>
                 
                 <div id="details-container" class="form-section hidden opacity-0 max-h-0 space-y-6">
-                    <!-- This section is only shown for 'ja' -->
                     <div class="p-4 bg-gray-50 rounded-lg border">
                         <fieldset>
                             <legend class="block text-md font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
@@ -144,11 +155,11 @@
                                 <legend class="block text-md font-semibold text-gray-700 mb-2">Möchtest du etwas zum Dessertbuffet beitragen?</legend>
                                 <div class="flex items-center gap-x-6">
                                     <label class="flex items-center cursor-pointer">
-                                        <input type="radio" name="dessert-beitrag" value="ja" class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
+                                        <input type="radio" name="dessert-beitrag" value="ja" checked class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
                                         <span class="ml-2 text-gray-800">Ja, gerne!</span>
                                     </label>
                                     <label class="flex items-center cursor-pointer">
-                                        <input type="radio" name="dessert-beitrag" value="nein" checked class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
+                                        <input type="radio" name="dessert-beitrag" value="nein" class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
                                         <span class="ml-2 text-gray-800">Nein, danke.</span>
                                     </label>
                                 </div>
@@ -196,7 +207,6 @@
             </div>
         </div>
         
-        <!-- NEUER Container für "Nein"-Antwort -->
         <div id="cancellation-container" class="hidden p-6 sm:p-10 text-center">
             <h2 class="text-3xl font-bold fap-teal-text">Abmeldung erhalten</h2>
             <p class="text-gray-700 mt-2 text-lg">Schade, dass du nicht dabei sein kannst!</p>
@@ -236,17 +246,8 @@
                 passwordInput.focus();
             }
         });
-
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBTbLCLBADWVRWbC9vpA6jJ0CN01ANZPAk",
-  authDomain: "anmeldungjubilaeumsfest-2025.firebaseapp.com",
-  projectId: "anmeldungjubilaeumsfest-2025",
-  storageBucket: "anmeldungjubilaeumsfest-2025.firebasestorage.app",
-  messagingSenderId: "766583458685",
-  appId: "1:766583458685:web:e5d37784976e3e858ada14",
-  measurementId: "G-DC6CC90H4R"
-};
+        
+        // Die Variable "firebaseConfig" wird aus der "firebase-config.js" Datei geladen
         const appId = 'fap-jubilaeum-25';
 
         const app = initializeApp(firebaseConfig);
@@ -266,14 +267,18 @@ const firebaseConfig = {
         const factsheetContent = document.getElementById('factsheet-content');
         const icsDownloadLink = document.getElementById('ics-download-link');
         const editLink = document.getElementById('edit-link');
-
-        // NEUE Elemente für "Nein"-Antwort
         const cancellationContainer = document.getElementById('cancellation-container');
         const editLinkCancel = document.getElementById('edit-link-cancel');
         
+        const eckdatenToggle = document.getElementById('eckdaten-toggle');
+        const eckdatenDetails = document.getElementById('eckdaten-details');
+        const eckdatenToggleIcon = document.getElementById('eckdaten-toggle-icon');
+
         function toggleSection(element, show) {
+            const icon = element.previousElementSibling?.querySelector('svg');
             if (show) {
                 element.classList.remove('hidden');
+                if (icon) icon.style.transform = 'rotate(180deg)';
                 setTimeout(() => {
                     element.classList.remove('opacity-0', 'max-h-0');
                     element.style.maxHeight = element.scrollHeight + 'px';
@@ -281,6 +286,7 @@ const firebaseConfig = {
             } else {
                 element.style.maxHeight = '0px';
                 element.classList.add('opacity-0');
+                if (icon) icon.style.transform = 'rotate(0deg)';
                  setTimeout(() => {
                     if (element.style.maxHeight === '0px') {
                          element.classList.add('hidden');
@@ -296,9 +302,23 @@ const firebaseConfig = {
                 }, 510);
             }
         }
+        
+        eckdatenToggle.addEventListener('click', () => {
+            const isHidden = eckdatenDetails.classList.contains('hidden');
+            toggleSection(eckdatenDetails, isHidden);
+        });
 
         anmeldeFormular.elements.teilnahme.forEach(radio => {
-            radio.addEventListener('change', (e) => toggleSection(detailsContainer, e.target.value === 'ja'));
+            radio.addEventListener('change', (e) => {
+                const isAttending = e.target.value === 'ja';
+                toggleSection(detailsContainer, isAttending);
+                if (isAttending) {
+                    const dessertBeitragJa = anmeldeFormular.querySelector('input[name="dessert-beitrag"][value="ja"]');
+                    if (dessertBeitragJa.checked) {
+                        setTimeout(() => toggleSection(dessertDetails, true), 50);
+                    }
+                }
+            });
         });
         anmeldeFormular.elements.begleitung.forEach(radio => {
             radio.addEventListener('change', (e) => {
@@ -346,7 +366,6 @@ const firebaseConfig = {
             successContainer.classList.remove('hidden');
         }
 
-        // NEUE Funktion für "Nein"-Antwort
         function showCancellationScreen(uniqueId) {
             const editUrl = `${window.location.href.split('?')[0]}?edit=${uniqueId}`;
             editLinkCancel.href = editUrl;
@@ -389,7 +408,6 @@ const firebaseConfig = {
                 const dataToSave = { ...data, timestamp: new Date(), registrationId: uniqueId };
                 
                 try {
-                    // Logik für "Ja"-Antwort
                     if (data.teilnahme === 'ja') {
                         const anzahlErwachsene = parseInt(data.erwachsene) || 0;
                         const anzahlKinder = parseInt(data.kinder) || 0;
@@ -412,7 +430,7 @@ const firebaseConfig = {
                             });
                         }
                         showSuccessScreen(data, uniqueId);
-                    } else { // Logik für "Nein"-Antwort
+                    } else { 
                         await addDoc(collection(db, `/artifacts/${appId}/public/data/anmeldungen`), dataToSave);
                         showCancellationScreen(uniqueId);
                     }
