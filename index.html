@@ -176,7 +176,6 @@
             </form>
         </div>
 
-        <!-- NEUE Bestätigungsseite -->
         <div id="success-container" class="hidden p-6 sm:p-10 text-center">
             <h2 class="text-3xl font-bold fap-teal-text">Vielen Dank!</h2>
             <p class="text-gray-700 mt-2 text-lg">Deine Anmeldung ist bei uns eingegangen.</p>
@@ -230,9 +229,18 @@
             }
         });
 
-        // --- Bestehende Firebase & Formular Logik ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "...", authDomain: "...", projectId: "..." };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-jubilaeum-app';
+        // --- Firebase & Formular Logik ---
+        // WICHTIG: Ersetze die folgenden Platzhalter mit deinen echten Werten aus der Firebase Konsole!
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTbLCLBADWVRWbC9vpA6jJ0CN01ANZPAk",
+                    authDomain: "anmeldungjubilaeumsfest-2025.firebaseapp.com",
+                    projectId: "anmeldungjubilaeumsfest-2025",
+                    storageBucket: "anmeldungjubilaeumsfest-2025.firebasestorage.app",
+                    messagingSenderId: "766583458685",
+                    appId: "1:766583458685:web:e5d37784976e3e858ada14",
+                    measurementId: "G-DC6CC90H4R"
+        };
+        const appId = 'fap-jubilaeum-25'; // Ein fester, eindeutiger Name für dieses Event
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -246,7 +254,6 @@
         const validationError = document.getElementById('validation-error');
         const submitButton = document.getElementById('submit-button');
         
-        // --- NEUE Elemente ---
         const anmeldungContainer = document.getElementById('anmeldung-container');
         const successContainer = document.getElementById('success-container');
         const factsheetContent = document.getElementById('factsheet-content');
@@ -295,15 +302,11 @@
             });
         });
 
-        // --- NEUE FUNKTIONEN für .ics und Erfolgsseite ---
         function generateICS(data) {
-            // Fülle diese Platzhalter mit den Event-Daten
             const event = {
                 title: "Jubiläumsfest Fun Agility People",
                 description: "Wir feiern 25 Jahre! Apéro, Spaziergang, Essen und gemütliches Beisammensein.",
                 location: "Schützenhaus Schönenbuch, [Adresse für Navi]",
-                // WICHTIG: Zeitformat muss YYYYMMDDTHHMMSSZ sein (UTC-Zeit)
-                // Beispiel: 20251026T160000Z für 26. Okt 2025, 18:00 CEST (UTC+2)
                 startTime: "[STARTZEIT_UTC]", 
                 endTime: "[ENDZEIT_UTC]", 
             };
