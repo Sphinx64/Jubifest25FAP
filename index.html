@@ -6,6 +6,7 @@
     <title>Anmeldung zum 25-jährigen Jubiläum | Fun Agility People</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
+    <!-- Referenz zur separaten Konfigurationsdatei -->
     <script src="firebase-config.js"></script>
     <style>
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
@@ -243,11 +244,8 @@
         }
 
         // --- FIREBASE & SUBMISSION ---
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        function initializeAppLogic() {
+        function initializeAppLogic(firebaseApp) {
+            const db = getFirestore(firebaseApp);
             const dessertsRef = collection(db, `/artifacts/${appId}/public/data/desserts`);
             onSnapshot(query(dessertsRef), (snapshot) => {
                 const dessertListe = document.getElementById('dessert-liste');
@@ -325,13 +323,21 @@
             return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
         }
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                initializeAppLogic();
-            } else {
-                signInAnonymously(auth).catch(console.error);
-            }
-        });
+        // --- APP INITIALIZATION ---
+        try {
+            const app = initializeApp(firebaseConfig); 
+            const auth = getAuth(app);
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    initializeAppLogic(app);
+                } else {
+                    signInAnonymously(auth).catch(console.error);
+                }
+            });
+        } catch (e) {
+            console.error("Firebase initialization failed: ", e);
+            alert("Fehler bei der Initialisierung der App. Bitte kontaktieren Sie den Administrator.");
+        }
 
     </script>
 </body>
