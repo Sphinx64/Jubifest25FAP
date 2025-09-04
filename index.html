@@ -5,33 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anmeldung zum 25-jährigen Jubiläum | Fun Agility People</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
     <!-- Referenz zur separaten Konfigurationsdatei -->
     <script src="firebase-config.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
-        body {
-            font-family: 'Open Sans', sans-serif;
-            background-color: #eef2f5;
-            transition: background-color 0.5s ease;
-        }
-        .form-section, #password-gate, #main-content {
-            transition: all 0.5s ease-in-out;
-            overflow: hidden;
-        }
-        #dessert-liste::-webkit-scrollbar { width: 8px; }
-        #dessert-liste::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        #dessert-liste::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-        #dessert-liste::-webkit-scrollbar-thumb:hover { background: #aaa; }
-        .fap-teal { background-color: #005a6a; }
-        .fap-teal-text { color: #005a6a; }
-        .fap-focus-ring:focus {
-            --tw-ring-color: #005a6a;
-            border-color: #005a6a;
-        }
-        #eckdaten-toggle-icon {
-            transition: transform 0.3s ease-in-out;
-        }
-    </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
 
@@ -63,14 +39,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-                <div id="eckdaten-details" class="form-section hidden opacity-0 max-h-0 px-4 pb-4">
+                <div id="eckdaten-details" class="form-section px-4 pb-4">
                     <ul class="list-disc list-inside mt-2 text-gray-700 space-y-1">
-                        <li><strong>Datum:</strong> [Datum hier eintragen], ab [Uhrzeit] Uhr</li>
-                        <li><strong>Ort:</strong> Schützenhaus Schönenbuch, [Adresse für Navi]</li>
-                        <li><strong>Kosten:</strong> Mitglieder gratis. Begleitpersonen: Erwachsene [Betrag] CHF, Kinder [Betrag] CHF.</li>
-                        <li><strong>Programm:</strong> Apéro, Spaziergang, Essen (Raclette/Fondue), Quiz & gemütliches Beisammensein.</li>
-                        <li><strong>Anmeldeschluss:</strong> [Datum für Anmeldeschluss]</li>
-                        <li><strong>Bezahlung Gäste:</strong> [Hinweis zur Bezahlung, z.B. bar vor Ort]</li>
+                        <li><strong>Datum:</strong> 18.10.2025, ab 14:00 Uhr</li>
+                        <li><strong>Ort:</strong> Schützenhaus Schönenbuch</li>
+                        <li><strong>Kosten:</strong> Mitglieder gratis. Begleitpersonen: Erwachsene 40 CHF, Kinder 15 CHF.</li>
+                        <li><strong>Programm:</strong> 14:00 Uhr: Begrüssung und Apéro, 15:00 Uhr: gemeinsamer Spaziergang, 18:00 Uhr: Fondue oder Raclette, später Dessertbuffet, Bar und Musik.</li>
+                        <li><strong>Anmeldeschluss:</strong> 09.09.2025</li>
+                        <li><strong>Bezahlung Gäste:</strong> Bar vor Ort</li>
                         <li><strong>Fragen an:</strong> [Ansprechperson], [Kontakt E-Mail/Tel]</li>
                     </ul>
                 </div>
@@ -164,7 +140,7 @@
                                     </label>
                                 </div>
                             </fieldset>
-                            <div id="dessert-details" class="form-section hidden opacity-0 max-h-0 mt-4">
+                            <div id="dessert-details" class="form-section mt-4">
                                 <label for="dessert-was" class="block text-sm font-medium text-gray-700">Was für ein Dessert bringst du mit?</label>
                                 <input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="z.B. Schokoladenkuchen">
                             </div>
@@ -247,7 +223,6 @@
             }
         });
         
-        // Die Variable "firebaseConfig" wird aus der "firebase-config.js" Datei geladen
         const appId = 'fap-jubilaeum-25';
 
         const app = initializeApp(firebaseConfig);
@@ -336,10 +311,10 @@
         function generateICS(data) {
             const event = {
                 title: "Jubiläumsfest Fun Agility People",
-                description: "Wir feiern 25 Jahre! Apéro, Spaziergang, Essen und gemütliches Beisammensein.",
-                location: "Schützenhaus Schönenbuch, [Adresse für Navi]",
-                startTime: "[STARTZEIT_UTC]", 
-                endTime: "[ENDZEIT_UTC]", 
+                description: "Wir feiern 25 Jahre! Programm: 14:00 Uhr: Begrüssung und Apéro, 15:00 Uhr: gemeinsamer Spaziergang, 18:00 Uhr: Fondue oder Raclette, später Dessertbuffet, Bar und Musik.",
+                location: "Schützenhaus Schönenbuch",
+                startTime: "20251018T120000Z", 
+                endTime: "20251018T210000Z", 
             };
             
             let icsMSG = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FunAgilityPeople//NONSGML v1.0//EN\nBEGIN:VEVENT\n";
@@ -376,6 +351,17 @@
         }
 
         function initializeAppLogic() {
+             // Initial check to show dessert details if 'ja' is pre-selected
+            const isAttending = anmeldeFormular.elements.teilnahme.value === 'ja';
+            toggleSection(detailsContainer, isAttending);
+            if (isAttending) {
+                const dessertBeitragJa = anmeldeFormular.querySelector('input[name="dessert-beitrag"][value="ja"]');
+                if (dessertBeitragJa.checked) {
+                    setTimeout(() => toggleSection(dessertDetails, true), 50);
+                }
+            }
+
+
             const dessertsRef = collection(db, `/artifacts/${appId}/public/data/desserts`);
             const q = query(dessertsRef);
             onSnapshot(q, (querySnapshot) => {
