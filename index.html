@@ -6,7 +6,6 @@
     <title>Anmeldung zum 25-jährigen Jubiläum | Fun Agility People</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
-    <!-- Referenz zur separaten Konfigurationsdatei -->
     <script src="firebase-config.js"></script>
     <style>
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
@@ -60,11 +59,6 @@
                     <div>
                         <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
                         <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="Max Mustermann">
-                        
-                    </div>
-                    <div>
-                        <label for="email" class="block text-lg font-semibold text-gray-700 mb-2">Deine E-Mail</label>
-                        <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="max.mustermann@mail.com">
                     </div>
                     <div>
                         <fieldset>
@@ -234,22 +228,32 @@
 
         function attachDynamicEventListeners() {
             const begleitungParent = document.getElementById('begleitung-parent');
-            anmeldeFormular.elements.begleitung.forEach(radio => {
-                radio.addEventListener('change', e => toggleSection(document.getElementById('begleitung-details'), e.target.value === 'ja', begleitungParent));
-            });
-
+            if(anmeldeFormular.elements.begleitung) {
+                 anmeldeFormular.elements.begleitung.forEach(radio => {
+                    radio.addEventListener('change', e => toggleSection(document.getElementById('begleitung-details'), e.target.value === 'ja', begleitungParent));
+                });
+            }
+           
             const essenParent = document.getElementById('essen-parent');
-            document.getElementById('kinder').addEventListener('input', e => {
-                toggleSection(document.getElementById('kinder-essen-details'), parseInt(e.target.value, 10) > 0, essenParent);
-            });
+            const kinderInput = document.getElementById('kinder');
+            if(kinderInput) {
+                kinderInput.addEventListener('input', e => {
+                    toggleSection(document.getElementById('kinder-essen-details'), parseInt(e.target.value, 10) > 0, essenParent);
+                });
+            }
             
             const dessertParent = document.getElementById('dessert-parent');
             const dessertDetails = document.getElementById('dessert-details');
-            anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
-                radio.addEventListener('change', e => toggleSection(dessertDetails, e.target.value === 'ja', dessertParent));
-            });
+            if(anmeldeFormular.elements['dessert-beitrag']) {
+                 anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
+                    radio.addEventListener('change', e => toggleSection(dessertDetails, e.target.value === 'ja', dessertParent));
+                });
+            }
             
-            toggleSection(dessertDetails, true, dessertParent);
+            // Initial state for dessert details
+            if(dessertDetails && anmeldeFormular.elements['dessert-beitrag'].value === 'ja') {
+                toggleSection(dessertDetails, true, dessertParent);
+            }
         }
 
         // --- FIREBASE & SUBMISSION ---
@@ -308,14 +312,17 @@
         }
 
         function showSuccessScreen(data) {
-            document.getElementById('factsheet-content').innerHTML = `
+            let factsheetHTML = `
                 <p><strong>Name:</strong> ${data.name}</p>
                 <p><strong>Teilnahme:</strong> Ja</p>
                 <p><strong>Begleitung:</strong> ${parseInt(data.erwachsene) || 0} Erw., ${parseInt(data.kinder) || 0} Kind(er)</p>
                 <p><strong>Essen:</strong> ${parseInt(data.raclette_erwachsene) || 0}x Raclette Erw., ${parseInt(data.fondue_erwachsene) || 0}x Fondue Erw., ${parseInt(data.raclette_kinder) || 0}x Raclette Kind, ${parseInt(data.fondue_kinder) || 0}x Fondue Kind</p>
                 <p><strong>Dessert:</strong> ${data['dessert-beitrag'] === 'ja' ? (data['dessert-was'] || 'Ja') : 'Nein'}</p>
-                ${data.bemerkungen ? `<p><strong>Bemerkungen:</strong> ${data.bemerkungen}</p>` : ''}
             `;
+            if (data.bemerkungen) {
+                factsheetHTML += `<p><strong>Bemerkungen:</strong> ${data.bemerkungen}</p>`;
+            }
+            document.getElementById('factsheet-content').innerHTML = factsheetHTML;
             document.getElementById('ics-download-link').href = generateICS();
             anmeldungContainer.classList.add('hidden');
             successContainer.classList.remove('hidden');
@@ -335,7 +342,6 @@
 
         // --- APP INITIALIZATION ---
         try {
-            // 'firebaseConfig' wird aus der globalen firebase-config.js Datei geladen
             const app = initializeApp(firebaseConfig); 
             const auth = getAuth(app);
             onAuthStateChanged(auth, (user) => {
