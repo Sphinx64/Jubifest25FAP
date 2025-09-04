@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -14,23 +15,12 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .form-section {
-            transition: all 0.5s ease-in-out;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
             overflow: hidden;
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gray-100">
-
-    <!-- Welcome Popup -->
-    <div id="welcome-popup" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full p-8 text-center relative animate-fade-in-up">
-            <button id="close-popup" class="absolute top-2 right-3 text-3xl text-gray-500 hover:text-gray-800">&times;</button>
-            <h2 class="text-2xl font-bold fap-teal-text mb-4">Herzlich Willkommen!</h2>
-            <p class="text-lg text-gray-700 mb-4">Liebe Mitglieder, liebe Freundinnen und Freunde,</p>
-            <p class="text-gray-600 mb-6">Wir haben einen Grund zu feiern! Unser Verein wird unglaubliche <strong>25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!</p>
-            <button id="continue-to-form" class="fap-teal text-white font-bold py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors">Zur Anmeldung</button>
-        </div>
-    </div>
 
     <!-- Password Gate -->
     <div id="password-gate" class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl p-8 text-center">
@@ -95,7 +85,17 @@
             <p class="text-gray-700 mt-2 text-lg">Schade, dass du nicht dabei sein kannst!</p>
             <p class="text-sm text-gray-500 mt-2">Wir haben deine Abmeldung gespeichert.</p>
         </div>
+    </div>
 
+    <!-- Welcome Popup (initial, but hidden) -->
+    <div id="welcome-popup" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50 flex opacity-0 hidden">
+        <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full p-8 text-center relative animate-fade-in-up">
+            <button id="close-popup" class="absolute top-2 right-3 text-3xl text-gray-500 hover:text-gray-800">&times;</button>
+            <h2 class="text-2xl font-bold fap-teal-text mb-4">Herzlich Willkommen!</h2>
+            <p class="text-lg text-gray-700 mb-4">Liebe Mitglieder, liebe Freundinnen und Freunde,</p>
+            <p class="text-gray-600 mb-6">Wir haben einen Grund zu feiern! Unser Verein wird unglaubliche <strong>25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!</p>
+            <button id="continue-to-form" class="fap-teal text-white font-bold py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors">Zur Anmeldung</button>
+        </div>
     </div>
 
     <script type="module">
@@ -106,6 +106,10 @@
         const CORRECT_PASSWORD = "Agility"; 
         const appId = 'fap-jubilaeum-25';
 
+        const anmeldungenCollectionName = `anmeldungen-${appId}`;
+        const dessertsCollectionName = `desserts-${appId}`;
+
+        // DOM Elements
         const passwordGate = document.getElementById('password-gate');
         const mainContent = document.getElementById('main-content');
         const passwordForm = document.getElementById('password-form');
@@ -117,16 +121,21 @@
         const cancellationContainer = document.getElementById('cancellation-container');
         const validationError = document.getElementById('validation-error');
         const submitButton = document.getElementById('submit-button');
+        const closePopupButton = document.getElementById('close-popup');
+        const continueToFormButton = document.getElementById('continue-to-form');
 
         // --- PASSWORD & POPUP --- 
         passwordForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (document.getElementById('password-input').value === CORRECT_PASSWORD) {
-                passwordGate.classList.add('opacity-0', 'hidden');
+                passwordGate.classList.add('opacity-0');
                 mainContent.classList.remove('hidden');
-                welcomePopup.classList.remove('hidden');
-                welcomePopup.classList.add('flex');
-                setTimeout(() => mainContent.classList.remove('opacity-0'), 50);
+                setTimeout(() => {
+                    passwordGate.classList.add('hidden');
+                    mainContent.classList.remove('opacity-0');
+                    welcomePopup.classList.remove('hidden');
+                    welcomePopup.classList.remove('opacity-0');
+                }, 300);
             } else {
                 document.getElementById('password-error').textContent = 'Falsches Passwort.';
             }
@@ -134,17 +143,17 @@
 
         function closeThePopup() {
             welcomePopup.classList.add('opacity-0');
-            setTimeout(() => { welcomePopup.classList.add('hidden'); welcomePopup.classList.remove('flex'); }, 500);
+            setTimeout(() => { welcomePopup.classList.add('hidden'); }, 500);
         }
-        document.getElementById('close-popup').addEventListener('click', closeThePopup);
-        document.getElementById('continue-to-form').addEventListener('click', closeThePopup);
+        closePopupButton.addEventListener('click', closeThePopup);
+        continueToFormButton.addEventListener('click', closeThePopup);
 
         // --- DYNAMIC FORM --- 
         function toggleSection(element, show, parentToUpdate = null) {
             if (show) {
                 element.classList.remove('hidden');
                 setTimeout(() => {
-                    element.classList.remove('opacity-0', 'max-h-0');
+                    element.classList.remove('opacity-0');
                     element.style.maxHeight = element.scrollHeight + 'px';
                     if (parentToUpdate) updateParentHeight(parentToUpdate);
                 }, 10);
@@ -152,14 +161,16 @@
                 element.style.maxHeight = '0px';
                 element.classList.add('opacity-0');
                 setTimeout(() => {
-                    if (element.style.maxHeight === '0px') element.classList.add('hidden');
+                    if (element.style.maxHeight === '0px') {
+                        element.classList.add('hidden');
+                    }
                     if (parentToUpdate) updateParentHeight(parentToUpdate);
                 }, 500);
             }
         }
 
         function updateParentHeight(parent) {
-             if (parent && parent.style.maxHeight !== '0px') {
+             if (parent && parent.style.maxHeight !== '0px' && parent.style.maxHeight !== null) {
                 setTimeout(() => { parent.style.maxHeight = parent.scrollHeight + 'px'; }, 510);
             }
         }
@@ -167,18 +178,17 @@
         anmeldeFormular.elements.teilnahme.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const isAttending = e.target.value === 'ja';
-                if(isAttending) {
+                if (isAttending && detailsContainer.innerHTML === '') {
                     renderDetailsContainer();
                 }
-                toggleSection(detailsContainer, isAttending, null);
-                 if(!isAttending) {
-                    setTimeout(() => detailsContainer.innerHTML = '', 500);
+                toggleSection(detailsContainer, isAttending);
+                if (!isAttending) {
+                    setTimeout(() => { detailsContainer.innerHTML = ''; }, 500);
                 }
             });
         });
 
         function renderDetailsContainer() {
-            if (detailsContainer.innerHTML !== '') return;
             detailsContainer.innerHTML = `
                 <div class="p-4 bg-gray-50 rounded-lg border" id="begleitung-parent">
                     <fieldset>
@@ -197,7 +207,7 @@
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
                     <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir).</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="1" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="fondue_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Fondue</label><input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
                     <div id="kinder-essen-details" class="form-section hidden opacity-0 max-h-0 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -216,56 +226,53 @@
                         </fieldset>
                         <div id="dessert-details" class="form-section hidden opacity-0 max-h-0 mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
                     </div>
-                    <div class="bg-white rounded-lg border p-4"><h3 class="text-md font-semibold text-center mb-3">Live Dessert-Liste</h3><div id="dessert-liste" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div></div>
+                    <div class="bg-gray-50 rounded-lg border p-4"><h3 class="text-md font-semibold text-center mb-3">Live Dessert-Liste</h3><div id="dessert-liste" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div></div>
                 </div>
                  <div class="p-4 bg-gray-50 rounded-lg border">
                     <label for="bemerkungen" class="block text-md font-semibold text-gray-700 mb-2">Bemerkungen</label>
                     <textarea id="bemerkungen" name="bemerkungen" rows="3" class="w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="Allergien, besondere Wünsche, etc."></textarea>
                 </div>
             `;
-            attachDynamicEventListeners();
+            // Must run after innerHTML is set
+            setTimeout(attachDynamicEventListeners, 0);
         }
 
         function attachDynamicEventListeners() {
             const begleitungParent = document.getElementById('begleitung-parent');
-            if(anmeldeFormular.elements.begleitung) {
-                 anmeldeFormular.elements.begleitung.forEach(radio => {
-                    radio.addEventListener('change', e => toggleSection(document.getElementById('begleitung-details'), e.target.value === 'ja', begleitungParent));
-                });
-            }
-           
+            anmeldeFormular.elements.begleitung.forEach(radio => {
+                radio.addEventListener('change', e => toggleSection(document.getElementById('begleitung-details'), e.target.value === 'ja', begleitungParent));
+            });
+
             const essenParent = document.getElementById('essen-parent');
-            const kinderInput = document.getElementById('kinder');
-            if(kinderInput) {
-                kinderInput.addEventListener('input', e => {
-                    toggleSection(document.getElementById('kinder-essen-details'), parseInt(e.target.value, 10) > 0, essenParent);
-                });
-            }
+            document.getElementById('kinder').addEventListener('input', e => {
+                const hasChildren = parseInt(e.target.value, 10) > 0;
+                toggleSection(document.getElementById('kinder-essen-details'), hasChildren, essenParent);
+            });
             
             const dessertParent = document.getElementById('dessert-parent');
             const dessertDetails = document.getElementById('dessert-details');
-            if(anmeldeFormular.elements['dessert-beitrag']) {
-                 anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
-                    radio.addEventListener('change', e => toggleSection(dessertDetails, e.target.value === 'ja', dessertParent));
-                });
-            }
+            anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
+                radio.addEventListener('change', e => toggleSection(dessertDetails, e.target.value === 'ja', dessertParent));
+            });
             
             // Initial state for dessert details
-            if(dessertDetails && anmeldeFormular.elements['dessert-beitrag'].value === 'ja') {
-                toggleSection(dessertDetails, true, dessertParent);
+            if (anmeldeFormular.elements['dessert-beitrag'].value === 'ja') {
+                 toggleSection(dessertDetails, true, dessertParent);
             }
         }
 
         // --- FIREBASE & SUBMISSION ---
         function initializeAppLogic(firebaseApp) {
             const db = getFirestore(firebaseApp);
-            const dessertsRef = collection(db, `/artifacts/${appId}/public/data/desserts`);
+            const dessertsRef = collection(db, dessertsCollectionName);
+
             onSnapshot(query(dessertsRef), (snapshot) => {
                 const dessertListe = document.getElementById('dessert-liste');
-                if (!dessertListe) return;
+                if (!dessertListe) return; // In case details aren't rendered
                 dessertListe.innerHTML = snapshot.empty ? '<p class="text-xs text-gray-500 text-center">Sei der/die Erste!</p>' : '';
                 snapshot.forEach(doc => {
-                    dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-gray-50 p-2 rounded-md"><span class="font-medium text-gray-800">${doc.data().dessert}</span><span class="text-xs text-gray-500">${doc.data().name}</span></div>`;
+                    const data = doc.data();
+                    dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-white p-2 rounded-md"><span class="font-medium text-gray-800">${data.dessert}</span><span class="text-xs text-gray-500">${data.name}</span></div>`;
                 });
             });
 
@@ -279,31 +286,41 @@
                 const data = Object.fromEntries(formData.entries());
 
                 try {
+                    const anmeldungenRef = collection(db, anmeldungenCollectionName);
+
                     if (data.teilnahme === 'nein') {
-                        await addDoc(collection(db, `/artifacts/${appId}/public/data/anmeldungen`), { name: data.name, teilnahme: 'nein', timestamp: new Date() });
+                        await addDoc(anmeldungenRef, { name: data.name, teilnahme: 'nein', timestamp: new Date() });
                         anmeldungContainer.classList.add('hidden');
                         cancellationContainer.classList.remove('hidden');
                         return;
                     }
 
-                    const teilnehmer = 1 + (parseInt(data.erwachsene) || 0) + (parseInt(data.kinder) || 0);
-                    const essen = (parseInt(data.raclette_erwachsene) || 0) + (parseInt(data.fondue_erwachsene) || 0) + (parseInt(data.raclette_kinder) || 0) + (parseInt(data.fondue_kinder) || 0);
+                    const teilnehmer = 1 + (parseInt(data.erwachsene) || 0);
+                    const kinder = (parseInt(data.kinder) || 0);
+                    const gesamtPersonen = teilnehmer + kinder;
 
-                    if (teilnehmer !== essen) {
-                        throw new Error(`Die Anzahl der Personen (${teilnehmer}) und Essensbestellungen (${essen}) stimmt nicht überein.`);
+                    const essenErwachsene = (parseInt(data.raclette_erwachsene) || 0) + (parseInt(data.fondue_erwachsene) || 0);
+                    const essenKinder = (parseInt(data.raclette_kinder) || 0) + (parseInt(data.fondue_kinder) || 0);
+
+                    if (teilnehmer !== essenErwachsene) {
+                        throw new Error(`Die Anzahl der Erwachsenen (${teilnehmer}) und die Essensbestellungen für Erwachsene (${essenErwachsene}) stimmen nicht überein.`);
+                    }
+                     if (kinder !== essenKinder) {
+                        throw new Error(`Die Anzahl der Kinder (${kinder}) und die Essensbestellungen für Kinder (${essenKinder}) stimmen nicht überein.`);
                     }
                     if (data['dessert-beitrag'] === 'ja' && !data['dessert-was']) {
                         throw new Error('Bitte gib an, welches Dessert du mitbringst.');
                     }
 
-                    const docRef = await addDoc(collection(db, `/artifacts/${appId}/public/data/anmeldungen`), { ...data, timestamp: new Date() });
+                    const docRef = await addDoc(anmeldungenRef, { ...data, timestamp: new Date() });
                     if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
-                        await addDoc(collection(db, `/artifacts/${appId}/public/data/desserts`), { name: data.name, dessert: data['dessert-was'], anmeldungId: docRef.id });
+                        await addDoc(dessertsRef, { name: data.name, dessert: data['dessert-was'], anmeldungId: docRef.id });
                     }
 
                     showSuccessScreen(data);
                 } catch (error) {
-                    validationError.textContent = error.message;
+                    console.error("Submission Error:", error);
+                    validationError.textContent = 'Fehler: ' + error.message;
                     validationError.classList.remove('hidden');
                     submitButton.disabled = false;
                     submitButton.textContent = 'Anmeldung abschicken';
@@ -312,8 +329,8 @@
         }
 
         function showSuccessScreen(data) {
-            let factsheetHTML = `
-                <p><strong>Name:</strong> ${data.name}</p>
+             let factsheetHTML = `
+                <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
                 <p><strong>Teilnahme:</strong> Ja</p>
                 <p><strong>Begleitung:</strong> ${parseInt(data.erwachsene) || 0} Erw., ${parseInt(data.kinder) || 0} Kind(er)</p>
                 <p><strong>Essen:</strong> ${parseInt(data.raclette_erwachsene) || 0}x Raclette Erw., ${parseInt(data.fondue_erwachsene) || 0}x Fondue Erw., ${parseInt(data.raclette_kinder) || 0}x Raclette Kind, ${parseInt(data.fondue_kinder) || 0}x Fondue Kind</p>
@@ -348,11 +365,14 @@
                 if (user) {
                     initializeAppLogic(app);
                 } else {
-                    signInAnonymously(auth).catch(console.error);
+                    signInAnonymously(auth).catch((error) => {
+                         console.error("Anonymous sign-in failed:", error);
+                         alert("Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.");
+                    });
                 }
             });
         } catch (e) {
-            console.error("Firebase initialization failed. Stellen Sie sicher, dass firebase-config.js korrekt geladen wurde und die 'firebaseConfig' Variable enthält.", e);
+            console.error("Firebase initialization failed:", e);
             alert("Fehler bei der Initialisierung der App. Bitte kontaktieren Sie den Administrator.");
         }
 
