@@ -325,6 +325,7 @@
 
         // --- APP INITIALIZATION ---
         try {
+            // 'firebaseConfig' wird aus der globalen firebase-config.js Datei geladen
             const app = initializeApp(firebaseConfig); 
             const auth = getAuth(app);
             onAuthStateChanged(auth, (user) => {
@@ -335,7 +336,7 @@
                 }
             });
         } catch (e) {
-            console.error("Firebase initialization failed: ", e);
+            console.error("Firebase initialization failed. Stellen Sie sicher, dass firebase-config.js korrekt geladen wurde und die 'firebaseConfig' Variable enthält.", e);
             alert("Fehler bei der Initialisierung der App. Bitte kontaktieren Sie den Administrator.");
         }
 
