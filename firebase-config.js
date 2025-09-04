@@ -1,5 +1,5 @@
 const firebaseConfig = {
-    apiKey: "AIzaSyBTbLCLBADWVRWbC9vpA6j...", // Ersetzen Sie dies mit Ihrem echten Firebase API Key
+    apiKey: "AIzaSyBTbLCLBADWVRWbC9vpA6jJ0CN01ANZPAk", // Ersetzen Sie dies mit Ihrem echten Firebase API Key
     authDomain: "fap-jubilaeum-25.firebaseapp.com",
     projectId: "fap-jubilaeum-25",
     storageBucket: "fap-jubilaeum-25.appspot.com",
