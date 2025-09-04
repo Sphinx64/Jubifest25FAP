@@ -13,6 +13,10 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .form-section {
+            transition: all 0.5s ease-in-out;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gray-100">
@@ -136,7 +140,7 @@
         document.getElementById('continue-to-form').addEventListener('click', closeThePopup);
 
         // --- DYNAMIC FORM --- 
-        function toggleSection(element, show, parentToUpdate) {
+        function toggleSection(element, show, parentToUpdate = null) {
             if (show) {
                 element.classList.remove('hidden');
                 setTimeout(() => {
@@ -163,16 +167,18 @@
         anmeldeFormular.elements.teilnahme.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const isAttending = e.target.value === 'ja';
-                renderDetailsContainer(isAttending);
+                if(isAttending) {
+                    renderDetailsContainer();
+                }
                 toggleSection(detailsContainer, isAttending, null);
+                 if(!isAttending) {
+                    setTimeout(() => detailsContainer.innerHTML = '', 500);
+                }
             });
         });
 
-        function renderDetailsContainer(isAttending) {
-            if (!isAttending) {
-                detailsContainer.innerHTML = '';
-                return;
-            }
+        function renderDetailsContainer() {
+            if (detailsContainer.innerHTML !== '') return;
             detailsContainer.innerHTML = `
                 <div class="p-4 bg-gray-50 rounded-lg border" id="begleitung-parent">
                     <fieldset>
@@ -191,7 +197,7 @@
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
                     <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir).</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="1" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="fondue_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Fondue</label><input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
                     <div id="kinder-essen-details" class="form-section hidden opacity-0 max-h-0 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -208,9 +214,9 @@
                                 <label class="flex items-center cursor-pointer"><input type="radio" name="dessert-beitrag" value="nein" class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein, danke.</span></label>
                             </div>
                         </fieldset>
-                        <div id="dessert-details" class="form-section mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
+                        <div id="dessert-details" class="form-section hidden opacity-0 max-h-0 mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
                     </div>
-                    <div class="bg-white rounded-lg border p-4"><h3 class="text-md font-semibold text-center mb-3">Live Dessert-Liste</h3><div id="dessert-liste" class="space-y-2 max-h-32 overflow-y-auto pr-2"><p class="text-center text-gray-500 text-sm">Lade...</p></div></div>
+                    <div class="bg-white rounded-lg border p-4"><h3 class="text-md font-semibold text-center mb-3">Live Dessert-Liste</h3><div id="dessert-liste" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div></div>
                 </div>
             `;
             attachDynamicEventListeners();
@@ -228,12 +234,12 @@
             });
             
             const dessertParent = document.getElementById('dessert-parent');
+            const dessertDetails = document.getElementById('dessert-details');
             anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
-                radio.addEventListener('change', e => toggleSection(document.getElementById('dessert-details'), e.target.value === 'ja', dessertParent));
+                radio.addEventListener('change', e => toggleSection(dessertDetails, e.target.value === 'ja', dessertParent));
             });
-
-            // Immediately open sections if they should be visible by default
-            toggleSection(document.getElementById('dessert-details'), anmeldeFormular.elements['dessert-beitrag'].value === 'ja', dessertParent);
+            
+            toggleSection(dessertDetails, true, dessertParent);
         }
 
         // --- FIREBASE & SUBMISSION ---
@@ -242,14 +248,13 @@
         const db = getFirestore(app);
 
         function initializeAppLogic() {
-            // Live Dessert List
             const dessertsRef = collection(db, `/artifacts/${appId}/public/data/desserts`);
-            const dessertListe = document.getElementById('dessert-liste');
             onSnapshot(query(dessertsRef), (snapshot) => {
+                const dessertListe = document.getElementById('dessert-liste');
                 if (!dessertListe) return;
                 dessertListe.innerHTML = snapshot.empty ? '<p class="text-xs text-gray-500 text-center">Sei der/die Erste!</p>' : '';
                 snapshot.forEach(doc => {
-                    dessertListe.innerHTML += `<div class="text-sm flex justify-between"><span class="font-medium">${doc.data().dessert}</span><span class="text-gray-500">${doc.data().name}</span></div>`;
+                    dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-gray-50 p-2 rounded-md"><span class="font-medium text-gray-800">${doc.data().dessert}</span><span class="text-xs text-gray-500">${doc.data().name}</span></div>`;
                 });
             });
 
@@ -275,6 +280,9 @@
 
                     if (teilnehmer !== essen) {
                         throw new Error(`Die Anzahl der Personen (${teilnehmer}) und Essensbestellungen (${essen}) stimmt nicht überein.`);
+                    }
+                    if (data['dessert-beitrag'] === 'ja' && !data['dessert-was']) {
+                        throw new Error('Bitte gib an, welches Dessert du mitbringst.');
                     }
 
                     const docRef = await addDoc(collection(db, `/artifacts/${appId}/public/data/anmeldungen`), { ...data, timestamp: new Date() });
