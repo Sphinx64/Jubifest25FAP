@@ -6,9 +6,25 @@
     <title>Anmeldung zum 25-jährigen Jubiläum | Fun Agility People</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
+    <!-- Referenz zur separaten Konfigurationsdatei -->
     <script src="firebase-config.js"></script>
+    <style>
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gray-100">
 
     <!-- Welcome Popup -->
     <div id="welcome-popup" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50 hidden">
@@ -27,6 +43,7 @@
         </div>
     </div>
 
+    <!-- Password Gate -->
     <div id="password-gate" class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl p-8 text-center">
         <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Anmeldung zum Jubiläumsfest</h2>
@@ -40,6 +57,7 @@
         </form>
     </div>
 
+    <!-- Main Content -->
     <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden opacity-0">
         <div class="fap-teal text-white p-6 text-center">
             <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
@@ -48,24 +66,112 @@
         </div>
 
         <div id="anmeldung-container" class="p-6 sm:p-10">
-            <div class="bg-gray-50 rounded-lg border mb-8 overflow-hidden">
-                <button type="button" id="eckdaten-toggle" class="w-full text-left p-4 flex justify-between items-center cursor-pointer focus:outline-none">
-                    <h3 class="text-lg font-bold fap-teal-text">Eckdaten & Programm (zum Auf-/Zuklappen klicken)</h3>
-                    <svg id="eckdaten-toggle-icon" class="w-6 h-6 text-gray-600 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div id="eckdaten-details" class="form-section hidden opacity-0 max-h-0 p-4 border-t">
-                     <!-- Details content here -->
-                </div>
-            </div>
-
             <form id="anmelde-formular">
                 <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Deine Anmeldung</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
-                    <!-- Name and Teilnahme fields -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
+                    <div>
+                        <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
+                        <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="Max Mustermann">
+                    </div>
+                    <div>
+                        <fieldset>
+                            <legend class="block text-lg font-semibold text-gray-700 mb-2">Nimmst du teil?</legend>
+                            <div class="flex items-center gap-x-6 h-full">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="teilnahme" value="ja" required class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
+                                    <span class="ml-2 text-gray-800">Ja, ich bin dabei!</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="teilnahme" value="nein" class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
+                                    <span class="ml-2 text-gray-800">Nein, leider nicht.</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </div>
                 </div>
                 
-                <div id="details-container" class="form-section hidden opacity-0 max-h-0 space-y-6">
-                    <!-- Begleitung, Essen, Dessert fields will be here -->
+                <div id="details-container" class="form-section hidden opacity-0 max-h-0 space-y-8">
+                    <!-- Begleitung -->
+                    <div class="p-4 bg-gray-50 rounded-lg border">
+                        <fieldset>
+                            <legend class="block text-md font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
+                            <div class="flex items-center gap-x-6">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="begleitung" value="ja" class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
+                                    <span class="ml-2 text-gray-800">Ja</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
+                                    <span class="ml-2 text-gray-800">Nein</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                        <div id="begleitung-details" class="form-section hidden opacity-0 max-h-0 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="erwachsene" class="block text-sm font-medium text-gray-700">Anzahl zus. Erwachsene</label>
+                                <input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring">
+                            </div>
+                            <div>
+                                <label for="kinder" class="block text-sm font-medium text-gray-700">Anzahl Kinder (bis 14 J.)</label>
+                                <input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Essen -->
+                    <div class="p-4 bg-gray-50 rounded-lg border">
+                        <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
+                        <p class="text-sm text-gray-500 mb-3">Bitte trage die Gesamtzahl der Personen pro Gericht ein (inkl. dir).</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                            <div>
+                                <label for="raclette_erwachsene" class="block text-sm font-medium text-gray-700">Anzahl Erw. für Raclette</label>
+                                <input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring">
+                            </div>
+                            <div>
+                                <label for="fondue_erwachsene" class="block text-sm font-medium text-gray-700">Anzahl Erw. für Fondue</label>
+                                <input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring">
+                            </div>
+                        </div>
+                        <div id="kinder-essen-details" class="form-section hidden opacity-0 max-h-0 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                            <div>
+                                <label for="raclette_kinder" class="block text-sm font-medium text-gray-700">Anzahl Kinder für Raclette</label>
+                                <input type="number" id="raclette_kinder" name="raclette_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring">
+                            </div>
+                            <div>
+                                <label for="fondue_kinder" class="block text-sm font-medium text-gray-700">Anzahl Kinder für Fondue</label>
+                                <input type="number" id="fondue_kinder" name="fondue_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dessert -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="p-4 bg-gray-50 rounded-lg border">
+                            <fieldset>
+                                <legend class="block text-md font-semibold text-gray-700 mb-2">Möchtest du etwas zum Dessertbuffet beitragen?</legend>
+                                <div class="flex items-center gap-x-6">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="dessert-beitrag" value="ja" checked class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
+                                        <span class="ml-2 text-gray-800">Ja, gerne!</span>
+                                    </label>
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="dessert-beitrag" value="nein" class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]">
+                                        <span class="ml-2 text-gray-800">Nein, danke.</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                            <div id="dessert-details" class="form-section mt-4">
+                                <label for="dessert-was" class="block text-sm font-medium text-gray-700">Was für ein Dessert bringst du mit?</label>
+                                <input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="z.B. Schokoladenkuchen">
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg border p-4">
+                             <h3 class="text-md font-semibold text-gray-800 text-center mb-3">Live Dessert-Liste</h3>
+                             <div id="dessert-liste" class="space-y-2 max-h-32 overflow-y-auto pr-2">
+                                <p class="text-center text-gray-500 text-sm">Lade...</p>
+                             </div>
+                        </div>
+                    </div>
                 </div>
 
                  <div id="validation-error" class="hidden text-center p-3 my-4 bg-red-100 text-red-800 rounded-lg text-sm"></div>
@@ -78,7 +184,8 @@
             </form>
         </div>
 
-        <!-- Success and Cancellation containers -->
+        <!-- Success/Cancellation Containers... -->
+
     </div>
 
     <script type="module">
@@ -86,16 +193,27 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // --- CONFIG ---
         const CORRECT_PASSWORD = "Agility"; 
         const appId = 'fap-jubilaeum-25';
 
+        // --- DOM ELEMENTS ---
         const passwordGate = document.getElementById('password-gate');
         const mainContent = document.getElementById('main-content');
         const passwordForm = document.getElementById('password-form');
         const welcomePopup = document.getElementById('welcome-popup');
         const closePopupButton = document.getElementById('close-popup');
         const continueToFormButton = document.getElementById('continue-to-form');
+        const anmeldeFormular = document.getElementById('anmelde-formular');
+        const detailsContainer = document.getElementById('details-container');
+        const begleitungDetails = document.getElementById('begleitung-details');
+        const kinderEssenDetails = document.getElementById('kinder-essen-details');
+        const dessertDetails = document.getElementById('dessert-details');
+        const dessertListe = document.getElementById('dessert-liste');
+        const validationError = document.getElementById('validation-error');
+        const submitButton = document.getElementById('submit-button');
 
+        // --- PASSWORD & POPUP LOGIC ---
         passwordForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (document.getElementById('password-input').value === CORRECT_PASSWORD) {
@@ -119,12 +237,108 @@
                  welcomePopup.classList.remove('flex');
             }, 500);
         }
-
         closePopupButton.addEventListener('click', closeThePopup);
         continueToFormButton.addEventListener('click', closeThePopup);
+
+        // --- DYNAMIC FORM LOGIC ---
+        function toggleSection(element, show) {
+            if (show) {
+                element.classList.remove('hidden');
+                setTimeout(() => {
+                    element.classList.remove('opacity-0', 'max-h-0');
+                    element.style.maxHeight = element.scrollHeight + 'px';
+                }, 10);
+            } else {
+                element.style.maxHeight = '0px';
+                element.classList.add('opacity-0');
+                setTimeout(() => {
+                    if (element.style.maxHeight === '0px') {
+                         element.classList.add('hidden');
+                    }
+                }, 500);
+            }
+        }
         
-        // The rest of your script ...
-        // Make sure to populate the #eckdaten-details and #details-container with the form fields directly in HTML
+        function updateParentHeight(parent) {
+             if (parent && parent.style.maxHeight !== '0px' && parent.style.maxHeight !== '') {
+                setTimeout(() => {
+                    parent.style.maxHeight = parent.scrollHeight + 'px';
+                }, 510); // Wait for child animation to finish
+            }
+        }
+
+        anmeldeFormular.elements.teilnahme.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const isAttending = e.target.value === 'ja';
+                toggleSection(detailsContainer, isAttending);
+            });
+        });
+
+        anmeldeFormular.elements.begleitung.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const showDetails = e.target.value === 'ja';
+                toggleSection(begleitungDetails, showDetails);
+                updateParentHeight(detailsContainer);
+            });
+        });
+        
+        document.getElementById('kinder').addEventListener('input', (e) => {
+            const hasChildren = parseInt(e.target.value, 10) > 0;
+            toggleSection(kinderEssenDetails, hasChildren);
+            updateParentHeight(detailsContainer.querySelector('.p-4.bg-gray-50'));
+        });
+
+        anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const showDetails = e.target.value === 'ja';
+                toggleSection(dessertDetails, showDetails);
+                updateParentHeight(detailsContainer.querySelector('.grid'));
+            });
+        });
+        
+        // --- FIREBASE & SUBMISSION ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function initializeAppLogic() {
+            // Live Dessert List
+            const dessertsRef = collection(db, `/artifacts/${appId}/public/data/desserts`);
+            onSnapshot(query(dessertsRef), (snapshot) => {
+                dessertListe.innerHTML = '';
+                if (snapshot.empty) {
+                    dessertListe.innerHTML = '<p class="text-center text-gray-500 text-sm">Sei der/die Erste!</p>';
+                } else {
+                    snapshot.forEach((doc) => {
+                        const { name, dessert } = doc.data();
+                        dessertListe.innerHTML += `<div class="flex justify-between items-center bg-gray-50 p-2 rounded-md"><span class="text-sm font-medium text-gray-800">${dessert}</span><span class="text-xs text-gray-500">${name}</span></div>`;
+                    });
+                }
+            });
+
+            // Form Submission
+            anmeldeFormular.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                // Validation and saving logic here...
+                // ... (Show success/cancellation message)
+                alert('Formular abgeschickt (simuliert)!');
+            });
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                initializeAppLogic();
+            } else {
+                signInAnonymously(auth).catch((error) => console.error("Anonyme Anmeldung fehlgeschlagen:", error));
+            }
+        });
+
+        // Initial check in case of page reload with form data
+        toggleSection(detailsContainer, anmeldeFormular.elements.teilnahme.value === 'ja');
+        toggleSection(begleitungDetails, anmeldeFormular.elements.begleitung.value === 'ja');
+        toggleSection(kinderEssenDetails, parseInt(document.getElementById('kinder').value, 10) > 0);
+        toggleSection(dessertDetails, anmeldeFormular.elements['dessert-beitrag'].value === 'ja');
+
     </script>
 </body>
 </html>
