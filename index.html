@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -7,6 +6,7 @@
     <title>Anmeldung zum 25-jährigen Jubiläum | Fun Agility People</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
+    <!-- Referenz zur separaten Konfigurationsdatei -->
     <script src="firebase-config.js"></script>
     <style>
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
@@ -18,9 +18,27 @@
             transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
             overflow: hidden;
         }
+        /* Tailwind CSS custom classes */
+        .fap-teal { background-color: #005a6a; }
+        .fap-teal-text { color: #005a6a; }
+        .fap-focus-ring:focus {
+            --tw-ring-color: #005a6a;
+            border-color: #005a6a;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gray-100">
+
+    <!-- Welcome Popup -->
+    <div id="welcome-popup" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full p-8 text-center relative animate-fade-in-up">
+            <button id="close-popup" class="absolute top-2 right-3 text-3xl text-gray-500 hover:text-gray-800">&times;</button>
+            <h2 class="text-2xl font-bold fap-teal-text mb-4">Herzlich Willkommen!</h2>
+            <p class="text-lg text-gray-700 mb-4">Liebe Mitglieder, liebe Freundinnen und Freunde,</p>
+            <p class="text-gray-600 mb-6">Wir haben einen Grund zu feiern! Unser Verein wird unglaubliche <strong>25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!</p>
+            <button id="continue-to-form" class="fap-teal text-white font-bold py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors">Zur Anmeldung</button>
+        </div>
+    </div>
 
     <!-- Password Gate -->
     <div id="password-gate" class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl p-8 text-center">
@@ -45,12 +63,18 @@
         <div id="anmeldung-container" class="p-6 sm:p-10">
             <form id="anmelde-formular">
                 <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Deine Anmeldung</h3>
+                
+                <!-- ANGEPASST: Name und E-Mail nebeneinander, Teilnahme darunter -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
                     <div>
                         <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
                         <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="Max Mustermann">
                     </div>
                     <div>
+                        <label for="email" class="block text-lg font-semibold text-gray-700 mb-2">Deine E-Mail</label>
+                        <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="max.mustermann@mail.com">
+                    </div>
+                    <div class="md:col-span-2">
                         <fieldset>
                             <legend class="block text-lg font-semibold text-gray-700 mb-2">Nimmst du teil?</legend>
                             <div class="flex items-center gap-x-6 h-full">
@@ -87,17 +111,6 @@
         </div>
     </div>
 
-    <!-- Welcome Popup (initial, but hidden) -->
-    <div id="welcome-popup" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50 flex opacity-0 hidden">
-        <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full p-8 text-center relative animate-fade-in-up">
-            <button id="close-popup" class="absolute top-2 right-3 text-3xl text-gray-500 hover:text-gray-800">&times;</button>
-            <h2 class="text-2xl font-bold fap-teal-text mb-4">Herzlich Willkommen!</h2>
-            <p class="text-lg text-gray-700 mb-4">Liebe Mitglieder, liebe Freundinnen und Freunde,</p>
-            <p class="text-gray-600 mb-6">Wir haben einen Grund zu feiern! Unser Verein wird unglaubliche <strong>25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!</p>
-            <button id="continue-to-form" class="fap-teal text-white font-bold py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors">Zur Anmeldung</button>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -105,7 +118,6 @@
 
         const CORRECT_PASSWORD = "Agility"; 
         const appId = 'fap-jubilaeum-25';
-
         const anmeldungenCollectionName = `anmeldungen-${appId}`;
         const dessertsCollectionName = `desserts-${appId}`;
 
@@ -121,21 +133,22 @@
         const cancellationContainer = document.getElementById('cancellation-container');
         const validationError = document.getElementById('validation-error');
         const submitButton = document.getElementById('submit-button');
-        const closePopupButton = document.getElementById('close-popup');
-        const continueToFormButton = document.getElementById('continue-to-form');
 
         // --- PASSWORD & POPUP --- 
         passwordForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (document.getElementById('password-input').value === CORRECT_PASSWORD) {
                 passwordGate.classList.add('opacity-0');
-                mainContent.classList.remove('hidden');
                 setTimeout(() => {
                     passwordGate.classList.add('hidden');
-                    mainContent.classList.remove('opacity-0');
-                    welcomePopup.classList.remove('hidden');
-                    welcomePopup.classList.remove('opacity-0');
-                }, 300);
+                    mainContent.classList.remove('hidden');
+                    setTimeout(() => {
+                        mainContent.classList.remove('opacity-0');
+                        welcomePopup.classList.remove('hidden');
+                        welcomePopup.classList.add('flex');
+                        welcomePopup.classList.remove('opacity-0');
+                    }, 50);
+                }, 500);
             } else {
                 document.getElementById('password-error').textContent = 'Falsches Passwort.';
             }
@@ -143,18 +156,18 @@
 
         function closeThePopup() {
             welcomePopup.classList.add('opacity-0');
-            setTimeout(() => { welcomePopup.classList.add('hidden'); }, 500);
+            setTimeout(() => { welcomePopup.classList.add('hidden'); welcomePopup.classList.remove('flex'); }, 500);
         }
-        closePopupButton.addEventListener('click', closeThePopup);
-        continueToFormButton.addEventListener('click', closeThePopup);
+        document.getElementById('close-popup').addEventListener('click', closeThePopup);
+        document.getElementById('continue-to-form').addEventListener('click', closeThePopup);
 
-        // --- DYNAMIC FORM --- 
-        function toggleSection(element, show, parentToUpdate = null) {
+        // --- DYNAMIC FORM (KORRIGIERT) --- 
+        function toggleSection(element, show, parentToUpdate = null, useMaxHeightHack = false) {
             if (show) {
                 element.classList.remove('hidden');
                 setTimeout(() => {
                     element.classList.remove('opacity-0');
-                    element.style.maxHeight = element.scrollHeight + 'px';
+                    element.style.maxHeight = useMaxHeightHack ? '2000px' : element.scrollHeight + 'px';
                     if (parentToUpdate) updateParentHeight(parentToUpdate);
                 }, 10);
             } else {
@@ -170,7 +183,7 @@
         }
 
         function updateParentHeight(parent) {
-             if (parent && parent.style.maxHeight !== '0px' && parent.style.maxHeight !== null) {
+             if (parent && parent.style.maxHeight !== '0px' && parent.style.maxHeight) {
                 setTimeout(() => { parent.style.maxHeight = parent.scrollHeight + 'px'; }, 510);
             }
         }
@@ -178,10 +191,10 @@
         anmeldeFormular.elements.teilnahme.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const isAttending = e.target.value === 'ja';
-                if (isAttending && detailsContainer.innerHTML === '') {
+                if (isAttending && detailsContainer.innerHTML.trim() === '') {
                     renderDetailsContainer();
                 }
-                toggleSection(detailsContainer, isAttending);
+                toggleSection(detailsContainer, isAttending, null, true); // Hack für den Hauptcontainer
                 if (!isAttending) {
                     setTimeout(() => { detailsContainer.innerHTML = ''; }, 500);
                 }
@@ -233,8 +246,7 @@
                     <textarea id="bemerkungen" name="bemerkungen" rows="3" class="w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="Allergien, besondere Wünsche, etc."></textarea>
                 </div>
             `;
-            // Must run after innerHTML is set
-            setTimeout(attachDynamicEventListeners, 0);
+            attachDynamicEventListeners();
         }
 
         function attachDynamicEventListeners() {
@@ -245,8 +257,7 @@
 
             const essenParent = document.getElementById('essen-parent');
             document.getElementById('kinder').addEventListener('input', e => {
-                const hasChildren = parseInt(e.target.value, 10) > 0;
-                toggleSection(document.getElementById('kinder-essen-details'), hasChildren, essenParent);
+                toggleSection(document.getElementById('kinder-essen-details'), parseInt(e.target.value, 10) > 0, essenParent);
             });
             
             const dessertParent = document.getElementById('dessert-parent');
@@ -268,11 +279,10 @@
 
             onSnapshot(query(dessertsRef), (snapshot) => {
                 const dessertListe = document.getElementById('dessert-liste');
-                if (!dessertListe) return; // In case details aren't rendered
+                if (!dessertListe) return;
                 dessertListe.innerHTML = snapshot.empty ? '<p class="text-xs text-gray-500 text-center">Sei der/die Erste!</p>' : '';
                 snapshot.forEach(doc => {
-                    const data = doc.data();
-                    dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-white p-2 rounded-md"><span class="font-medium text-gray-800">${data.dessert}</span><span class="text-xs text-gray-500">${data.name}</span></div>`;
+                    dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-white p-2 rounded-md"><span class="font-medium text-gray-800">${doc.data().dessert}</span><span class="text-xs text-gray-500">${doc.data().name}</span></div>`;
                 });
             });
 
@@ -289,7 +299,7 @@
                     const anmeldungenRef = collection(db, anmeldungenCollectionName);
 
                     if (data.teilnahme === 'nein') {
-                        await addDoc(anmeldungenRef, { name: data.name, teilnahme: 'nein', timestamp: new Date() });
+                        await addDoc(anmeldungenRef, { name: data.name, email: data.email, teilnahme: 'nein', timestamp: new Date() });
                         anmeldungContainer.classList.add('hidden');
                         cancellationContainer.classList.remove('hidden');
                         return;
@@ -297,20 +307,12 @@
 
                     const teilnehmer = 1 + (parseInt(data.erwachsene) || 0);
                     const kinder = (parseInt(data.kinder) || 0);
-                    const gesamtPersonen = teilnehmer + kinder;
-
                     const essenErwachsene = (parseInt(data.raclette_erwachsene) || 0) + (parseInt(data.fondue_erwachsene) || 0);
                     const essenKinder = (parseInt(data.raclette_kinder) || 0) + (parseInt(data.fondue_kinder) || 0);
 
-                    if (teilnehmer !== essenErwachsene) {
-                        throw new Error(`Die Anzahl der Erwachsenen (${teilnehmer}) und die Essensbestellungen für Erwachsene (${essenErwachsene}) stimmen nicht überein.`);
-                    }
-                     if (kinder !== essenKinder) {
-                        throw new Error(`Die Anzahl der Kinder (${kinder}) und die Essensbestellungen für Kinder (${essenKinder}) stimmen nicht überein.`);
-                    }
-                    if (data['dessert-beitrag'] === 'ja' && !data['dessert-was']) {
-                        throw new Error('Bitte gib an, welches Dessert du mitbringst.');
-                    }
+                    if (teilnehmer !== essenErwachsene) throw new Error(`Anzahl Erwachsene (${teilnehmer}) stimmt nicht mit Essensbestellungen (${essenErwachsene}) überein.`);
+                    if (kinder !== essenKinder) throw new Error(`Anzahl Kinder (${kinder}) stimmt nicht mit Essensbestellungen (${essenKinder}) überein.`);
+                    if (data['dessert-beitrag'] === 'ja' && !data['dessert-was']) throw new Error('Bitte gib an, welches Dessert du mitbringst.');
 
                     const docRef = await addDoc(anmeldungenRef, { ...data, timestamp: new Date() });
                     if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
@@ -319,7 +321,6 @@
 
                     showSuccessScreen(data);
                 } catch (error) {
-                    console.error("Submission Error:", error);
                     validationError.textContent = 'Fehler: ' + error.message;
                     validationError.classList.remove('hidden');
                     submitButton.disabled = false;
@@ -331,6 +332,7 @@
         function showSuccessScreen(data) {
              let factsheetHTML = `
                 <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+                <p><strong>E-Mail:</strong> ${data.email || 'N/A'}</p>
                 <p><strong>Teilnahme:</strong> Ja</p>
                 <p><strong>Begleitung:</strong> ${parseInt(data.erwachsene) || 0} Erw., ${parseInt(data.kinder) || 0} Kind(er)</p>
                 <p><strong>Essen:</strong> ${parseInt(data.raclette_erwachsene) || 0}x Raclette Erw., ${parseInt(data.fondue_erwachsene) || 0}x Fondue Erw., ${parseInt(data.raclette_kinder) || 0}x Raclette Kind, ${parseInt(data.fondue_kinder) || 0}x Fondue Kind</p>
@@ -366,8 +368,8 @@
                     initializeAppLogic(app);
                 } else {
                     signInAnonymously(auth).catch((error) => {
-                         console.error("Anonymous sign-in failed:", error);
-                         alert("Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.");
+                        console.error("Anonymous sign-in failed:", error);
+                        alert("Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.");
                     });
                 }
             });
@@ -379,3 +381,4 @@
     </script>
 </body>
 </html>
+
