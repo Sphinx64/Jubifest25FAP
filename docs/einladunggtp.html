@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Einladung – 25 Jahre Fun Agility People</title>
+  <script src="../event-config.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fdfdfd;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    header {
+      background: #005f6b; /* Vereinsblau */
+      color: white;
+      text-align: center;
+      padding: 3rem 1rem;
+      border-radius: 0 0 20px 20px;
+    }
+    header img {
+      max-height: 90px;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
+    h2 {
+      color: #005f6b;
+      margin-bottom: 1rem;
+    }
+    main {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+      text-align: center;
+    }
+    section {
+      margin-bottom: 2.5rem;
+    }
+    .programm ul, .kosten ul {
+      list-style: none;
+      padding: 0;
+    }
+    .programm li, .kosten li {
+      margin: 0.4rem 0;
+    }
+    .intro {
+      font-size: 1.2rem;
+      margin: 1.5rem 0;
+    }
+    .button-print {
+      background: #005f6b;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .button-print:hover {
+      background: #004352;
+    }
+    footer {
+      background: #f1f1f1;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Fun Agility People Logo">
+    <h1 id="title"></h1>
+    <p id="subtitle"></p>
+  </header>
+
+  <main>
+    <section class="intro">
+      <p>Liebes Vereinsmitglied, liebe Freunde</p>
+      <p>Wir freuen uns, dich zu unserem <strong>25-jährigen Jubiläum</strong> einzuladen! Gemeinsam wollen wir feiern, erinnern und einen unvergesslichen Tag verbringen.</p>
+    </section>
+
+    <section>
+      <h2>Wann & Wo</h2>
+      <p><strong id="datetime"></strong></p>
+      <p id="location"></p>
+      <p><a id="mapslink" href="#" target="_blank">📍 Google Maps öffnen</a></p>
+    </section>
+
+    <section class="programm">
+      <h2>Ablauf</h2>
+      <ul id="programm"></ul>
+    </section>
+
+    <section>
+      <h2>Anmeldung</h2>
+      <p>Bitte bis <strong id="deadline"></strong> anmelden:</p>
+      <p><a id="anmeldelink" href="#" target="_blank">👉 Zur Anmeldung</a></p>
+      <div>
+        <img id="qrcode" src="" alt="QR-Code zur Anmeldung">
+      </div>
+    </section>
+
+    <section class="kosten">
+      <h2>Kosten</h2>
+      <ul>
+        <li id="members"></li>
+        <li id="adults"></li>
+        <li id="children"></li>
+      </ul>
+      <p id="payment"></p>
+    </section>
+
+    <section>
+      <h2>Kontakt</h2>
+      <p id="contact"></p>
+    </section>
+
+    <div>
+      <button class="button-print" onclick="window.print()">📄 Einladung drucken</button>
+    </div>
+  </main>
+
+  <footer>
+    <p>Fun Agility People · Wir freuen uns auf Euch!</p>
+  </footer>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const e = eventConfig;
+      document.getElementById('title').textContent = e.event.title;
+      document.getElementById('subtitle').textContent = e.event.description;
+      document.getElementById('datetime').textContent = `${e.datetime.date} · ab ${e.datetime.startTime}`;
+      document.getElementById('location').textContent = e.location.fullName;
+      document.getElementById('mapslink').href = e.location.googleMapsLink;
+
+      const ul = document.getElementById('programm');
+      e.program.forEach(p => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${p.time}</strong> – ${p.activity}`;
+        ul.appendChild(li);
+      });
+
+      document.getElementById('deadline').textContent = e.registration.deadline;
+      document.getElementById('anmeldelink').href = e.registration.url;
+      document.getElementById('qrcode').src = e.registration.qrCodeUrl;
+
+      document.getElementById('members').textContent = `Mitglieder: ${e.pricing.members} (${e.pricing.membersNote})`;
+      document.getElementById('adults').textContent = `Erwachsene: ${e.pricing.adultsPrice}`;
+      document.getElementById('children').textContent = `Kinder ${e.pricing.childrenAgeLimit}: ${e.pricing.childrenPrice}`;
+      document.getElementById('payment').textContent = `Zahlung: ${e.pricing.paymentMethods}`;
+
+      document.getElementById('contact').textContent = `${e.contact.name} · ${e.contact.phone}`;
+    });
+  </script>
+</body>
+</html>
