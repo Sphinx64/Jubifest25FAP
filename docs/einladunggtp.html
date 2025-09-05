@@ -6,6 +6,10 @@
   <title>Einladung – 25 Jahre Fun Agility People</title>
   <script src="../event-config.js"></script>
   <style>
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
     body {
       font-family: Arial, sans-serif;
       background: #fdfdfd;
@@ -15,14 +19,14 @@
       line-height: 1.6;
     }
     header {
-      background: #005f6b; /* Vereinsblau */
+      background: #005f6b;
       color: white;
       text-align: center;
-      padding: 3rem 1rem;
-      border-radius: 0 0 20px 20px;
+      padding: 2rem 1rem;
+      
     }
     header img {
-      max-height: 90px;
+      max-height: 80px;
       margin-bottom: 1rem;
     }
     h1 {
@@ -31,27 +35,55 @@
     }
     h2 {
       color: #005f6b;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 3px solid #005f6b;
+      padding-bottom: 0.2rem;
     }
     main {
-      max-width: 800px;
+      max-width: 1000px;
       margin: auto;
       padding: 2rem;
-      text-align: center;
-    }
-    section {
-      margin-bottom: 2.5rem;
-    }
-    .programm ul, .kosten ul {
-      list-style: none;
-      padding: 0;
-    }
-    .programm li, .kosten li {
-      margin: 0.4rem 0;
     }
     .intro {
       font-size: 1.2rem;
       margin: 1.5rem 0;
+      text-align: center;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      margin: 0.3rem 0;
+    }
+    .center {
+      text-align: center;
+    }
+    .map-container {
+      margin-top: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    iframe {
+      width: 100%;
+      height: 300px;
+      border: 0;
     }
     .button-print {
       background: #005f6b;
@@ -61,6 +93,8 @@
       font-size: 1.1rem;
       border-radius: 8px;
       cursor: pointer;
+      display: block;
+      margin: 2rem auto;
     }
     .button-print:hover {
       background: #004352;
@@ -70,6 +104,10 @@
       text-align: center;
       padding: 1rem;
       font-size: 0.9rem;
+    }
+    @media print {
+      .button-print { display: none; }
+      section { box-shadow: none; border: 1px solid #ccc; }
     }
   </style>
 </head>
@@ -83,48 +121,44 @@
   <main>
     <section class="intro">
       <p>Liebes Vereinsmitglied, liebe Freunde</p>
-      <p>Wir freuen uns, dich zu unserem <strong>25-jährigen Jubiläum</strong> einzuladen! Gemeinsam wollen wir feiern, erinnern und einen unvergesslichen Tag verbringen.</p>
+      <p>Wir freuen uns, dich zu unserem <strong>25-jährigen Jubiläum</strong> einzuladen! Gemeinsam wollen wir feiern, erinnern und ein unvergessliches Fest verbringen.</p>
     </section>
 
-    <section>
-      <h2>Wann & Wo</h2>
-      <p><strong id="datetime"></strong></p>
-      <p id="location"></p>
-      <p><a id="mapslink" href="#" target="_blank">📍 Google Maps öffnen</a></p>
-    </section>
+    <div class="grid">
+      <section>
+        <h2>Wann & Wo</h2>
+        <p><strong id="datetime"></strong></p>
+        <p id="location"></p>
+        <div class="map-container">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11267.409694397285!2d7.51124480147484!3d47.5313719243814!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4791bf45c4ad2baf%3A0xcd59e1773464a61f!2sSch%C3%BCtzenhaus!5e0!3m2!1sde!2sch!4v1757111884720!5m2!1sde!2sch" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
 
-    <section class="programm">
-      <h2>Ablauf</h2>
-      <ul id="programm"></ul>
-    </section>
+        <h2>Ablauf</h2>
+        <ul id="programm"></ul>
+      </section>
 
-    <section>
-      <h2>Anmeldung</h2>
-      <p>Bitte bis <strong id="deadline"></strong> anmelden:</p>
-      <p><a id="anmeldelink" href="#" target="_blank">👉 Zur Anmeldung</a></p>
-      <div>
-        <img id="qrcode" src="" alt="QR-Code zur Anmeldung">
-      </div>
-    </section>
+      <section>
+        <h2>Anmeldung</h2>
+        <p>Bitte bis <strong id="deadline"></strong> anmelden:</p>
+        <p><a id="anmeldelink" href="#" target="_blank">👉 Zur Anmeldung</a></p>
+        <div class="center">
+          <img id="qrcode" src="" alt="QR-Code zur Anmeldung">
+        </div>
 
-    <section class="kosten">
-      <h2>Kosten</h2>
-      <ul>
-        <li id="members"></li>
-        <li id="adults"></li>
-        <li id="children"></li>
-      </ul>
-      <p id="payment"></p>
-    </section>
+        <h2>Kosten</h2>
+        <ul>
+          <li id="members"></li>
+          <li id="adults"></li>
+          <li id="children"></li>
+        </ul>
+        <p id="payment"></p>
 
-    <section>
-      <h2>Kontakt</h2>
-      <p id="contact"></p>
-    </section>
-
-    <div>
-      <button class="button-print" onclick="window.print()">📄 Einladung drucken</button>
+        <h2>Kontakt</h2>
+        <p id="contact"></p>
+      </section>
     </div>
+
+    <button class="button-print" onclick="window.print()">📄 Einladung drucken</button>
   </main>
 
   <footer>
