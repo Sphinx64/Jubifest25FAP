@@ -157,27 +157,7 @@
 
         // --- DYNAMIC FORM (REVISED FOR SMOOTH RESIZING) --- 
         function toggleSection(element, show) {
-            if (show) {
-                element.classList.remove('hidden');
-                setTimeout(() => {
-                    element.classList.remove('opacity-0');
-                    element.style.maxHeight = element.scrollHeight + 'px';
-                }, 10);
-            } else {
-                element.style.maxHeight = '0px';
-                element.classList.add('opacity-0');
-                setTimeout(() => {
-                    // Only hide it if it's still closed, to prevent race conditions
-                    if (element.style.maxHeight === '0px') {
-                        element.classList.add('hidden');
-                    }
-                }, 500); // Wait for transition to finish
-            }
-        }
-        
-        // This new helper function recalculates the main container's height
-        function updateDetailsContainerHeight() {
-            // Only update if the container is actually visible
+// ... existing code ... -->
             if (detailsContainer.style.maxHeight && detailsContainer.style.maxHeight !== '0px') {
                 detailsContainer.style.maxHeight = detailsContainer.scrollHeight + 'px';
             }
@@ -186,12 +166,30 @@
         anmeldeFormular.elements.teilnahme.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const isAttending = e.target.value === 'ja';
-                if (isAttending && detailsContainer.innerHTML.trim() === '') {
-                    renderDetailsContainer();
-                }
-                toggleSection(detailsContainer, isAttending);
-                if (!isAttending) {
-                    // Clear content after hiding animation
+
+                if (isAttending) {
+                    // Render content ONLY if it's not already there.
+                    if (detailsContainer.innerHTML.trim() === '') {
+                        renderDetailsContainer();
+                        // IMPORTANT FIX: Wait for the browser to render the new HTML
+                        // before we try to animate any heights.
+                        setTimeout(() => {
+                            // First, open the inner sections that should be visible by default
+                            const dessertDetails = document.getElementById('dessert-details');
+                            if(anmeldeFormular.elements['dessert-beitrag'].value === 'ja') {
+                                toggleSection(dessertDetails, true);
+                            }
+                            // NOW, open the main container. It will have the correct full height.
+                            toggleSection(detailsContainer, true);
+                        }, 20); // A tiny delay is enough for the browser to catch up.
+                    } else {
+                         // If content is already there, just open it.
+                         toggleSection(detailsContainer, true);
+                    }
+                } else {
+                    // If switching to "Nein", start the hiding animation.
+                    toggleSection(detailsContainer, false);
+                    // Clear content after hiding animation is complete.
                     setTimeout(() => { detailsContainer.innerHTML = ''; }, 500);
                 }
             });
@@ -267,8 +265,8 @@
                 });
             });
             
-            // Initial state for dessert details when form is first rendered
-            toggleSection(dessertDetails, anmeldeFormular.elements['dessert-beitrag'].value === 'ja');
+            // REMOVED: The initial state is now set in the 'teilnahme' event listener
+            // to avoid the race condition.
         }
 
         // --- FIREBASE & SUBMISSION ---
@@ -383,5 +381,6 @@
     </script>
 </body>
 </html>
+
 
 
