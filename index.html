@@ -78,33 +78,29 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gray-100">
 
-    <!-- Welcome Popup -->
-    <div id="welcome-popup" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full p-8 text-center relative animate-fade-in-up">
-            <button id="close-popup" class="absolute top-2 right-3 text-3xl text-gray-500 hover:text-gray-800">&times;</button>
-            <h2 class="text-2xl font-bold fap-teal-text mb-4">Herzlich Willkommen!</h2>
-            <p class="text-lg text-gray-700 mb-4">Liebe Mitglieder, liebe Freundinnen und Freunde,</p>
-            <p class="text-gray-600 mb-6">Wir haben einen Grund zu feiern! Unser Verein wird <strong>stolze 25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!</p>
-            <button id="continue-to-form" class="fap-teal text-white font-bold py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors">Zur Anmeldung</button>
+    <!-- Password Gate (Now with integrated Welcome Message) -->
+    <div id="password-gate" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <div class="fap-teal text-white p-6 text-center">
+            <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
+            <h1 class="text-3xl sm:text-4xl font-bold">Willkommen zur Anmeldung!</h1>
+            <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
+        </div>
+        <div class="p-8 text-center">
+            <img src="logo_blau.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
+            <p class="text-lg text-gray-700 mb-4">Unser Verein wird <strong>stolze 25 Jahre</strong> alt. Das möchten wir gebührend mit euch feiern!</p>
+            <p class="text-gray-600 mb-6">Bitte gib das Passwort aus der Einladung ein, um fortzufahren.</p>
+            <form id="password-form" class="max-w-xs mx-auto">
+                <input type="password" id="password-input" placeholder="Passwort" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring mb-4 text-center">
+                <button type="submit" class="w-full fap-teal text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 transition-colors">Anmeldung starten</button>
+                <p id="password-error" class="text-red-500 text-sm mt-3 h-4"></p>
+            </form>
         </div>
     </div>
 
-    <!-- Password Gate -->
-    <div id="password-gate" class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl p-8 text-center">
-        <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">Anmeldung zum Jubiläumsfest</h2>
-        <p class="text-gray-600 mb-6">Bitte gib das Passwort ein, um fortzufahren.</p>
-        <form id="password-form">
-            <input type="password" id="password-input" placeholder="Passwort" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring mb-4 text-center">
-            <button type="submit" class="w-full fap-teal text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 transition-colors">Zugang</button>
-            <p id="password-error" class="text-red-500 text-sm mt-3 h-4"></p>
-        </form>
-    </div>
-
-    <!-- Main Content -->
-    <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden opacity-0">
+    <!-- Main Content (Form) -->
+    <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden">
         <div class="fap-teal text-white p-6 text-center">
-            <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
+            <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
             <h1 class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
             <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
         </div>
@@ -158,9 +154,9 @@
                             <!-- Companions section, shown conditionally -->
                             <div id="companions-container" class="sub-section-container">
                                 <div class="sub-section-content">
-                                     <div class="mt-6 p-4 bg-gray-50 rounded-lg border">
+                                     <div class="mt-2">
                                         <fieldset>
-                                            <legend class="block text-md font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
+                                            <legend class="block text-lg font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
                                             <div class="flex items-center gap-x-6">
                                                 <label class="flex items-center cursor-pointer"><input type="radio" name="begleitung" value="ja" class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Ja</span></label>
                                                 <label class="flex items-center cursor-pointer"><input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein</span></label>
@@ -241,7 +237,6 @@
         const passwordGate = document.getElementById('password-gate');
         const mainContent = document.getElementById('main-content');
         const passwordForm = document.getElementById('password-form');
-        const welcomePopup = document.getElementById('welcome-popup');
         const anmeldeFormular = document.getElementById('anmelde-formular');
         const anmeldungContainer = document.getElementById('anmeldung-container');
         const successContainer = document.getElementById('success-container');
@@ -254,26 +249,20 @@
         passwordForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (document.getElementById('password-input').value === CORRECT_PASSWORD) {
-                passwordGate.classList.add('opacity-0');
+                // Fade out password gate
+                passwordGate.style.transition = 'opacity 0.5s';
+                passwordGate.style.opacity = '0';
+                
                 setTimeout(() => {
                     passwordGate.classList.add('hidden');
+                    // Show main content and fade it in
                     mainContent.classList.remove('hidden');
-                    setTimeout(() => {
-                        mainContent.classList.remove('opacity-0');
-                        welcomePopup.classList.remove('hidden');
-                        welcomePopup.classList.add('flex');
-                    }, 50);
+                    setTimeout(() => mainContent.style.opacity = '1', 20);
                 }, 500);
             } else {
                 document.getElementById('password-error').textContent = 'Falsches Passwort.';
             }
         });
-        function closeThePopup() {
-            welcomePopup.classList.add('opacity-0');
-            setTimeout(() => { welcomePopup.classList.add('hidden'); welcomePopup.classList.remove('flex'); }, 500);
-        }
-        document.getElementById('close-popup').addEventListener('click', closeThePopup);
-        document.getElementById('continue-to-form').addEventListener('click', closeThePopup);
 
         // --- MULTI-STEP LOGIC ---
         function goToStep(stepNumber) {
@@ -312,11 +301,9 @@
 
             if (teilnahme === 'ja') {
                 const step2Container = document.querySelector('[data-step="2"] .space-y-8');
-                // Always re-render step 2 to ensure data is fresh
                 renderStep2Details(step2Container);
                 goToStep(2);
             } else {
-                // Handle "no" case immediately
                 submitCancellation(name, email);
             }
         });
@@ -325,7 +312,6 @@
             goToStep(1);
         });
 
-        // Event listener for participation radio buttons
         anmeldeFormular.elements.teilnahme.forEach(radio => {
             radio.addEventListener('change', e => {
                 const companionsContainer = document.getElementById('companions-container');
@@ -333,7 +319,6 @@
             });
         });
 
-        // Event listener for companions radio buttons (inside step 1)
         anmeldeFormular.addEventListener('change', e => {
             if (e.target.name === 'begleitung') {
                 document.getElementById('begleitung-details').classList.toggle('hidden', e.target.value !== 'ja');
@@ -376,11 +361,9 @@
         }
 
         function attachStep2EventListeners() {
-            // Show/hide children food section based on number of children from step 1
             const kinderCount = parseInt(anmeldeFormular.elements.kinder.value, 10) || 0;
             document.getElementById('kinder-essen-details').classList.toggle('hidden', kinderCount <= 0);
 
-            // Listener for dessert contribution
             anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
                 radio.addEventListener('change', e => document.getElementById('dessert-details').classList.toggle('hidden', e.target.value !== 'ja'));
             });
