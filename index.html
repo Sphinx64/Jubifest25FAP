@@ -6,8 +6,20 @@
     <title>Anmeldung zum 25-jährigen Jubiläum | Fun Agility People</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
-    <!-- Referenz zur separaten Konfigurationsdatei -->
-    <script src="firebase-config.js"></script>
+    
+    <!-- Die Firebase-Konfiguration wird hier direkt eingefügt -->
+    <!-- Die Werte werden automatisch durch den GitHub Actions Workflow ersetzt -->
+    <script>
+      const firebaseConfig = {
+        apiKey: "${{ secrets.FIREBASE_API_KEY }}",
+        authDomain: "${{ vars.FIREBASE_AUTH_DOMAIN }}",
+        projectId: "${{ vars.FIREBASE_PROJECT_ID }}",
+        storageBucket: "${{ vars.FIREBASE_STORAGE_BUCKET }}",
+        messagingSenderId: "${{ vars.FIREBASE_MESSAGING_SENDER_ID }}",
+        appId: "${{ vars.FIREBASE_APP_ID }}"
+      };
+    </script>
+    
     <style>
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
         @keyframes fadeInUp {
@@ -17,13 +29,6 @@
         .form-section {
             transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
             overflow: hidden;
-        }
-        /* Tailwind CSS custom classes */
-        .fap-teal { background-color: #005a6a; }
-        .fap-teal-text { color: #005a6a; }
-        .fap-focus-ring:focus {
-            --tw-ring-color: #005a6a;
-            border-color: #005a6a;
         }
     </style>
 </head>
@@ -35,14 +40,14 @@
             <button id="close-popup" class="absolute top-2 right-3 text-3xl text-gray-500 hover:text-gray-800">&times;</button>
             <h2 class="text-2xl font-bold fap-teal-text mb-4">Herzlich Willkommen!</h2>
             <p class="text-lg text-gray-700 mb-4">Liebe Mitglieder, liebe Freundinnen und Freunde,</p>
-            <p class="text-gray-600 mb-6">Wir haben einen Grund zu feiern! Unser Verein wird unglaubliche <strong>25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!</p>
+            <p class="text-gray-600 mb-6">Wir haben einen Grund zu feiern! Unser Verein wird <strong>stolze 25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!</p>
             <button id="continue-to-form" class="fap-teal text-white font-bold py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors">Zur Anmeldung</button>
         </div>
     </div>
 
     <!-- Password Gate -->
     <div id="password-gate" class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl p-8 text-center">
-        <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
+        <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Anmeldung zum Jubiläumsfest</h2>
         <p class="text-gray-600 mb-6">Bitte gib das Passwort ein, um fortzufahren.</p>
         <form id="password-form">
@@ -55,7 +60,7 @@
     <!-- Main Content -->
     <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden opacity-0">
         <div class="fap-teal text-white p-6 text-center">
-            <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
+            <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
             <h1 class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
             <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
         </div>
@@ -64,7 +69,6 @@
             <form id="anmelde-formular">
                 <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Deine Anmeldung</h3>
                 
-                <!-- ANGEPASST: Name und E-Mail nebeneinander, Teilnahme darunter -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
                     <div>
                         <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
@@ -116,6 +120,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // This password check happens client-side. It's not for high security, but to prevent random visitors.
         const CORRECT_PASSWORD = "Agility"; 
         const appId = 'fap-jubilaeum-25';
         const anmeldungenCollectionName = `anmeldungen-${appId}`;
@@ -161,7 +166,7 @@
         document.getElementById('close-popup').addEventListener('click', closeThePopup);
         document.getElementById('continue-to-form').addEventListener('click', closeThePopup);
 
-        // --- DYNAMIC FORM (KORRIGIERT) --- 
+        // --- DYNAMIC FORM --- 
         function toggleSection(element, show, parentToUpdate = null, useMaxHeightHack = false) {
             if (show) {
                 element.classList.remove('hidden');
@@ -174,9 +179,7 @@
                 element.style.maxHeight = '0px';
                 element.classList.add('opacity-0');
                 setTimeout(() => {
-                    if (element.style.maxHeight === '0px') {
-                        element.classList.add('hidden');
-                    }
+                    if (element.style.maxHeight === '0px') element.classList.add('hidden');
                     if (parentToUpdate) updateParentHeight(parentToUpdate);
                 }, 500);
             }
@@ -194,7 +197,7 @@
                 if (isAttending && detailsContainer.innerHTML.trim() === '') {
                     renderDetailsContainer();
                 }
-                toggleSection(detailsContainer, isAttending, null, true); // Hack für den Hauptcontainer
+                toggleSection(detailsContainer, isAttending, null, true);
                 if (!isAttending) {
                     setTimeout(() => { detailsContainer.innerHTML = ''; }, 500);
                 }
@@ -266,7 +269,6 @@
                 radio.addEventListener('change', e => toggleSection(dessertDetails, e.target.value === 'ja', dessertParent));
             });
             
-            // Initial state for dessert details
             if (anmeldeFormular.elements['dessert-beitrag'].value === 'ja') {
                  toggleSection(dessertDetails, true, dessertParent);
             }
@@ -352,8 +354,8 @@
                 title: "Jubiläumsfest Fun Agility People",
                 description: "25 Jahre FAP! Apéro, Spaziergang, Essen und gemütliches Beisammensein.",
                 location: "Schützenhaus Schönenbuch",
-                startTime: "20251018T120000Z",
-                endTime: "20251018T220000Z",
+                startTime: "20251018T120000Z", // 14:00 in CEST (UTC+2)
+                endTime: "20251018T200000Z",   // 22:00 in CEST (UTC+2)
             };
             const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FunAgilityPeople//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:${Date.now()}@fun-agility-people.ch\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}\nDTSTART:${event.startTime}\nDTEND:${event.endTime}\nSUMMARY:${event.title}\nDESCRIPTION:${event.description}\nLOCATION:${event.location}\nEND:VEVENT\nEND:VCALENDAR`;
             return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
@@ -361,6 +363,10 @@
 
         // --- APP INITIALIZATION ---
         try {
+            // Check if firebaseConfig is populated. If not, it means the GitHub Action hasn't run.
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("secrets.FIREBASE")) {
+                 throw new Error("Firebase config is not correctly loaded.");
+            }
             const app = initializeApp(firebaseConfig); 
             const auth = getAuth(app);
             onAuthStateChanged(auth, (user) => {
@@ -369,16 +375,14 @@
                 } else {
                     signInAnonymously(auth).catch((error) => {
                         console.error("Anonymous sign-in failed:", error);
-                        alert("Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.");
+                        document.body.innerHTML = '<div class="text-center p-8">Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.</div>';
                     });
                 }
             });
         } catch (e) {
             console.error("Firebase initialization failed:", e);
-            alert("Fehler bei der Initialisierung der App. Bitte kontaktieren Sie den Administrator.");
+            document.body.innerHTML = '<div class="text-center p-8">Fehler bei der Initialisierung der App. Bitte kontaktieren Sie den Administrator.</div>';
         }
-
     </script>
 </body>
 </html>
-
