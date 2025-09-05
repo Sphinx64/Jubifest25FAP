@@ -1,8 +1,8 @@
 // =================================================================
-// ZENTRALE KONFIGURATION - JUBILÄUMSFEST 25 JAHRE FAP
+// 📁 DATEI 1: event-config.js (Root-Verzeichnis)
+// 📁 DATEI 2: functions/event-config.js
 // =================================================================
-// Hier kannst du alle wichtigen Daten zentral verwalten.
-// Änderungen hier werden automatisch überall übernommen!
+// BEIDE Dateien müssen identisch sein!
 
 const eventConfig = {
     // === GRUNDLEGENDE EVENT-DATEN ===
@@ -40,9 +40,11 @@ const eventConfig = {
     registration: {
         deadline: "Dienstag, 9. September 2025",
         shortDeadline: "09.09.2025",
-        url: "https://fap-jubilaeum-25.web.app/",
+        // ✅ KORRIGIERT: GitHub Pages URL (deine aktuelle URL)
+        url: "https://sphinx64.github.io/Jubifest25FAP",
         password: "Agility",
-        qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://fap-jubilaeum-25.web.app/"
+        // ✅ KORRIGIERT: QR-Code mit GitHub Pages URL
+        qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://sphinx64.github.io/Jubifest25FAP/"
     },
 
     // === PREISE ===
