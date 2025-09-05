@@ -9,9 +9,17 @@ match /anmeldungen-fap-jubilaeum-25/{docId} {
   // aber nur, wenn der Benutzer authentifiziert ist (was durch signInAnonymously geschieht).
   allow create: if request.auth != null;
   
-  // VERBOTEN: Das Lesen, Ändern oder Löschen von Anmeldungen.
-  // Das schützt die Daten der Mitglieder.
-  allow read, update, delete: if false;
+  // ERLAUBT: Das Lesen eines einzelnen Dokuments für authentifizierte Benutzer
+  // Das ist notwendig für die Bearbeitungsfunktion über den Link
+  allow get: if request.auth != null;
+  
+  // ERLAUBT: Das Aktualisieren eines Dokuments für authentifizierte Benutzer
+  // Das ist notwendig für die Bearbeitungsfunktion
+  allow update: if request.auth != null;
+  
+  // VERBOTEN: Das Listen aller Anmeldungen und das Löschen von Anmeldungen.
+  // Das schützt die Daten der Mitglieder vor unbefugtem Zugriff.
+  allow list, delete: if false;
 }
 
 // Regeln für die Dessert-Liste
