@@ -16,7 +16,6 @@ const SHEET_NAME = "Anmeldungen";
  */
 async function appendToSheet(data, docId) {
     // Create a Google Auth client using Application Default Credentials
-    // This automatically uses the function's runtime service account.
     const auth = new google.auth.GoogleAuth({
         scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
@@ -43,7 +42,8 @@ async function appendToSheet(data, docId) {
     try {
         await sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
-            range: `${SHEET_NAME}!A1`,
+            // Corrected Range: Just the sheet name. Append will find the next empty row.
+            range: SHEET_NAME, 
             valueInputOption: "USER_ENTERED",
             resource: {
                 values: [row],
@@ -51,7 +51,9 @@ async function appendToSheet(data, docId) {
         });
         console.log("Successfully appended data to Google Sheet.");
     } catch (err) {
-        console.error("Error appending data to Google Sheet:", err);
+        console.error("Error appending data to Google Sheet:", err.message);
+        // Log the full error for better debugging
+        console.error(err);
     }
 }
 
