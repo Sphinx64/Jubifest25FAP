@@ -28,13 +28,14 @@ jobs:
 
       - name: Replace Firebase Config Placeholders ⚙️
         run: |
-          # Use a different delimiter for sed, like |, to avoid issues with special characters in secrets
-          sed -i 's|"${{ secrets.FIREBASE_API_KEY }}"|"${{ secrets.FIREBASE_API_KEY }}"|g' index.html
-          sed -i 's|"${{ vars.FIREBASE_AUTH_DOMAIN }}"|"${{ vars.FIREBASE_AUTH_DOMAIN }}"|g' index.html
-          sed -i 's|"${{ vars.FIREBASE_PROJECT_ID }}"|"${{ vars.FIREBASE_PROJECT_ID }}"|g' index.html
-          sed -i 's|"${{ vars.FIREBASE_STORAGE_BUCKET }}"|"${{ vars.FIREBASE_STORAGE_BUCKET }}"|g' index.html
-          sed -i 's|"${{ vars.FIREBASE_MESSAGING_SENDER_ID }}"|"${{ vars.FIREBASE_MESSAGING_SENDER_ID }}"|g' index.html
-          sed -i 's|"${{ vars.FIREBASE_APP_ID }}"|"${{ vars.FIREBASE_APP_ID }}"|g' index.html
+          # This step replaces the simple __PLACEHOLDER__ text with the actual secret values.
+          # Using double quotes around the sed command allows the shell to expand the GitHub variables.
+          sed -i "s|__FIREBASE_API_KEY__|${{ secrets.FIREBASE_API_KEY }}|g" index.html
+          sed -i "s|__FIREBASE_AUTH_DOMAIN__|${{ vars.FIREBASE_AUTH_DOMAIN }}|g" index.html
+          sed -i "s|__FIREBASE_PROJECT_ID__|${{ vars.FIREBASE_PROJECT_ID }}|g" index.html
+          sed -i "s|__FIREBASE_STORAGE_BUCKET__|${{ vars.FIREBASE_STORAGE_BUCKET }}|g" index.html
+          sed -i "s|__FIREBASE_MESSAGING_SENDER_ID__|${{ vars.FIREBASE_MESSAGING_SENDER_ID }}|g" index.html
+          sed -i "s|__FIREBASE_APP_ID__|${{ vars.FIREBASE_APP_ID }}|g" index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
