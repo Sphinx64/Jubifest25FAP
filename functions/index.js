@@ -202,8 +202,42 @@ async function sendConfirmationEmail(data, docId) {
             email: eventConfig.sender.email,
             name: eventConfig.sender.name
         },
-        subject: `🎉 Anmeldebestätigung - ${eventConfig.event.shortTitle} Jubiläumsfest`,
+        replyTo: eventConfig.sender.email, // Allow replies
+        subject: `Anmeldebestätigung - ${eventConfig.event.shortTitle} Jubiläumsfest`,
         html: emailHtml,
+        // Anti-spam headers
+        headers: {
+            'X-Priority': '3',
+            'X-MSMail-Priority': 'Normal',
+            'Importance': 'Normal'
+        },
+        // Text version for better deliverability
+        text: `
+Hallo ${data.name || 'Liebe/r Teilnehmer/in'},
+
+vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! Wir freuen uns riesig, dass du dabei bist.
+
+ECKDATEN:
+Datum: ${eventConfig.datetime.date}
+Zeit: ab ${eventConfig.datetime.startTime}
+Ort: ${eventConfig.location.name}
+
+DEINE ANMELDEDATEN:
+Name: ${data.name || 'N/A'}
+E-Mail: ${data.email || 'N/A'}${hasCompanions ? `
+Begleitung: ${begleitungText}` : ''}
+Essen: ${essenText.replace(/<br>/g, ', ')}
+Dessert-Beitrag: ${dessertText}${data.bemerkungen ? `
+Bemerkungen: ${data.bemerkungen}` : ''}
+
+ÄNDERUNGEN MÖGLICH:
+Falls du deine Angaben noch anpassen möchtest: ${editLink}
+
+Bis dahin freuen wir uns auf einen unvergesslichen Tag mit dir!
+
+${eventConfig.sender.signature}
+${eventConfig.sender.name} • ${eventConfig.event.jubilee} Hundesport mit Herz
+        `
     };
 
     console.log("📧 Email message prepared:");
