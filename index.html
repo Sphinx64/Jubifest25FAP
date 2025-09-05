@@ -7,13 +7,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Firebase Config -->
-    <script src="firebase-config.js"></script>
-    <!-- Event Config -->
-    <script src="event-config.js"></script>
-    
-    <!-- Google reCAPTCHA (Optional) -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Firebase Config - Make sure this loads first -->
+    <script>
+        // Hardcoded config to avoid loading issues
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTbLCLBADWVRWbC9vpA6jJ0CN01ANZPAk",
+            authDomain: "fap-jubilaeum-25.firebaseapp.com",
+            projectId: "fap-jubilaeum-25",
+            storageBucket: "fap-jubilaeum-25.appspot.com",
+            messagingSenderId: "1088458369388",
+            appId: "1:1088458369388:web:e47c9df1a3e7244955216f"
+        };
+    </script>
     
     <style>
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
@@ -22,7 +27,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* --- Styles for Multi-Step Form --- */
         .form-step {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
@@ -33,7 +37,6 @@
             pointer-events: none;
         }
         
-        /* Progress Bar */
         .progress-step {
             transition: all 0.3s ease;
         }
@@ -51,7 +54,6 @@
             border-color: #005a6a;
             color: white;
         }
-        /* Line between steps */
         .progress-step:not(:last-child)::after {
             content: '';
             position: absolute;
@@ -67,7 +69,6 @@
             background-color: #005a6a;
         }
 
-        /* Helper for showing/hiding sub-sections */
         .sub-section-container {
             display: grid;
             grid-template-rows: 0fr;
@@ -89,13 +90,6 @@
             <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3">
             <h1 id="main-title" class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
             <p id="main-subtitle" class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
-        </div>
-
-        <!-- Bot Protection Notice -->
-        <div class="bot-notice p-4 mx-6 mt-6 rounded-lg text-center">
-            <p class="text-sm text-gray-600">
-                🛡️ Diese Anmeldung ist nur für eingeladene Mitglieder bestimmt.
-            </p>
         </div>
 
         <div id="anmeldung-container" class="p-6 sm:p-10">
@@ -157,7 +151,7 @@
                                         </fieldset>
                                         <div id="begleitung-details" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div><label for="erwachsene" class="block text-sm font-medium">Anzahl zus. Erwachsene</label><input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
-                                            <div><label for="kinder" class="block text-sm font-medium" id="children-label">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
+                                            <div><label for="kinder" class="block text-sm font-medium">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -176,12 +170,7 @@
                         </div>
                          <div class="mt-8 flex justify-between">
                             <button type="button" id="back-to-step-1" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors text-lg">Zurück</button>
-                            
-                            <!-- reCAPTCHA (Optional - nur wenn gewünscht) -->
-                            <div class="flex items-center gap-4">
-                                <!-- <div class="g-recaptcha" data-sitekey="DEIN_RECAPTCHA_SITE_KEY"></div> -->
-                                <button type="submit" id="submit-button" class="fap-teal text-white font-bold py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors text-lg disabled:opacity-70 disabled:cursor-not-allowed">Anmeldung abschicken</button>
-                            </div>
+                            <button type="submit" id="submit-button" class="fap-teal text-white font-bold py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors text-lg disabled:opacity-70 disabled:cursor-not-allowed">Anmeldung abschicken</button>
                         </div>
                     </div>
                 </div>
@@ -205,9 +194,9 @@
             <div class="mt-8 text-left bg-gray-50 p-6 rounded-lg border max-w-2xl mx-auto">
                 <h3 class="font-bold text-xl mb-4 text-gray-800">Zur Erinnerung: Die Eckdaten</h3>
                 <div id="event-reminder" class="space-y-2 text-gray-700">
-                    <p><strong>Datum:</strong> <span id="reminder-date">Samstag, 18. Oktober 2025</span></p>
-                    <p><strong>Zeit:</strong> ab <span id="reminder-time">14:00 Uhr</span></p>
-                    <p><strong>Ort:</strong> <span id="reminder-location">Schützenhaus Schönenbuch</span></p>
+                    <p><strong>Datum:</strong> Samstag, 18. Oktober 2025</p>
+                    <p><strong>Zeit:</strong> ab 14:00 Uhr</p>
+                    <p><strong>Ort:</strong> Schützenhaus Schönenbuch</p>
                 </div>
             </div>
 
@@ -230,19 +219,14 @@
     </div>
 
     <script type="module">
-        // Import Firebase modules at the top
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        console.log("🚀 Script starting...");
+        
+        // Import Firebase modules
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+        const { getAuth, signInAnonymously, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+        const { getFirestore, collection, addDoc, onSnapshot, query, doc, getDoc, updateDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
 
-        // Use fallback values if eventConfig doesn't load
-        const getConfigValue = (path, fallback) => {
-            try {
-                return path.split('.').reduce((obj, key) => obj[key], window.eventConfig) || fallback;
-            } catch {
-                return fallback;
-            }
-        };
+        console.log("📦 Firebase modules imported");
 
         const appId = 'fap-jubilaeum-25';
         const anmeldungenCollectionName = `anmeldungen-${appId}`;
@@ -263,36 +247,11 @@
         const urlParams = new URLSearchParams(window.location.search);
         const registrationId = urlParams.get('id');
 
-        console.log("🚀 Script loaded, registrationId:", registrationId);
-
-        // Update UI with config (with fallbacks)
-        function populateUIWithConfig() {
-            console.log("🎨 Populating UI with config...");
-            
-            // Update titles and subtitles with fallbacks
-            document.getElementById('main-title').textContent = 'Anmeldung zum Jubiläumsfest';
-            document.getElementById('main-subtitle').textContent = `Wir feiern 25 Jahre – sei dabei!`;
-            
-            // Update children age limit with fallback
-            const childrenLabel = document.getElementById('children-label');
-            if (childrenLabel) {
-                childrenLabel.textContent = 'Anzahl Kinder (bis 14 J.)';
-            }
-            
-            // Update success screen reminder with fallbacks
-            document.getElementById('reminder-date').textContent = 'Samstag, 18. Oktober 2025';
-            document.getElementById('reminder-time').textContent = '14:00 Uhr';
-            document.getElementById('reminder-location').textContent = 'Schützenhaus Schönenbuch';
-            
-            // Update page title
-            document.title = 'Anmeldung zum 25-jährigen Jubiläum | Fun Agility People';
-        }
-
-        // Initialize UI immediately (no waiting for config)
-        populateUIWithConfig();
+        console.log("🔗 Registration ID from URL:", registrationId);
 
         // --- MULTI-STEP LOGIC ---
         function goToStep(stepNumber) {
+            console.log("📋 Going to step:", stepNumber);
             const steps = document.querySelectorAll('.form-step');
             const progressSteps = document.querySelectorAll('.progress-step');
             
@@ -315,9 +274,12 @@
         }
 
         document.getElementById('next-to-step-2').addEventListener('click', () => {
+            console.log("▶️ Next button clicked");
             const name = anmeldeFormular.elements.name.value;
             const email = anmeldeFormular.elements.email.value;
             const teilnahme = anmeldeFormular.elements.teilnahme.value;
+            
+            console.log("📝 Form data:", { name, email, teilnahme });
             
             validationError.classList.add('hidden');
             if (!name || !email || !teilnahme) {
@@ -357,6 +319,7 @@
         });
 
         function renderStep2Details(container) {
+            console.log("🍽️ Rendering step 2 details");
             container.innerHTML = `
                 <div class="p-4 bg-gray-50 rounded-lg border">
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
@@ -399,8 +362,10 @@
                 radio.addEventListener('change', e => document.getElementById('dessert-details').classList.toggle('hidden', e.target.value !== 'ja'));
             });
         }
+
         // --- LOAD EXISTING REGISTRATION ---
         async function loadRegistrationData(id) {
+            console.log("📖 Loading registration data for ID:", id);
             try {
                 const docRef = doc(db, anmeldungenCollectionName, id);
                 const docSnap = await getDoc(docRef);
@@ -410,6 +375,7 @@
                 }
                 
                 const data = docSnap.data();
+                console.log("📄 Registration data loaded:", data);
                 
                 // Fill form with existing data
                 document.getElementById('name').value = data.name || '';
@@ -480,7 +446,7 @@
                 }
                 
             } catch (error) {
-                console.error('Error loading registration:', error);
+                console.error('❌ Error loading registration:', error);
                 alert('Anmeldung konnte nicht geladen werden. Bitte versuche es erneut oder erstelle eine neue Anmeldung.');
                 window.history.replaceState({}, document.title, window.location.pathname);
                 location.reload();
@@ -489,6 +455,7 @@
 
         // --- FIREBASE & SUBMISSION ---
         function initializeAppLogic(firebaseApp) {
+            console.log("🔥 Initializing app logic");
             db = getFirestore(firebaseApp);
             const dessertsRef = collection(db, dessertsCollectionName);
             
@@ -532,6 +499,7 @@
         }
         
         async function submitCancellation(name, email) {
+            console.log("❌ Submitting cancellation");
             const submitButton = document.getElementById('next-to-step-2');
             submitButton.disabled = true;
             submitButton.textContent = 'Wird gesendet...';
@@ -550,6 +518,7 @@
         }
 
         async function updateCancellation(name, email) {
+            console.log("🔄 Updating cancellation");
             const submitButton = document.getElementById('next-to-step-2');
             submitButton.disabled = true;
             submitButton.textContent = 'Wird gespeichert...';
@@ -573,6 +542,7 @@
         }
 
         async function handleFormSubmit(e) {
+            console.log("📤 Form submitted");
             e.preventDefault();
             const submitButton = document.getElementById('submit-button');
             validationError.classList.add('hidden');
@@ -636,6 +606,7 @@
         }
 
         function showSuccessScreen(data, isEditing = false) {
+            console.log("✅ Showing success screen");
             const essenItems = [];
             if (parseInt(data.raclette_erwachsene) > 0) essenItems.push(`${data.raclette_erwachsene}x Raclette Erw.`);
             if (parseInt(data.fondue_erwachsene) > 0) essenItems.push(`${data.fondue_erwachsene}x Fondue Erw.`);
@@ -693,31 +664,24 @@
         }
 
         // --- APP INITIALIZATION ---
-        function initializeApp() {
-            try {
-                if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith('__')) {
-                     throw new Error("Firebase config is not correctly loaded.");
-                }
-                const app = initializeApp(firebaseConfig); 
-                auth = getAuth(app);
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        initializeAppLogic(app);
-                    } else {
-                        signInAnonymously(auth).catch((error) => {
-                            console.error("Anonymous sign-in failed:", error);
-                            document.body.innerHTML = '<div class="text-center p-8">Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.</div>';
-                        });
-                    }
+        console.log("🔥 Initializing Firebase...");
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("✅ User authenticated, initializing app logic");
+                initializeAppLogic(app);
+            } else {
+                console.log("🔑 No user, signing in anonymously...");
+                signInAnonymously(auth).catch((error) => {
+                    console.error("❌ Anonymous sign-in failed:", error);
+                    document.body.innerHTML = '<div class="text-center p-8">Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.</div>';
                 });
-            } catch (e) {
-                console.error("Firebase initialization failed:", e);
-                document.body.innerHTML = `<div class="text-center p-8">${e.message}</div>`;
             }
-        }
+        });
 
-        // Initialize immediately (no password gate)
-        initializeApp();
+        console.log("🎯 Script initialization complete");
     </script>
 </body>
 </html>
