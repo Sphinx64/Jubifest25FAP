@@ -17,8 +17,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- NEW: Grid Animation Technique --- */
-        /* This is a modern, robust way to animate height from 0 to auto. */
+        /* --- Grid Animation Technique --- */
         #details-container {
             display: grid;
             grid-template-rows: 0fr; /* Start collapsed */
@@ -57,7 +56,7 @@
 
     <!-- Password Gate -->
     <div id="password-gate" class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl p-8 text-center">
-        <img src="https://fun-agility-people.ch/wp-content/uploads/2011/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
+        <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Anmeldung zum Jubiläumsfest</h2>
         <p class="text-gray-600 mb-6">Bitte gib das Passwort ein, um fortzufahren.</p>
         <form id="password-form">
@@ -70,7 +69,7 @@
     <!-- Main Content -->
     <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden opacity-0">
         <div class="fap-teal text-white p-6 text-center">
-            <img src="https://fun-agility-people.ch/wp-content/uploads/2011/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
+            <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
             <h1 class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
             <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
         </div>
@@ -181,14 +180,15 @@
                 const isAttending = e.target.value === 'ja';
                 
                 if (isAttending) {
-                    // Only render the HTML if it's not already there
                     if (detailsContainer.innerHTML.trim() === '') {
                         renderDetailsContainer();
                     }
-                    // Add 'open' class to trigger the CSS grid-template-rows transition
-                    detailsContainer.classList.add('open');
+                    // Use requestAnimationFrame to ensure the class is added in the next paint cycle,
+                    // after the DOM has been updated by renderDetailsContainer(). This is the fix.
+                    requestAnimationFrame(() => {
+                        detailsContainer.classList.add('open');
+                    });
                 } else {
-                    // Remove 'open' class to collapse the container
                     detailsContainer.classList.remove('open');
                 }
             });
@@ -196,7 +196,7 @@
 
         function renderDetailsContainer() {
             const contentWrapper = document.createElement('div');
-            contentWrapper.className = 'space-y-8 pb-2';
+            contentWrapper.className = 'space-y-8 pb-2'; // Added pb-2 to prevent last element from being cut off
             contentWrapper.innerHTML = `
                 <div class="p-4 bg-gray-50 rounded-lg border">
                     <fieldset>
@@ -206,7 +206,7 @@
                             <label class="flex items-center cursor-pointer"><input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein</span></label>
                         </div>
                     </fieldset>
-                    <div id="begleitung-details" class="sub-section mt-4 grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div id="begleitung-details" class="sub-section mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div><label for="erwachsene" class="block text-sm font-medium">Anzahl zus. Erwachsene</label><input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="kinder" class="block text-sm font-medium">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
@@ -215,10 +215,10 @@
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
                     <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir).</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                        <label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="fondue_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Fondue</label><input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
-                    <div id="kinder-essen-details" class="sub-section mt-4 grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div id="kinder-essen-details" class="sub-section mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                          <div><label for="raclette_kinder" class="block text-sm font-medium">Anzahl Kinder für Raclette</label><input type="number" id="raclette_kinder" name="raclette_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                          <div><label for="fondue_kinder" class="block text-sm font-medium">Anzahl Kinder für Fondue</label><input type="number" id="fondue_kinder" name="fondue_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
