@@ -5,12 +5,11 @@ name: Build and Deploy to GitHub Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"] # Change this to your default branch if it's not "main"
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -26,16 +25,21 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Replace Firebase Config Placeholders ⚙️
+      - name: Generate Firebase Config File ⚙️
         run: |
-          # This step replaces the simple __PLACEHOLDER__ text with the actual secret values.
-          # Using double quotes around the sed command allows the shell to expand the GitHub variables.
-          sed -i "s|__FIREBASE_API_KEY__|${{ secrets.FIREBASE_API_KEY }}|g" index.html
-          sed -i "s|__FIREBASE_AUTH_DOMAIN__|${{ vars.FIREBASE_AUTH_DOMAIN }}|g" index.html
-          sed -i "s|__FIREBASE_PROJECT_ID__|${{ vars.FIREBASE_PROJECT_ID }}|g" index.html
-          sed -i "s|__FIREBASE_STORAGE_BUCKET__|${{ vars.FIREBASE_STORAGE_BUCKET }}|g" index.html
-          sed -i "s|__FIREBASE_MESSAGING_SENDER_ID__|${{ vars.FIREBASE_MESSAGING_SENDER_ID }}|g" index.html
-          sed -i "s|__FIREBASE_APP_ID__|${{ vars.FIREBASE_APP_ID }}|g" index.html
+          # This step creates the firebase-config.js file from scratch
+          # using your secrets and variables.
+          echo "const firebaseConfig = {" > firebase-config.js
+          echo "  apiKey: \"${{ secrets.FIREBASE_API_KEY }}\"," >> firebase-config.js
+          echo "  authDomain: \"${{ vars.FIREBASE_AUTH_DOMAIN }}\"," >> firebase-config.js
+          echo "  projectId: \"${{ vars.FIREBASE_PROJECT_ID }}\"," >> firebase-config.js
+          echo "  storageBucket: \"${{ vars.FIREBASE_STORAGE_BUCKET }}\"," >> firebase-config.js
+          echo "  messagingSenderId: \"${{ vars.FIREBASE_MESSAGING_SENDER_ID }}\"," >> firebase-config.js
+          echo "  appId: \"${{ vars.FIREBASE_APP_ID }}\"" >> firebase-config.js
+          echo "};" >> firebase-config.js
+
+      - name: Verify generated config file (for debugging)
+        run: cat firebase-config.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -43,7 +47,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repositoryff
           path: '.'
           
       - name: Deploy to GitHub Pages

@@ -7,18 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Die Firebase-Konfiguration wird hier direkt eingefügt -->
-    <!-- Die Werte werden automatisch durch den GitHub Actions Workflow ersetzt -->
-    <script>
-      const firebaseConfig = {
-        apiKey: "${{ secrets.FIREBASE_API_KEY }}",
-        authDomain: "${{ vars.FIREBASE_AUTH_DOMAIN }}",
-        projectId: "${{ vars.FIREBASE_PROJECT_ID }}",
-        storageBucket: "${{ vars.FIREBASE_STORAGE_BUCKET }}",
-        messagingSenderId: "${{ vars.FIREBASE_MESSAGING_SENDER_ID }}",
-        appId: "${{ vars.FIREBASE_APP_ID }}"
-      };
-    </script>
+    <!-- Referenz zur Konfigurationsdatei, die vom Workflow erstellt wird -->
+    <script src="firebase-config.js"></script>
     
     <style>
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
@@ -120,7 +110,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // This password check happens client-side. It's not for high security, but to prevent random visitors.
         const CORRECT_PASSWORD = "Agility"; 
         const appId = 'fap-jubilaeum-25';
         const anmeldungenCollectionName = `anmeldungen-${appId}`;
@@ -363,8 +352,8 @@
 
         // --- APP INITIALIZATION ---
         try {
-            // Check if firebaseConfig is populated. If not, it means the GitHub Action hasn't run.
-            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("secrets.FIREBASE")) {
+            // Check if the firebaseConfig object is available and properly populated
+            if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey) {
                  throw new Error("Firebase config is not correctly loaded.");
             }
             const app = initializeApp(firebaseConfig); 
@@ -381,8 +370,9 @@
             });
         } catch (e) {
             console.error("Firebase initialization failed:", e);
-            document.body.innerHTML = '<div class="text-center p-8">Fehler bei der Initialisierung der App. Bitte kontaktieren Sie den Administrator.</div>';
+            document.body.innerHTML = `<div class="text-center p-8">${e.message}</div>`;
         }
     </script>
 </body>
 </html>
+
