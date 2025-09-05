@@ -79,7 +79,7 @@
                     </div>
                 </div>
                 
-                <div id="details-container" class="form-section hidden opacity-0 max-h-0 space-y-8">
+                <div id="details-container" class="form-section hidden opacity-0 max-h-0 space-y-8 pb-1">
                     <!-- Dynamic content will be injected here -->
                 </div>
 
@@ -157,7 +157,24 @@
 
         // --- DYNAMIC FORM (REVISED FOR SMOOTH RESIZING) --- 
         function toggleSection(element, show) {
-// ... existing code ... -->
+            if (show) {
+                element.classList.remove('hidden');
+                setTimeout(() => {
+                    element.classList.remove('opacity-0');
+                    element.style.maxHeight = element.scrollHeight + 'px';
+                }, 10);
+            } else {
+                element.style.maxHeight = '0px';
+                element.classList.add('opacity-0');
+                setTimeout(() => {
+                    if (element.style.maxHeight === '0px') {
+                        element.classList.add('hidden');
+                    }
+                }, 500); 
+            }
+        }
+        
+        function updateDetailsContainerHeight() {
             if (detailsContainer.style.maxHeight && detailsContainer.style.maxHeight !== '0px') {
                 detailsContainer.style.maxHeight = detailsContainer.scrollHeight + 'px';
             }
@@ -168,28 +185,23 @@
                 const isAttending = e.target.value === 'ja';
 
                 if (isAttending) {
-                    // Render content ONLY if it's not already there.
                     if (detailsContainer.innerHTML.trim() === '') {
                         renderDetailsContainer();
-                        // IMPORTANT FIX: Wait for the browser to render the new HTML
-                        // before we try to animate any heights.
-                        setTimeout(() => {
-                            // First, open the inner sections that should be visible by default
-                            const dessertDetails = document.getElementById('dessert-details');
-                            if(anmeldeFormular.elements['dessert-beitrag'].value === 'ja') {
+                        // Wait for the browser to render the new HTML before animating
+                        requestAnimationFrame(() => {
+                            // Pre-open sections that should be visible by default
+                             if (anmeldeFormular.elements['dessert-beitrag'].value === 'ja') {
+                                const dessertDetails = document.getElementById('dessert-details');
                                 toggleSection(dessertDetails, true);
                             }
-                            // NOW, open the main container. It will have the correct full height.
-                            toggleSection(detailsContainer, true);
-                        }, 20); // A tiny delay is enough for the browser to catch up.
+                            // NOW, animate the main container with the correct full height.
+                            setTimeout(() => toggleSection(detailsContainer, true), 50);
+                        });
                     } else {
-                         // If content is already there, just open it.
                          toggleSection(detailsContainer, true);
                     }
                 } else {
-                    // If switching to "Nein", start the hiding animation.
                     toggleSection(detailsContainer, false);
-                    // Clear content after hiding animation is complete.
                     setTimeout(() => { detailsContainer.innerHTML = ''; }, 500);
                 }
             });
@@ -214,7 +226,7 @@
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
                     <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir).</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="1" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="fondue_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Fondue</label><input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
                     <div id="kinder-essen-details" class="form-section hidden opacity-0 max-h-0 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -231,7 +243,7 @@
                                 <label class="flex items-center cursor-pointer"><input type="radio" name="dessert-beitrag" value="nein" class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein, danke.</span></label>
                             </div>
                         </fieldset>
-                        <div id="dessert-details" class="form-section opacity-0 max-h-0 mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
+                        <div id="dessert-details" class="form-section hidden opacity-0 max-h-0 mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
                     </div>
                     <div class="bg-gray-50 rounded-lg border p-4"><h3 class="text-md font-semibold text-center mb-3">Live Dessert-Liste</h3><div id="dessert-liste" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div></div>
                 </div>
@@ -247,7 +259,6 @@
             anmeldeFormular.elements.begleitung.forEach(radio => {
                 radio.addEventListener('change', e => {
                     toggleSection(document.getElementById('begleitung-details'), e.target.value === 'ja');
-                    // Wait for the animation to start, then update the main container
                     setTimeout(updateDetailsContainerHeight, 50);
                 });
             });
@@ -257,16 +268,12 @@
                 setTimeout(updateDetailsContainerHeight, 50);
             });
             
-            const dessertDetails = document.getElementById('dessert-details');
             anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
                 radio.addEventListener('change', e => {
-                    toggleSection(dessertDetails, e.target.value === 'ja');
+                    toggleSection(document.getElementById('dessert-details'), e.target.value === 'ja');
                     setTimeout(updateDetailsContainerHeight, 50);
                 });
             });
-            
-            // REMOVED: The initial state is now set in the 'teilnahme' event listener
-            // to avoid the race condition.
         }
 
         // --- FIREBASE & SUBMISSION ---
@@ -381,6 +388,4 @@
     </script>
 </body>
 </html>
-
-
 
