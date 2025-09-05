@@ -42,7 +42,6 @@ async function appendToSheet(data, docId) {
     try {
         await sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
-            // Corrected Range: Just the sheet name. Append will find the next empty row.
             range: SHEET_NAME, 
             valueInputOption: "USER_ENTERED",
             resource: {
@@ -52,7 +51,6 @@ async function appendToSheet(data, docId) {
         console.log("Successfully appended data to Google Sheet.");
     } catch (err) {
         console.error("Error appending data to Google Sheet:", err.message);
-        // Log the full error for better debugging
         console.error(err);
     }
 }
@@ -75,11 +73,14 @@ exports.handleNewRegistration = functions.firestore
 
 /**
  * HTTP-triggered function to export all registrations as JSON.
+ * This function is protected by a secret.
  */
-exports.exportAnmeldungen = functions.https.onRequest(async (req, res) => {
-    const SECRET = "bitte-aendern"; // Change this to a secure secret!
+exports.exportAnmeldungen = functions
+    .runWith({ secrets: ["EXPORT_SECRET"] })
+    .https.onRequest(async (req, res) => {
 
-    if (req.query.secret !== SECRET) {
+    // Access the secret from the environment variables
+    if (req.query.secret !== process.env.EXPORT_SECRET) {
         res.status(403).send("Unauthorized");
         return;
     }
