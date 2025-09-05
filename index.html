@@ -61,6 +61,19 @@
         .progress-step.completed::after {
             background-color: #005a6a;
         }
+
+        /* Helper for showing/hiding sub-sections */
+        .sub-section-container {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out;
+        }
+        .sub-section-container.open {
+            grid-template-rows: 1fr;
+        }
+        .sub-section-content {
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gray-100">
@@ -108,7 +121,7 @@
                         </div>
                         <div class="progress-step text-center relative" data-progress="2">
                             <div class="step-circle w-10 h-10 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-lg text-gray-500">2</div>
-                            <div class="step-label mt-2 text-sm text-gray-500">Details</div>
+                            <div class="step-label mt-2 text-sm text-gray-500">Essen</div>
                         </div>
                         <div class="progress-step text-center relative" data-progress="3">
                             <div class="step-circle w-10 h-10 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-lg text-gray-500">✓</div>
@@ -119,19 +132,21 @@
 
                 <!-- Form Steps Container -->
                 <div class="relative">
-                    <!-- Step 1: Participation -->
+                    <!-- Step 1: Participation & Companions -->
                     <div class="form-step" data-step="1">
                         <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Deine Anmeldung</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                            <div>
-                                <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
-                                <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="Max Mustermann">
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                <div>
+                                    <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
+                                    <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="Max Mustermann">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-lg font-semibold text-gray-700 mb-2">Deine E-Mail</label>
+                                    <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="max.mustermann@mail.com">
+                                </div>
                             </div>
                             <div>
-                                <label for="email" class="block text-lg font-semibold text-gray-700 mb-2">Deine E-Mail</label>
-                                <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="max.mustermann@mail.com">
-                            </div>
-                            <div class="md:col-span-2">
                                 <fieldset>
                                     <legend class="block text-lg font-semibold text-gray-700 mb-2">Nimmst du teil?</legend>
                                     <div class="flex items-center gap-x-6 h-full">
@@ -139,6 +154,24 @@
                                         <label class="flex items-center cursor-pointer"><input type="radio" name="teilnahme" value="nein" class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]"> <span class="ml-2 text-gray-800">Nein, leider nicht.</span></label>
                                     </div>
                                 </fieldset>
+                            </div>
+                            <!-- Companions section, shown conditionally -->
+                            <div id="companions-container" class="sub-section-container">
+                                <div class="sub-section-content pt-4">
+                                     <div class="p-4 bg-gray-50 rounded-lg border">
+                                        <fieldset>
+                                            <legend class="block text-md font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
+                                            <div class="flex items-center gap-x-6">
+                                                <label class="flex items-center cursor-pointer"><input type="radio" name="begleitung" value="ja" class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Ja</span></label>
+                                                <label class="flex items-center cursor-pointer"><input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein</span></label>
+                                            </div>
+                                        </fieldset>
+                                        <div id="begleitung-details" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div><label for="erwachsene" class="block text-sm font-medium">Anzahl zus. Erwachsene</label><input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                                            <div><label for="kinder" class="block text-sm font-medium">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="mt-8 flex justify-end">
@@ -148,7 +181,7 @@
 
                     <!-- Step 2: Details -->
                     <div class="form-step hidden" data-step="2">
-                        <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Details zur Feier</h3>
+                        <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Essen & Dessert</h3>
                         <div class="space-y-8 pb-2">
                            <!-- Dynamic content will be injected here -->
                         </div>
@@ -232,11 +265,8 @@
             const progressSteps = document.querySelectorAll('.progress-step');
             
             steps.forEach(step => {
-                if (step.dataset.step == stepNumber) {
-                    step.classList.remove('hidden');
-                } else {
-                    step.classList.add('hidden');
-                }
+                const stepIsTarget = step.dataset.step == stepNumber;
+                step.classList.toggle('hidden', !stepIsTarget);
             });
 
             progressSteps.forEach((step, index) => {
@@ -280,24 +310,26 @@
             goToStep(1);
         });
 
+        // Event listener for participation radio buttons
+        anmeldeFormular.elements.teilnahme.forEach(radio => {
+            radio.addEventListener('change', e => {
+                const companionsContainer = document.getElementById('companions-container');
+                companionsContainer.classList.toggle('open', e.target.value === 'ja');
+            });
+        });
+
+        // Event listener for companions radio buttons (inside step 1)
+        anmeldeFormular.addEventListener('change', e => {
+            if (e.target.name === 'begleitung') {
+                document.getElementById('begleitung-details').classList.toggle('hidden', e.target.value !== 'ja');
+            }
+        });
+
         function renderStep2Details(container) {
             container.innerHTML = `
                 <div class="p-4 bg-gray-50 rounded-lg border">
-                    <fieldset>
-                        <legend class="block text-md font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
-                        <div class="flex items-center gap-x-6">
-                            <label class="flex items-center cursor-pointer"><input type="radio" name="begleitung" value="ja" class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Ja</span></label>
-                            <label class="flex items-center cursor-pointer"><input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein</span></label>
-                        </div>
-                    </fieldset>
-                    <div id="begleitung-details" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label for="erwachsene" class="block text-sm font-medium">Anzahl zus. Erwachsene</label><input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
-                        <div><label for="kinder" class="block text-sm font-medium">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
-                    </div>
-                </div>
-                <div class="p-4 bg-gray-50 rounded-lg border">
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
-                    <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir).</p>
+                    <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir und Begleitpersonen).</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="fondue_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Fondue</label><input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
@@ -329,12 +361,11 @@
         }
 
         function attachStep2EventListeners() {
-            anmeldeFormular.elements.begleitung.forEach(radio => {
-                radio.addEventListener('change', e => document.getElementById('begleitung-details').classList.toggle('hidden', e.target.value !== 'ja'));
-            });
-            document.getElementById('kinder').addEventListener('input', e => {
-                 document.getElementById('kinder-essen-details').classList.toggle('hidden', parseInt(e.target.value, 10) <= 0);
-            });
+            // Show/hide children food section based on number of children from step 1
+            const kinderCount = parseInt(anmeldeFormular.elements.kinder.value, 10) || 0;
+            document.getElementById('kinder-essen-details').classList.toggle('hidden', kinderCount <= 0);
+
+            // Listener for dessert contribution
             anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
                 radio.addEventListener('change', e => document.getElementById('dessert-details').classList.toggle('hidden', e.target.value !== 'ja'));
             });
