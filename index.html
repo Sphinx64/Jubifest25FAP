@@ -526,14 +526,36 @@
         function initializeAppLogic(firebaseApp) {
             db = getFirestore(firebaseApp);
             const dessertsRef = collection(db, dessertsCollectionName);
+            
+            console.log("🍰 Setting up dessert list listener for collection:", dessertsCollectionName);
 
             onSnapshot(query(dessertsRef), (snapshot) => {
+                console.log("🍰 Dessert snapshot received, size:", snapshot.size);
+                
                 const dessertListe = document.getElementById('dessert-liste');
-                if (!dessertListe) return;
-                dessertListe.innerHTML = snapshot.empty ? '<p class="text-xs text-gray-500 text-center">Sei der/die Erste!</p>' : '';
-                snapshot.forEach(doc => {
-                    dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-white p-2 rounded-md"><span class="font-medium text-gray-800">${doc.data().dessert}</span><span class="text-xs text-gray-500">${doc.data().name}</span></div>`;
-                });
+                if (!dessertListe) {
+                    console.log("⚠️ Dessert list element not found in DOM");
+                    return;
+                }
+                
+                if (snapshot.empty) {
+                    console.log("🍰 No desserts found, showing placeholder");
+                    dessertListe.innerHTML = '<p class="text-xs text-gray-500 text-center">Sei der/die Erste!</p>';
+                } else {
+                    console.log("🍰 Found desserts, rendering list");
+                    dessertListe.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        console.log("🍰 Dessert:", data);
+                        dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-white p-2 rounded-md"><span class="font-medium text-gray-800">${data.dessert}</span><span class="text-xs text-gray-500">${data.name}</span></div>`;
+                    });
+                }
+            }, (error) => {
+                console.error("❌ Error in dessert listener:", error);
+                const dessertListe = document.getElementById('dessert-liste');
+                if (dessertListe) {
+                    dessertListe.innerHTML = '<p class="text-xs text-red-500 text-center">Fehler beim Laden der Desserts</p>';
+                }
             });
 
             anmeldeFormular.addEventListener('submit', handleFormSubmit);
