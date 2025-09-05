@@ -18,6 +18,7 @@ exports.sendConfirmationEmail = functions.firestore
     .document("anmeldungen-fap-jubilaeum-25/{docId}")
     .onCreate((snap, context) => {
       const data = snap.data();
+      const docId = context.params.docId;
 
       // Email content
       const to = data.email;
@@ -46,6 +47,25 @@ exports.sendConfirmationEmail = functions.firestore
         const essenText = essenItems.length > 0 ?
           essenItems.join(", ") : "Keine Auswahl";
 
+        const aenderungslink = `https://fap-jubilaeum-25.web.app/index.html?id=${docId}`;
+
+        // Create iCalendar data
+        const icsData = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//FAP//NONSGML v1.0//EN
+BEGIN:VEVENT
+UID:${docId}@fap-jubilaeum-25.web.app
+DTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}Z
+DTSTART:20251018T120000Z
+DTEND:20251018T220000Z
+SUMMARY:FAP Jubiläumsfest
+DESCRIPTION:Jubiläumsfest der Fun Agility People. Details siehe unter ${aenderungslink}
+LOCATION:Schützenhaus Schönenbuch
+END:VEVENT
+END:VCALENDAR`;
+
+        const calLink = `data:text/calendar;charset=utf8,${encodeURIComponent(icsData)}`;
+
         html = `
           <p>Hallo ${data.name},</p>
           <p>vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! 
@@ -65,6 +85,10 @@ exports.sendConfirmationEmail = functions.firestore
             <li><strong>Zeit:</strong> ab 14:00 Uhr</li>
             <li><strong>Ort:</strong> Schützenhaus Schönenbuch</li>
           </ul>
+          <p>
+            <a href="${calLink}">Kalendereintrag herunterladen</a> |
+            <a href="${aenderungslink}">Anmeldung bearbeiten</a>
+          </p>
           <p>Herzliche Grüsse,<br>Das OK und der Vorstand der Fun Agility People</p>
         `;
       } else {
@@ -88,4 +112,3 @@ exports.sendConfirmationEmail = functions.firestore
             console.error("Error sending email:", error.toString());
           });
     });
-
