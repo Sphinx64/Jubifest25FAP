@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+match /databases/{database}/documents {
+
+// Regeln für die Anmeldungen
+// Hier werden die persönlichen Daten gespeichert.
+match /anmeldungen-fap-jubilaeum-25/{docId} {
+  // ERLAUBT: Das Erstellen (create) einer neuen Anmeldung, 
+  // aber nur, wenn der Benutzer authentifiziert ist (was durch signInAnonymously geschieht).
+  allow create: if request.auth != null;
+  
+  // VERBOTEN: Das Lesen, Ändern oder Löschen von Anmeldungen.
+  // Das schützt die Daten der Mitglieder.
+  allow read, update, delete: if false;
+}
+
+// Regeln für die Dessert-Liste
+// Diese Daten sind öffentlich sichtbar.
+match /desserts-fap-jubilaeum-25/{docId} {
+  // ERLAUBT: Das Lesen der Dessert-Liste für jeden Besucher der Seite.
+  // Das ist notwendig, damit die "Live Dessert-Liste" funktioniert.
+  allow read: if true;
+  
+  // ERLAUBT: Das Hinzufügen eines neuen Desserts, wenn der Benutzer authentifiziert ist.
+  allow create: if request.auth != null;
+  
+  // VERBOTEN: Das Ändern oder Löschen von Dessert-Einträgen.
+  allow update, delete: if false;
+}
+
+}
+}
