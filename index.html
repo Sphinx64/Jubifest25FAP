@@ -399,9 +399,6 @@
                 radio.addEventListener('change', e => document.getElementById('dessert-details').classList.toggle('hidden', e.target.value !== 'ja'));
             });
         }
-        
-        let db, auth;
-
         // --- LOAD EXISTING REGISTRATION ---
         async function loadRegistrationData(id) {
             try {
