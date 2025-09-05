@@ -101,7 +101,7 @@
     <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden opacity-0">
         <div class="fap-teal text-white p-6 text-center">
             <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3">
-            <h1 class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
+            <h1 id="main-title" class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
             <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
         </div>
 
@@ -194,8 +194,8 @@
         
         <!-- Step 3 / Success Screen -->
         <div id="success-container" class="hidden p-6 sm:p-10 text-center">
-            <h2 class="text-3xl font-bold fap-teal-text">Vielen Dank!</h2>
-            <p class="text-gray-700 mt-2 text-lg">Deine Anmeldung ist bei uns eingegangen. Du erhältst in Kürze eine Bestätigung per E-Mail.</p>
+            <h2 id="success-title" class="text-3xl font-bold fap-teal-text">Vielen Dank!</h2>
+            <p id="success-message" class="text-gray-700 mt-2 text-lg">Deine Anmeldung ist bei uns eingegangen. Du erhältst in Kürze eine Bestätigung per E-Mail.</p>
             
             <div class="mt-8 text-left bg-gray-50 p-6 rounded-lg border max-w-2xl mx-auto">
                 <h3 class="font-bold text-xl mb-4 text-gray-800">Zur Erinnerung: Die Eckdaten</h3>
@@ -227,7 +227,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const CORRECT_PASSWORD = "Agility"; 
         const appId = 'fap-jubilaeum-25';
@@ -245,26 +245,35 @@
         const validationError = document.getElementById('validation-error');
         
         let currentStep = 1;
+        let editingId = null; // Stores the ID if we're editing an existing registration
+
+        // Check URL parameters on load
+        const urlParams = new URLSearchParams(window.location.search);
+        const registrationId = urlParams.get('id');
 
         // --- PASSWORD & POPUP --- 
         passwordForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (document.getElementById('password-input').value === CORRECT_PASSWORD) {
-                // Fade out password gate
-                passwordGate.style.transition = 'opacity 0.5s';
-                passwordGate.style.opacity = '0';
-                
-                setTimeout(() => {
-                    passwordGate.classList.add('hidden');
-                    // Show main content and fade it in
-                    mainContent.classList.remove('hidden');
-                    mainContent.style.transition = 'opacity 0.5s';
-                    setTimeout(() => mainContent.style.opacity = '1', 20);
-                }, 500);
+                showMainContent();
             } else {
                 document.getElementById('password-error').textContent = 'Falsches Passwort.';
             }
         });
+
+        function showMainContent() {
+            // Fade out password gate
+            passwordGate.style.transition = 'opacity 0.5s';
+            passwordGate.style.opacity = '0';
+            
+            setTimeout(() => {
+                passwordGate.classList.add('hidden');
+                // Show main content and fade it in
+                mainContent.classList.remove('hidden');
+                mainContent.style.transition = 'opacity 0.5s';
+                setTimeout(() => mainContent.style.opacity = '1', 20);
+            }, 500);
+        }
 
         // --- MULTI-STEP LOGIC ---
         function goToStep(stepNumber) {
@@ -306,7 +315,11 @@
                 renderStep2Details(step2Container);
                 goToStep(2);
             } else {
-                submitCancellation(name, email);
+                if (editingId) {
+                    updateCancellation(name, email);
+                } else {
+                    submitCancellation(name, email);
+                }
             }
         });
 
@@ -373,6 +386,96 @@
         
         let db, auth;
 
+        // --- LOAD EXISTING REGISTRATION ---
+        async function loadRegistrationData(id) {
+            try {
+                const docRef = doc(db, anmeldungenCollectionName, id);
+                const docSnap = await getDoc(docRef);
+                
+                if (!docSnap.exists()) {
+                    throw new Error('Anmeldung nicht gefunden');
+                }
+                
+                const data = docSnap.data();
+                
+                // Fill form with existing data
+                document.getElementById('name').value = data.name || '';
+                document.getElementById('email').value = data.email || '';
+                
+                // Set radio buttons
+                if (data.teilnahme) {
+                    const teilnahmeRadio = document.querySelector(`input[name="teilnahme"][value="${data.teilnahme}"]`);
+                    if (teilnahmeRadio) teilnahmeRadio.checked = true;
+                }
+                
+                if (data.begleitung) {
+                    const begleitungRadio = document.querySelector(`input[name="begleitung"][value="${data.begleitung}"]`);
+                    if (begleitungRadio) begleitungRadio.checked = true;
+                }
+                
+                // Set numbers
+                document.getElementById('erwachsene').value = data.erwachsene || '0';
+                document.getElementById('kinder').value = data.kinder || '0';
+                
+                // Trigger visibility changes
+                const companionsContainer = document.getElementById('companions-container');
+                companionsContainer.classList.toggle('open', data.teilnahme === 'ja');
+                
+                const begleitungDetails = document.getElementById('begleitung-details');
+                begleitungDetails.classList.toggle('hidden', data.begleitung !== 'ja');
+                
+                // Update UI for editing mode
+                document.getElementById('main-title').textContent = 'Anmeldung bearbeiten';
+                document.getElementById('submit-button').textContent = 'Änderungen speichern';
+                
+                editingId = id;
+                
+                // If we have more data to fill (from step 2), we need to render step 2 first
+                if (data.teilnahme === 'ja') {
+                    const step2Container = document.querySelector('[data-step="2"] .space-y-6');
+                    renderStep2Details(step2Container);
+                    
+                    // Fill step 2 data
+                    setTimeout(() => {
+                        document.getElementById('raclette_erwachsene').value = data.raclette_erwachsene || '0';
+                        document.getElementById('fondue_erwachsene').value = data.fondue_erwachsene || '0';
+                        document.getElementById('raclette_kinder').value = data.raclette_kinder || '0';
+                        document.getElementById('fondue_kinder').value = data.fondue_kinder || '0';
+                        
+                        if (data['dessert-beitrag']) {
+                            const dessertRadio = document.querySelector(`input[name="dessert-beitrag"][value="${data['dessert-beitrag']}"]`);
+                            if (dessertRadio) dessertRadio.checked = true;
+                        }
+                        
+                        if (data['dessert-was']) {
+                            document.getElementById('dessert-was').value = data['dessert-was'];
+                        }
+                        
+                        if (data.bemerkungen) {
+                            document.getElementById('bemerkungen').value = data.bemerkungen;
+                        }
+                        
+                        // Update dessert details visibility
+                        const dessertDetails = document.getElementById('dessert-details');
+                        dessertDetails.classList.toggle('hidden', data['dessert-beitrag'] !== 'ja');
+                        
+                        // Update children food visibility
+                        const kinderEssenDetails = document.getElementById('kinder-essen-details');
+                        const kinderCount = parseInt(data.kinder, 10) || 0;
+                        kinderEssenDetails.classList.toggle('hidden', kinderCount <= 0);
+                    }, 100);
+                }
+                
+            } catch (error) {
+                console.error('Error loading registration:', error);
+                // Show error and redirect to normal form
+                alert('Anmeldung konnte nicht geladen werden. Bitte versuche es erneut oder erstelle eine neue Anmeldung.');
+                // Remove ID from URL and reload
+                window.history.replaceState({}, document.title, window.location.pathname);
+                location.reload();
+            }
+        }
+
         // --- FIREBASE & SUBMISSION ---
         function initializeAppLogic(firebaseApp) {
             db = getFirestore(firebaseApp);
@@ -388,6 +491,11 @@
             });
 
             anmeldeFormular.addEventListener('submit', handleFormSubmit);
+            
+            // If we have a registration ID, load the data
+            if (registrationId) {
+                loadRegistrationData(registrationId);
+            }
         }
         
         async function submitCancellation(name, email) {
@@ -408,12 +516,37 @@
             }
         }
 
+        async function updateCancellation(name, email) {
+            const submitButton = document.getElementById('next-to-step-2');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Wird gespeichert...';
+            try {
+                const docRef = doc(db, anmeldungenCollectionName, editingId);
+                await updateDoc(docRef, { 
+                    name, 
+                    email, 
+                    teilnahme: 'nein', 
+                    lastModified: new Date() 
+                });
+                
+                anmeldungContainer.classList.add('hidden');
+                cancellationContainer.classList.remove('hidden');
+            } catch (error) {
+                validationError.textContent = 'Fehler: ' + error.message;
+                validationError.classList.remove('hidden');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Weiter';
+            }
+        }
+
         async function handleFormSubmit(e) {
             e.preventDefault();
             const submitButton = document.getElementById('submit-button');
             validationError.classList.add('hidden');
             submitButton.disabled = true;
-            submitButton.textContent = 'Wird gesendet...';
+            
+            const isEditing = editingId !== null;
+            submitButton.textContent = isEditing ? 'Wird gespeichert...' : 'Wird gesendet...';
 
             const formData = new FormData(anmeldeFormular);
             const data = Object.fromEntries(formData.entries());
@@ -431,28 +564,65 @@
                 const anmeldungenRef = collection(db, anmeldungenCollectionName);
                 const dessertsRef = collection(db, dessertsCollectionName);
 
-                const docRef = await addDoc(anmeldungenRef, { ...data, timestamp: new Date() });
-                if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
-                    await addDoc(dessertsRef, { name: data.name, dessert: data['dessert-was'], anmeldungId: docRef.id });
+                if (isEditing) {
+                    // Update existing registration
+                    const docRef = doc(db, anmeldungenCollectionName, editingId);
+                    await updateDoc(docRef, { 
+                        ...data, 
+                        lastModified: new Date() 
+                    });
+
+                    // Handle dessert update
+                    if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
+                        // For simplicity, we'll add a new dessert entry
+                        // In a more sophisticated setup, you might want to update existing entries
+                        await addDoc(dessertsRef, { 
+                            name: data.name, 
+                            dessert: data['dessert-was'], 
+                            anmeldungId: editingId 
+                        });
+                    }
+                } else {
+                    // Create new registration
+                    const docRef = await addDoc(anmeldungenRef, { ...data, timestamp: new Date() });
+                    if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
+                        await addDoc(dessertsRef, { 
+                            name: data.name, 
+                            dessert: data['dessert-was'], 
+                            anmeldungId: docRef.id 
+                        });
+                    }
                 }
 
-                showSuccessScreen(data);
+                showSuccessScreen(data, isEditing);
 
             } catch (error) {
                 validationError.textContent = 'Fehler: ' + error.message;
                 validationError.classList.remove('hidden');
                 submitButton.disabled = false;
-                submitButton.textContent = 'Anmeldung abschicken';
+                submitButton.textContent = isEditing ? 'Änderungen speichern' : 'Anmeldung abschicken';
             }
         }
 
-        function showSuccessScreen(data) {
+        function showSuccessScreen(data, isEditing = false) {
             const essenItems = [];
             if (parseInt(data.raclette_erwachsene) > 0) essenItems.push(`${data.raclette_erwachsene}x Raclette Erw.`);
             if (parseInt(data.fondue_erwachsene) > 0) essenItems.push(`${data.fondue_erwachsene}x Fondue Erw.`);
             if (parseInt(data.raclette_kinder) > 0) essenItems.push(`${data.raclette_kinder}x Raclette Kind`);
             if (parseInt(data.fondue_kinder) > 0) essenItems.push(`${data.fondue_kinder}x Fondue Kind`);
             const essenText = essenItems.length > 0 ? essenItems.join(', ') : 'Keine Auswahl';
+
+            // Update success screen text based on whether we're editing
+            const successTitle = document.getElementById('success-title');
+            const successMessage = document.getElementById('success-message');
+            
+            if (isEditing) {
+                successTitle.textContent = 'Änderungen gespeichert!';
+                successMessage.textContent = 'Deine Anmeldung wurde erfolgreich aktualisiert.';
+            } else {
+                successTitle.textContent = 'Vielen Dank!';
+                successMessage.textContent = 'Deine Anmeldung ist bei uns eingegangen. Du erhältst in Kürze eine Bestätigung per E-Mail.';
+            }
 
              let factsheetHTML = `
                 <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
@@ -494,6 +664,11 @@
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     initializeAppLogic(app);
+                    
+                    // If we have a registration ID, skip password gate
+                    if (registrationId) {
+                        showMainContent();
+                    }
                 } else {
                     signInAnonymously(auth).catch((error) => {
                         console.error("Anonymous sign-in failed:", error);
@@ -508,4 +683,3 @@
     </script>
 </body>
 </html>
-
