@@ -7,27 +7,24 @@ admin.initializeApp();
 
 // --- Google Sheets Configuration ---
 const SPREADSHEET_ID = "1ttmK64mZr1BZbZVrXUX7iztZE7DqZK68C49RoGi5bew";
-const SERVICE_ACCOUNT_PATH = "./service-account.json";
-const SHEET_NAME = "Anmeldungen"; // Name of the tab in your Google Sheet
+const SHEET_NAME = "Anmeldungen";
 
 /**
- * Appends data to a Google Sheet.
+ * Appends data to a Google Sheet using Application Default Credentials.
  * @param {object} data The data object to be added.
  * @param {string} docId The ID of the Firestore document.
  */
 async function appendToSheet(data, docId) {
-    // Authenticate with Google Sheets API
+    // Create a Google Auth client using Application Default Credentials
+    // This automatically uses the function's runtime service account.
     const auth = new google.auth.GoogleAuth({
-        keyFile: SERVICE_ACCOUNT_PATH,
         scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
     const sheets = google.sheets({version: "v4", auth});
 
-    // Create the row data in the correct order
     const timestamp = new Date().toISOString();
     const aenderungslink = `https://fap-jubilaeum-25.web.app/index.html?id=${docId}`;
 
-    // Map form data to sheet columns
     const row = [
         timestamp,
         docId,
@@ -46,7 +43,7 @@ async function appendToSheet(data, docId) {
     try {
         await sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
-            range: `${SHEET_NAME}!A1`, // Append after the last row in the sheet
+            range: `${SHEET_NAME}!A1`,
             valueInputOption: "USER_ENTERED",
             resource: {
                 values: [row],
@@ -55,14 +52,12 @@ async function appendToSheet(data, docId) {
         console.log("Successfully appended data to Google Sheet.");
     } catch (err) {
         console.error("Error appending data to Google Sheet:", err);
-        // We log the error but don't re-throw it to not block other operations
     }
 }
 
 
 /**
  * Triggered when a new registration is created in Firestore.
- * It now also appends the registration data to a Google Sheet.
  */
 exports.handleNewRegistration = functions.firestore
     .document("anmeldungen-fap-jubilaeum-25/{docId}")
@@ -70,23 +65,14 @@ exports.handleNewRegistration = functions.firestore
         const data = snap.data();
         const docId = context.params.docId;
 
-        // Only proceed for "yes" responses
         if (data.teilnahme === "ja") {
-            try {
-                await appendToSheet(data, docId);
-            } catch (error) {
-                // The error is already logged in appendToSheet
-                // We can add more handling here if needed
-            }
+            await appendToSheet(data, docId);
         }
-        // Note: The email sending logic is removed as per the previous request.
-        // If you need it back, the code can be re-inserted here.
         return null;
     });
 
 /**
  * HTTP-triggered function to export all registrations as JSON.
- * Protect with a secret query parameter.
  */
 exports.exportAnmeldungen = functions.https.onRequest(async (req, res) => {
     const SECRET = "bitte-aendern"; // Change this to a secure secret!
