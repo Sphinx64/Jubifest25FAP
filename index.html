@@ -155,28 +155,31 @@
         document.getElementById('close-popup').addEventListener('click', closeThePopup);
         document.getElementById('continue-to-form').addEventListener('click', closeThePopup);
 
-        // --- DYNAMIC FORM --- 
-        function toggleSection(element, show, parentToUpdate = null, useMaxHeightHack = false) {
+        // --- DYNAMIC FORM (REVISED FOR SMOOTH RESIZING) --- 
+        function toggleSection(element, show) {
             if (show) {
                 element.classList.remove('hidden');
                 setTimeout(() => {
                     element.classList.remove('opacity-0');
-                    element.style.maxHeight = useMaxHeightHack ? '2000px' : element.scrollHeight + 'px';
-                    if (parentToUpdate) updateParentHeight(parentToUpdate);
+                    element.style.maxHeight = element.scrollHeight + 'px';
                 }, 10);
             } else {
                 element.style.maxHeight = '0px';
                 element.classList.add('opacity-0');
                 setTimeout(() => {
-                    if (element.style.maxHeight === '0px') element.classList.add('hidden');
-                    if (parentToUpdate) updateParentHeight(parentToUpdate);
-                }, 500);
+                    // Only hide it if it's still closed, to prevent race conditions
+                    if (element.style.maxHeight === '0px') {
+                        element.classList.add('hidden');
+                    }
+                }, 500); // Wait for transition to finish
             }
         }
-
-        function updateParentHeight(parent) {
-             if (parent && parent.style.maxHeight !== '0px' && parent.style.maxHeight) {
-                setTimeout(() => { parent.style.maxHeight = parent.scrollHeight + 'px'; }, 510);
+        
+        // This new helper function recalculates the main container's height
+        function updateDetailsContainerHeight() {
+            // Only update if the container is actually visible
+            if (detailsContainer.style.maxHeight && detailsContainer.style.maxHeight !== '0px') {
+                detailsContainer.style.maxHeight = detailsContainer.scrollHeight + 'px';
             }
         }
 
@@ -186,8 +189,9 @@
                 if (isAttending && detailsContainer.innerHTML.trim() === '') {
                     renderDetailsContainer();
                 }
-                toggleSection(detailsContainer, isAttending, null, true);
+                toggleSection(detailsContainer, isAttending);
                 if (!isAttending) {
+                    // Clear content after hiding animation
                     setTimeout(() => { detailsContainer.innerHTML = ''; }, 500);
                 }
             });
@@ -220,7 +224,7 @@
                          <div><label for="fondue_kinder" class="block text-sm font-medium">Anzahl Kinder für Fondue</label><input type="number" id="fondue_kinder" name="fondue_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="dessert-parent">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="p-4 bg-gray-50 rounded-lg border">
                         <fieldset>
                             <legend class="block text-md font-semibold text-gray-700 mb-2">Dessertbuffet-Beitrag</legend>
@@ -229,7 +233,7 @@
                                 <label class="flex items-center cursor-pointer"><input type="radio" name="dessert-beitrag" value="nein" class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein, danke.</span></label>
                             </div>
                         </fieldset>
-                        <div id="dessert-details" class="form-section hidden opacity-0 max-h-0 mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
+                        <div id="dessert-details" class="form-section opacity-0 max-h-0 mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
                     </div>
                     <div class="bg-gray-50 rounded-lg border p-4"><h3 class="text-md font-semibold text-center mb-3">Live Dessert-Liste</h3><div id="dessert-liste" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div></div>
                 </div>
@@ -242,25 +246,29 @@
         }
 
         function attachDynamicEventListeners() {
-            const begleitungParent = document.getElementById('begleitung-parent');
             anmeldeFormular.elements.begleitung.forEach(radio => {
-                radio.addEventListener('change', e => toggleSection(document.getElementById('begleitung-details'), e.target.value === 'ja', begleitungParent));
+                radio.addEventListener('change', e => {
+                    toggleSection(document.getElementById('begleitung-details'), e.target.value === 'ja');
+                    // Wait for the animation to start, then update the main container
+                    setTimeout(updateDetailsContainerHeight, 50);
+                });
             });
 
-            const essenParent = document.getElementById('essen-parent');
             document.getElementById('kinder').addEventListener('input', e => {
-                toggleSection(document.getElementById('kinder-essen-details'), parseInt(e.target.value, 10) > 0, essenParent);
+                toggleSection(document.getElementById('kinder-essen-details'), parseInt(e.target.value, 10) > 0);
+                setTimeout(updateDetailsContainerHeight, 50);
             });
             
-            const dessertParent = document.getElementById('dessert-parent');
             const dessertDetails = document.getElementById('dessert-details');
             anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
-                radio.addEventListener('change', e => toggleSection(dessertDetails, e.target.value === 'ja', dessertParent));
+                radio.addEventListener('change', e => {
+                    toggleSection(dessertDetails, e.target.value === 'ja');
+                    setTimeout(updateDetailsContainerHeight, 50);
+                });
             });
             
-            if (anmeldeFormular.elements['dessert-beitrag'].value === 'ja') {
-                 toggleSection(dessertDetails, true, dessertParent);
-            }
+            // Initial state for dessert details when form is first rendered
+            toggleSection(dessertDetails, anmeldeFormular.elements['dessert-beitrag'].value === 'ja');
         }
 
         // --- FIREBASE & SUBMISSION ---
@@ -375,4 +383,5 @@
     </script>
 </body>
 </html>
+
 
