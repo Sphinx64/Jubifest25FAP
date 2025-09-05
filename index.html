@@ -50,13 +50,13 @@
         .progress-step:not(:last-child)::after {
             content: '';
             position: absolute;
-            top: 1.25rem; /* Center with circle */
+            top: 1.25rem; /* Center with circle (h-10 is 2.5rem, so half is 1.25rem) */
             left: 50%;
             height: 2px;
-            width: calc(100% - 2.5rem);
+            width: calc(100% - 2.5rem); /* Full width minus the circle's diameter */
             background-color: #e5e7eb; /* gray-200 */
             z-index: -1;
-            transform: translateX(1.25rem);
+            transform: translateX(1.25rem); /* Start after the circle */
         }
         .progress-step.completed::after {
             background-color: #005a6a;
@@ -157,8 +157,8 @@
                             </div>
                             <!-- Companions section, shown conditionally -->
                             <div id="companions-container" class="sub-section-container">
-                                <div class="sub-section-content pt-4">
-                                     <div class="p-4 bg-gray-50 rounded-lg border">
+                                <div class="sub-section-content">
+                                     <div class="mt-6 p-4 bg-gray-50 rounded-lg border">
                                         <fieldset>
                                             <legend class="block text-md font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
                                             <div class="flex items-center gap-x-6">
@@ -183,7 +183,7 @@
                     <div class="form-step hidden" data-step="2">
                         <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Essen & Dessert</h3>
                         <div class="space-y-8 pb-2">
-                           <!-- Dynamic content will be injected here -->
+                           <!-- Dynamic content is injected here -->
                         </div>
                          <div class="mt-8 flex justify-between">
                             <button type="button" id="back-to-step-1" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors text-lg">Zurück</button>
@@ -199,8 +199,24 @@
         <div id="success-container" class="hidden p-6 sm:p-10 text-center">
             <h2 class="text-3xl font-bold fap-teal-text">Vielen Dank!</h2>
             <p class="text-gray-700 mt-2 text-lg">Deine Anmeldung ist bei uns eingegangen.</p>
-            <div class="mt-8 text-left bg-gray-50 p-6 rounded-lg border max-w-2xl mx-auto"><h3 class="font-bold text-xl mb-4 text-gray-800">Deine Angaben</h3><div id="factsheet-content" class="space-y-2 text-gray-700"></div></div>
-            <div class="mt-6"><a id="ics-download-link" href="#" class="inline-block bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors">Kalendertermin (.ics) herunterladen</a></div>
+            
+            <div class="mt-8 text-left bg-gray-50 p-6 rounded-lg border max-w-2xl mx-auto">
+                <h3 class="font-bold text-xl mb-4 text-gray-800">Zur Erinnerung: Die Eckdaten</h3>
+                <div class="space-y-2 text-gray-700">
+                    <p><strong>Datum:</strong> Samstag, 18. Oktober 2025</p>
+                    <p><strong>Zeit:</strong> ab 14:00 Uhr</p>
+                    <p><strong>Ort:</strong> Schützenhaus Schönenbuch</p>
+                </div>
+            </div>
+
+            <div class="mt-8 text-left bg-gray-100 p-6 rounded-lg border max-w-2xl mx-auto">
+                <h3 class="font-bold text-xl mb-4 text-gray-800">Deine Angaben</h3>
+                <div id="factsheet-content" class="space-y-2 text-gray-700"></div>
+            </div>
+
+            <div class="mt-6">
+                <a id="ics-download-link" href="#" class="inline-block bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors">Kalendertermin (.ics) herunterladen</a>
+            </div>
         </div>
         
         <!-- Cancellation Screen -->
@@ -296,9 +312,8 @@
 
             if (teilnahme === 'ja') {
                 const step2Container = document.querySelector('[data-step="2"] .space-y-8');
-                if(step2Container.innerHTML.trim() === '') {
-                     renderStep2Details(step2Container);
-                }
+                // Always re-render step 2 to ensure data is fresh
+                renderStep2Details(step2Container);
                 goToStep(2);
             } else {
                 // Handle "no" case immediately
@@ -470,7 +485,7 @@
                 description: "25 Jahre FAP! Apéro, Spaziergang, Essen und gemütliches Beisammensein.",
                 location: "Schützenhaus Schönenbuch",
                 startTime: "20251018T120000Z", // 14:00 in CEST (UTC+2)
-                endTime: "20251018T200000Z",   // 22:00 in CEST (UTC+2)
+                endTime: "20251018T20000Z",   // 22:00 in CEST (UTC+2)
             };
             const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FunAgilityPeople//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:${Date.now()}@fun-agility-people.ch\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}\nDTSTART:${event.startTime}\nDTEND:${event.endTime}\nSUMMARY:${event.title}\nDESCRIPTION:${event.description}\nLOCATION:${event.location}\nEND:VEVENT\nEND:VCALENDAR`;
             return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
