@@ -1,7 +1,8 @@
 {
-    "projects"; {
-      "default"; "anmeldungjubilaeumsfest-2025"
-    }
-  }
-  
-  
+  "projects": {
+    "jubifest25": "anmeldungjubilaeumsfest-2025"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}
