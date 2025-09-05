@@ -665,9 +665,16 @@
             if (isEditing) {
                 successTitle.textContent = 'Änderungen gespeichert!';
                 successMessage.textContent = 'Deine Anmeldung wurde erfolgreich aktualisiert.';
+                
+                // Update email notice for editing
+                const emailNotice = document.querySelector('.bg-blue-50');
+                if (emailNotice) {
+                    emailNotice.querySelector('h3').textContent = '📧 Update-Bestätigung';
+                    emailNotice.querySelector('p').innerHTML = 'Wir haben dir eine Bestätigung der Änderungen per E-Mail gesendet.<br><strong>Falls sie nicht im Posteingang ankommt, schaue bitte auch im Spam-Ordner nach.</strong>';
+                }
             } else {
                 successTitle.textContent = 'Vielen Dank!';
-                successMessage.textContent = 'Deine Anmeldung ist bei uns eingegangen. Du erhältst in Kürze eine Bestätigung per E-Mail.';
+                successMessage.textContent = 'Deine Anmeldung ist bei uns eingegangen.';
             }
 
              let factsheetHTML = `
