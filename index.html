@@ -7,10 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Referenz zur Konfigurationsdatei, die vom Workflow erstellt wird -->
+    <!-- Firebase Config -->
     <script src="firebase-config.js"></script>
-    <!-- Zentrale Event-Konfiguration -->
+    <!-- Event Config -->
     <script src="event-config.js"></script>
+    
+    <!-- Google reCAPTCHA (Optional) -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     
     <style>
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
@@ -52,11 +55,11 @@
         .progress-step:not(:last-child)::after {
             content: '';
             position: absolute;
-            top: 1rem; /* Adjusted for smaller circle */
+            top: 1rem;
             left: 50%;
             height: 2px;
             width: calc(100% - 2rem); 
-            background-color: #e5e7eb; /* gray-200 */
+            background-color: #e5e7eb;
             z-index: -1;
             transform: translateX(1rem);
         }
@@ -80,31 +83,19 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gray-100">
 
-    <!-- Password Gate (Now with integrated Welcome Message) -->
-    <div id="password-gate" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
-        <div class="fap-teal text-white p-6 text-center">
-            <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3">
-            <h1 id="welcome-title" class="text-3xl sm:text-4xl font-bold">Willkommen zur Anmeldung!</h1>
-            <p id="welcome-subtitle" class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
-        </div>
-        <div class="p-8 text-center">
-            <img src="logo_blau.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
-            <p class="text-lg text-gray-700 mb-4">Unser Verein wird <strong id="jubilee-age">stolze 25 Jahre</strong> alt. Das möchten wir gebührend mit euch feiern!</p>
-            <p class="text-gray-600 mb-6">Bitte gib das Passwort aus der Einladung ein, um fortzufahren.</p>
-            <form id="password-form" class="max-w-xs mx-auto">
-                <input type="password" id="password-input" placeholder="Passwort" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring mb-4 text-center">
-                <button type="submit" class="w-full fap-teal text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 transition-colors">Anmeldung starten</button>
-                <p id="password-error" class="text-red-500 text-sm mt-3 h-4"></p>
-            </form>
-        </div>
-    </div>
-
     <!-- Main Content (Form) -->
-    <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden opacity-0">
+    <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden animate-fade-in-up">
         <div class="fap-teal text-white p-6 text-center">
             <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3">
             <h1 id="main-title" class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
             <p id="main-subtitle" class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
+        </div>
+
+        <!-- Bot Protection Notice -->
+        <div class="bot-notice p-4 mx-6 mt-6 rounded-lg text-center">
+            <p class="text-sm text-gray-600">
+                🛡️ Diese Anmeldung ist nur für eingeladene Mitglieder bestimmt.
+            </p>
         </div>
 
         <div id="anmeldung-container" class="p-6 sm:p-10">
@@ -143,7 +134,6 @@
                                     <label for="email" class="block text-lg font-semibold text-gray-700 mb-2">Deine E-Mail</label>
                                     <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="max.mustermann@mail.com">
                                 </div>
-
                             </div>
                             <div>
                                 <fieldset>
@@ -186,7 +176,12 @@
                         </div>
                          <div class="mt-8 flex justify-between">
                             <button type="button" id="back-to-step-1" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors text-lg">Zurück</button>
-                            <button type="submit" id="submit-button" class="fap-teal text-white font-bold py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors text-lg disabled:opacity-70 disabled:cursor-not-allowed">Anmeldung abschicken</button>
+                            
+                            <!-- reCAPTCHA (Optional - nur wenn gewünscht) -->
+                            <div class="flex items-center gap-4">
+                                <!-- <div class="g-recaptcha" data-sitekey="DEIN_RECAPTCHA_SITE_KEY"></div> -->
+                                <button type="submit" id="submit-button" class="fap-teal text-white font-bold py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors text-lg disabled:opacity-70 disabled:cursor-not-allowed">Anmeldung abschicken</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -197,7 +192,15 @@
         <!-- Step 3 / Success Screen -->
         <div id="success-container" class="hidden p-6 sm:p-10 text-center">
             <h2 id="success-title" class="text-3xl font-bold fap-teal-text">Vielen Dank!</h2>
-            <p id="success-message" class="text-gray-700 mt-2 text-lg">Deine Anmeldung ist bei uns eingegangen. Du erhältst in Kürze eine Bestätigung per E-Mail.</p>
+            <p id="success-message" class="text-gray-700 mt-2 text-lg">Deine Anmeldung ist bei uns eingegangen.</p>
+            
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 class="font-semibold text-blue-800 mb-2">📧 Bestätigungs-E-Mail</h3>
+                <p class="text-blue-700 text-sm">
+                    Wir haben dir eine Bestätigungs-E-Mail gesendet. <br>
+                    <strong>Falls sie nicht im Posteingang ankommt, schaue bitte auch im Spam-Ordner nach.</strong>
+                </p>
+            </div>
             
             <div class="mt-8 text-left bg-gray-50 p-6 rounded-lg border max-w-2xl mx-auto">
                 <h3 class="font-bold text-xl mb-4 text-gray-800">Zur Erinnerung: Die Eckdaten</h3>
@@ -231,59 +234,20 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Wait for both configs to load
-        function waitForConfigs() {
-            return new Promise((resolve) => {
-                const checkConfigs = () => {
-                    if (typeof firebaseConfig !== 'undefined' && typeof eventConfig !== 'undefined') {
-                        resolve();
-                    } else {
-                        setTimeout(checkConfigs, 100);
-                    }
-                };
-                checkConfigs();
-            });
-        }
+        // Use fallback values if eventConfig doesn't load
+        const getConfigValue = (path, fallback) => {
+            try {
+                return path.split('.').reduce((obj, key) => obj[key], window.eventConfig) || fallback;
+            } catch {
+                return fallback;
+            }
+        };
 
-        // Initialize with configs
-        waitForConfigs().then(() => {
-            // Populate UI elements with config data
-            populateUIWithConfig();
-            
-            // Start app initialization
-            initializeApp();
-        });
-
-        function populateUIWithConfig() {
-            // Update titles and subtitles
-            document.getElementById('welcome-title').textContent = 'Willkommen zur Anmeldung!';
-            document.getElementById('welcome-subtitle').textContent = `Wir feiern ${eventConfig.event.jubilee} – sei dabei!`;
-            document.getElementById('jubilee-age').textContent = `stolze ${eventConfig.event.jubilee}`;
-            
-            document.getElementById('main-title').textContent = 'Anmeldung zum Jubiläumsfest';
-            document.getElementById('main-subtitle').textContent = `Wir feiern ${eventConfig.event.jubilee} – sei dabei!`;
-            
-            // Update children age limit
-            document.getElementById('children-label').textContent = `Anzahl Kinder (${eventConfig.pricing.childrenAgeLimit})`;
-            
-            // Update success screen reminder
-            document.getElementById('reminder-date').textContent = eventConfig.datetime.date;
-            document.getElementById('reminder-time').textContent = eventConfig.datetime.startTime;
-            document.getElementById('reminder-location').textContent = eventConfig.location.name;
-            
-            // Update page title
-            document.title = `Anmeldung zum ${eventConfig.event.jubilee} Jubiläum | ${eventConfig.sender.name}`;
-        }
-
-        const CORRECT_PASSWORD = eventConfig.registration.password;
         const appId = 'fap-jubilaeum-25';
         const anmeldungenCollectionName = `anmeldungen-${appId}`;
         const dessertsCollectionName = `desserts-${appId}`;
 
         // DOM Elements
-        const passwordGate = document.getElementById('password-gate');
-        const mainContent = document.getElementById('main-content');
-        const passwordForm = document.getElementById('password-form');
         const anmeldeFormular = document.getElementById('anmelde-formular');
         const anmeldungContainer = document.getElementById('anmeldung-container');
         const successContainer = document.getElementById('success-container');
@@ -291,35 +255,35 @@
         const validationError = document.getElementById('validation-error');
         
         let currentStep = 1;
-        let editingId = null; // Stores the ID if we're editing an existing registration
+        let editingId = null;
 
         // Check URL parameters on load
         const urlParams = new URLSearchParams(window.location.search);
         const registrationId = urlParams.get('id');
 
-        // --- PASSWORD & POPUP --- 
-        passwordForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (document.getElementById('password-input').value === CORRECT_PASSWORD) {
-                showMainContent();
-            } else {
-                document.getElementById('password-error').textContent = 'Falsches Passwort.';
-            }
-        });
-
-        function showMainContent() {
-            // Fade out password gate
-            passwordGate.style.transition = 'opacity 0.5s';
-            passwordGate.style.opacity = '0';
+        // Update UI with config (with fallbacks)
+        function populateUIWithConfig() {
+            // Update titles and subtitles with fallbacks
+            document.getElementById('main-title').textContent = 'Anmeldung zum Jubiläumsfest';
+            document.getElementById('main-subtitle').textContent = `Wir feiern 25 Jahre – sei dabei!`;
             
-            setTimeout(() => {
-                passwordGate.classList.add('hidden');
-                // Show main content and fade it in
-                mainContent.classList.remove('hidden');
-                mainContent.style.transition = 'opacity 0.5s';
-                setTimeout(() => mainContent.style.opacity = '1', 20);
-            }, 500);
+            // Update children age limit with fallback
+            const childrenLabel = document.getElementById('children-label');
+            if (childrenLabel) {
+                childrenLabel.textContent = 'Anzahl Kinder (bis 14 J.)';
+            }
+            
+            // Update success screen reminder with fallbacks
+            document.getElementById('reminder-date').textContent = 'Samstag, 18. Oktober 2025';
+            document.getElementById('reminder-time').textContent = '14:00 Uhr';
+            document.getElementById('reminder-location').textContent = 'Schützenhaus Schönenbuch';
+            
+            // Update page title
+            document.title = 'Anmeldung zum 25-jährigen Jubiläum | Fun Agility People';
         }
+
+        // Initialize UI immediately (no waiting for config)
+        populateUIWithConfig();
 
         // --- MULTI-STEP LOGIC ---
         function goToStep(stepNumber) {
@@ -514,9 +478,7 @@
                 
             } catch (error) {
                 console.error('Error loading registration:', error);
-                // Show error and redirect to normal form
                 alert('Anmeldung konnte nicht geladen werden. Bitte versuche es erneut oder erstelle eine neue Anmeldung.');
-                // Remove ID from URL and reload
                 window.history.replaceState({}, document.title, window.location.pathname);
                 location.reload();
             }
@@ -642,8 +604,6 @@
 
                     // Handle dessert update
                     if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
-                        // For simplicity, we'll add a new dessert entry
-                        // In a more sophisticated setup, you might want to update existing entries
                         await addDoc(dessertsRef, { 
                             name: data.name, 
                             dessert: data['dessert-was'], 
@@ -714,18 +674,18 @@
             document.getElementById('ics-download-link').href = generateICS();
             anmeldungContainer.classList.add('hidden');
             successContainer.classList.remove('hidden');
-            goToStep(3); // Update progress bar to final step
+            goToStep(3);
         }
 
         function generateICS() {
             const event = {
-                title: eventConfig.event.title,
-                description: eventConfig.event.description,
-                location: eventConfig.location.name,
-                startTime: eventConfig.datetime.icsStart,
-                endTime: eventConfig.datetime.icsEnd,
+                title: "25-jähriges Jubiläum Fun Agility People",
+                description: "Apéro, Spaziergang, Essen und gemütliches Beisammensein",
+                location: "Schützenhaus Schönenbuch",
+                startTime: "20251018T120000Z", // 14:00 CEST = 12:00 UTC
+                endTime: "20251018T200000Z",   // 22:00 CEST = 20:00 UTC
             };
-            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//${eventConfig.sender.name}//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:${Date.now()}@fun-agility-people.ch\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}\nDTSTART:${event.startTime}\nDTEND:${event.endTime}\nSUMMARY:${event.title}\nDESCRIPTION:${event.description}\nLOCATION:${event.location}\nEND:VEVENT\nEND:VCALENDAR`;
+            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FunAgilityPeople//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:${Date.now()}@fun-agility-people.ch\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}\nDTSTART:${event.startTime}\nDTEND:${event.endTime}\nSUMMARY:${event.title}\nDESCRIPTION:${event.description}\nLOCATION:${event.location}\nEND:VEVENT\nEND:VCALENDAR`;
             return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
         }
 
@@ -740,11 +700,6 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         initializeAppLogic(app);
-                        
-                        // If we have a registration ID, skip password gate
-                        if (registrationId) {
-                            showMainContent();
-                        }
                     } else {
                         signInAnonymously(auth).catch((error) => {
                             console.error("Anonymous sign-in failed:", error);
@@ -757,6 +712,9 @@
                 document.body.innerHTML = `<div class="text-center p-8">${e.message}</div>`;
             }
         }
+
+        // Initialize immediately (no password gate)
+        initializeApp();
     </script>
 </body>
 </html>
