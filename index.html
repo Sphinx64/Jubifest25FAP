@@ -16,10 +16,30 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .form-section {
-            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+
+        /* --- NEW: Grid Animation Technique --- */
+        /* This is a modern, robust way to animate height from 0 to auto. */
+        #details-container {
+            display: grid;
+            grid-template-rows: 0fr; /* Start collapsed */
+            transition: grid-template-rows 0.5s ease-in-out;
+        }
+        #details-container.open {
+            grid-template-rows: 1fr; /* Expand to full content height */
+        }
+        /* The direct child handles the overflow */
+        #details-container > div {
             overflow: hidden;
         }
+
+        /* Simpler hide/show for sub-sections */
+        .sub-section {
+            display: none;
+        }
+        .sub-section.open {
+            display: grid; /* or 'block', depending on content */
+        }
+        
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gray-100">
@@ -37,7 +57,7 @@
 
     <!-- Password Gate -->
     <div id="password-gate" class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl p-8 text-center">
-        <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
+        <img src="https://fun-agility-people.ch/wp-content/uploads/2011/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Anmeldung zum Jubiläumsfest</h2>
         <p class="text-gray-600 mb-6">Bitte gib das Passwort ein, um fortzufahren.</p>
         <form id="password-form">
@@ -50,7 +70,7 @@
     <!-- Main Content -->
     <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden opacity-0">
         <div class="fap-teal text-white p-6 text-center">
-            <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
+            <img src="https://fun-agility-people.ch/wp-content/uploads/2011/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
             <h1 class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
             <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
         </div>
@@ -79,9 +99,8 @@
                     </div>
                 </div>
                 
-                <!-- FIX: Added pb-2 to prevent last element from being cut off -->
-                <div id="details-container" class="form-section hidden opacity-0 max-h-0 space-y-8 pb-2">
-                    <!-- Dynamic content will be injected here -->
+                <div id="details-container">
+                    <!-- Dynamic content will be wrapped in a direct child div -->
                 </div>
 
                 <div id="validation-error" class="hidden text-center p-3 my-4 bg-red-100 text-red-800 rounded-lg text-sm"></div>
@@ -156,62 +175,30 @@
         document.getElementById('close-popup').addEventListener('click', closeThePopup);
         document.getElementById('continue-to-form').addEventListener('click', closeThePopup);
 
-        // --- DYNAMIC FORM (REVISED FOR SMOOTH RESIZING) --- 
-        function toggleSection(element, show) {
-            if (show) {
-                element.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    element.classList.remove('opacity-0');
-                    element.style.maxHeight = element.scrollHeight + 'px';
-                });
-            } else {
-                element.style.maxHeight = '0px';
-                element.classList.add('opacity-0');
-                setTimeout(() => {
-                    if (element.style.maxHeight === '0px') {
-                        element.classList.add('hidden');
-                    }
-                }, 500); 
-            }
-        }
-        
-        function updateDetailsContainerHeight() {
-            if (detailsContainer.style.maxHeight && detailsContainer.style.maxHeight !== '0px') {
-                detailsContainer.style.maxHeight = detailsContainer.scrollHeight + 'px';
-            }
-        }
-
+        // --- DYNAMIC FORM (REVISED WITH CSS GRID ANIMATION) --- 
         anmeldeFormular.elements.teilnahme.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const isAttending = e.target.value === 'ja';
-
+                
                 if (isAttending) {
+                    // Only render the HTML if it's not already there
                     if (detailsContainer.innerHTML.trim() === '') {
                         renderDetailsContainer();
-                        // This robust method waits for the browser to render the new HTML,
-                        // ensuring scrollHeight is correct before the animation starts.
-                        requestAnimationFrame(() => {
-                            toggleSection(detailsContainer, true);
-                        });
-                    } else {
-                         toggleSection(detailsContainer, true);
                     }
+                    // Add 'open' class to trigger the CSS grid-template-rows transition
+                    detailsContainer.classList.add('open');
                 } else {
-                    toggleSection(detailsContainer, false);
-                    setTimeout(() => { detailsContainer.innerHTML = ''; }, 500);
+                    // Remove 'open' class to collapse the container
+                    detailsContainer.classList.remove('open');
                 }
             });
         });
 
         function renderDetailsContainer() {
-            // FIX: Render sub-sections that should be open by default WITHOUT hidden classes.
-            // This ensures their height is part of the initial calculation.
-            const dessertDetailsClasses = anmeldeFormular.elements['dessert-beitrag']?.value === 'nein' 
-                ? 'form-section hidden opacity-0 max-h-0 mt-4'
-                : 'form-section mt-4';
-
-            detailsContainer.innerHTML = `
-                <div class="p-4 bg-gray-50 rounded-lg border" id="begleitung-parent">
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'space-y-8 pb-2';
+            contentWrapper.innerHTML = `
+                <div class="p-4 bg-gray-50 rounded-lg border">
                     <fieldset>
                         <legend class="block text-md font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
                         <div class="flex items-center gap-x-6">
@@ -219,20 +206,19 @@
                             <label class="flex items-center cursor-pointer"><input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein</span></label>
                         </div>
                     </fieldset>
-                    <div id="begleitung-details" class="form-section hidden opacity-0 max-h-0 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div id="begleitung-details" class="sub-section mt-4 grid-cols-1 sm:grid-cols-2 gap-4">
                         <div><label for="erwachsene" class="block text-sm font-medium">Anzahl zus. Erwachsene</label><input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="kinder" class="block text-sm font-medium">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
                 </div>
-                <div class="p-4 bg-gray-50 rounded-lg border" id="essen-parent">
+                <div class="p-4 bg-gray-50 rounded-lg border">
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
                     <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir).</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- FIX: Default food values set to 0 -->
                         <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="fondue_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Fondue</label><input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
-                    <div id="kinder-essen-details" class="form-section hidden opacity-0 max-h-0 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div id="kinder-essen-details" class="sub-section mt-4 grid-cols-1 sm:grid-cols-2 gap-4">
                          <div><label for="raclette_kinder" class="block text-sm font-medium">Anzahl Kinder für Raclette</label><input type="number" id="raclette_kinder" name="raclette_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                          <div><label for="fondue_kinder" class="block text-sm font-medium">Anzahl Kinder für Fondue</label><input type="number" id="fondue_kinder" name="fondue_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
@@ -246,7 +232,7 @@
                                 <label class="flex items-center cursor-pointer"><input type="radio" name="dessert-beitrag" value="nein" class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein, danke.</span></label>
                             </div>
                         </fieldset>
-                        <div id="dessert-details" class="${dessertDetailsClasses}"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
+                        <div id="dessert-details" class="sub-section open mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
                     </div>
                     <div class="bg-gray-50 rounded-lg border p-4"><h3 class="text-md font-semibold text-center mb-3">Live Dessert-Liste</h3><div id="dessert-liste" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div></div>
                 </div>
@@ -255,26 +241,25 @@
                     <textarea id="bemerkungen" name="bemerkungen" rows="3" class="w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="Allergien, besondere Wünsche, etc."></textarea>
                 </div>
             `;
+            detailsContainer.innerHTML = ''; // Clear previous content
+            detailsContainer.appendChild(contentWrapper);
             attachDynamicEventListeners();
         }
 
         function attachDynamicEventListeners() {
             anmeldeFormular.elements.begleitung.forEach(radio => {
                 radio.addEventListener('change', e => {
-                    toggleSection(document.getElementById('begleitung-details'), e.target.value === 'ja');
-                    setTimeout(updateDetailsContainerHeight, 50);
+                    document.getElementById('begleitung-details').classList.toggle('open', e.target.value === 'ja');
                 });
             });
 
             document.getElementById('kinder').addEventListener('input', e => {
-                toggleSection(document.getElementById('kinder-essen-details'), parseInt(e.target.value, 10) > 0);
-                setTimeout(updateDetailsContainerHeight, 50);
+                 document.getElementById('kinder-essen-details').classList.toggle('open', parseInt(e.target.value, 10) > 0);
             });
             
             anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
                 radio.addEventListener('change', e => {
-                    toggleSection(document.getElementById('dessert-details'), e.target.value === 'ja');
-                    setTimeout(updateDetailsContainerHeight, 50);
+                    document.getElementById('dessert-details').classList.toggle('open', e.target.value === 'ja');
                 });
             });
         }
