@@ -163,8 +163,8 @@
                                             </div>
                                         </fieldset>
                                         <div id="begleitung-details" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div><label for="erwachsene" class="block text-sm font-medium">Anzahl zus. Erwachsene</label><input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
-                                            <div><label for="kinder" class="block text-sm font-medium">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                                            <div><label for="erwachsene" class="block text-sm font-medium">Anzahl zus. Erwachsene</label><input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
+                                            <div><label for="kinder" class="block text-sm font-medium">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -175,7 +175,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 2: Details -->
+                    <!-- Step 2: Food & Dessert -->
                     <div class="form-step hidden" data-step="2">
                         <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Essen & Dessert</h3>
                         <div class="space-y-6 pb-2">
@@ -194,7 +194,7 @@
         <!-- Step 3 / Success Screen -->
         <div id="success-container" class="hidden p-6 sm:p-10 text-center">
             <h2 class="text-3xl font-bold fap-teal-text">Vielen Dank!</h2>
-            <p class="text-gray-700 mt-2 text-lg">Deine Anmeldung ist bei uns eingegangen.</p>
+            <p class="text-gray-700 mt-2 text-lg">Deine Anmeldung ist bei uns eingegangen. Du erhältst in Kürze eine Bestätigung per E-Mail.</p>
             
             <div class="mt-8 text-left bg-gray-50 p-6 rounded-lg border max-w-2xl mx-auto">
                 <h3 class="font-bold text-xl mb-4 text-gray-800">Zur Erinnerung: Die Eckdaten</h3>
@@ -219,7 +219,7 @@
         <div id="cancellation-container" class="hidden p-6 sm:p-10 text-center">
             <h2 class="text-3xl font-bold fap-teal-text">Abmeldung erhalten</h2>
             <p class="text-gray-700 mt-2 text-lg">Schade, dass du nicht dabei sein kannst!</p>
-            <p class="text-sm text-gray-500 mt-2">Wir haben deine Abmeldung gespeichert.</p>
+            <p class="text-sm text-gray-500 mt-2">Wir haben deine Abmeldung gespeichert und dir eine E-Mail gesendet.</p>
         </div>
     </div>
 
@@ -332,12 +332,12 @@
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
                     <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir und Begleitpersonen).</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
-                        <div><label for="fondue_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Fondue</label><input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
+                        <div><label for="fondue_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Fondue</label><input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
                     <div id="kinder-essen-details" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                         <div><label for="raclette_kinder" class="block text-sm font-medium">Anzahl Kinder für Raclette</label><input type="number" id="raclette_kinder" name="raclette_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
-                         <div><label for="fondue_kinder" class="block text-sm font-medium">Anzahl Kinder für Fondue</label><input type="number" id="fondue_kinder" name="fondue_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                         <div><label for="raclette_kinder" class="block text-sm font-medium">Anzahl Kinder für Raclette</label><input type="number" id="raclette_kinder" name="raclette_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
+                         <div><label for="fondue_kinder" class="block text-sm font-medium">Anzahl Kinder für Fondue</label><input type="number" id="fondue_kinder" name="fondue_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -349,13 +349,13 @@
                                 <label class="flex items-center cursor-pointer"><input type="radio" name="dessert-beitrag" value="nein" class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein, danke.</span></label>
                             </div>
                         </fieldset>
-                        <div id="dessert-details" class="mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
+                        <div id="dessert-details" class="mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
                     </div>
                     <div class="bg-gray-50 rounded-lg border p-4"><h3 class="text-md font-semibold text-center mb-3">Live Dessert-Liste</h3><div id="dessert-liste" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div></div>
                 </div>
                  <div class="p-4 bg-gray-50 rounded-lg border">
                     <label for="bemerkungen" class="block text-md font-semibold text-gray-700 mb-2">Bemerkungen</label>
-                    <textarea id="bemerkungen" name="bemerkungen" rows="3" class="w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="Allergien, besondere Wünsche, etc."></textarea>
+                    <textarea id="bemerkungen" name="bemerkungen" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring" placeholder="Allergien, besondere Wünsche, etc."></textarea>
                 </div>
             `;
             attachStep2EventListeners();
@@ -396,6 +396,7 @@
             try {
                 const anmeldungenRef = collection(db, anmeldungenCollectionName);
                 await addDoc(anmeldungenRef, { name, email, teilnahme: 'nein', timestamp: new Date() });
+                
                 anmeldungContainer.classList.add('hidden');
                 cancellationContainer.classList.remove('hidden');
             } catch (error) {
@@ -476,7 +477,7 @@
                 description: "25 Jahre FAP! Apéro, Spaziergang, Essen und gemütliches Beisammensein.",
                 location: "Schützenhaus Schönenbuch",
                 startTime: "20251018T120000Z", // 14:00 in CEST (UTC+2)
-                endTime: "20251018T20000Z",   // 22:00 in CEST (UTC+2)
+                endTime: "20251018T200000Z",   // 22:00 in CEST (UTC+2)
             };
             const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FunAgilityPeople//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:${Date.now()}@fun-agility-people.ch\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}\nDTSTART:${event.startTime}\nDTEND:${event.endTime}\nSUMMARY:${event.title}\nDESCRIPTION:${event.description}\nLOCATION:${event.location}\nEND:VEVENT\nEND:VCALENDAR`;
             return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
@@ -484,7 +485,7 @@
 
         // --- APP INITIALIZATION ---
         try {
-            if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey) {
+            if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith('__')) {
                  throw new Error("Firebase config is not correctly loaded.");
             }
             const app = initializeApp(firebaseConfig); 
