@@ -1,114 +1,115 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const sgMail = require("@sendgrid/mail");
+const {google} = require("googleapis");
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
 
-// Get SendGrid API key from Firebase environment configuration
-const SENDGRID_API_KEY = functions.config().sendgrid.key;
-const SENDER_EMAIL = functions.config().sendgrid.sender;
-sgMail.setApiKey(SENDGRID_API_KEY);
+// --- Google Sheets Configuration ---
+const SPREADSHEET_ID = "1ttmK64mZr1BZbZVrXUX7iztZE7DqZK68C49RoGi5bew";
+const SERVICE_ACCOUNT_PATH = "./service-account.json";
+const SHEET_NAME = "Anmeldungen"; // Name of the tab in your Google Sheet
+
+/**
+ * Appends data to a Google Sheet.
+ * @param {object} data The data object to be added.
+ * @param {string} docId The ID of the Firestore document.
+ */
+async function appendToSheet(data, docId) {
+    // Authenticate with Google Sheets API
+    const auth = new google.auth.GoogleAuth({
+        keyFile: SERVICE_ACCOUNT_PATH,
+        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
+    const sheets = google.sheets({version: "v4", auth});
+
+    // Create the row data in the correct order
+    const timestamp = new Date().toISOString();
+    const aenderungslink = `https://fap-jubilaeum-25.web.app/index.html?id=${docId}`;
+
+    // Map form data to sheet columns
+    const row = [
+        timestamp,
+        docId,
+        data.name || "",
+        data.erwachsene || "0",
+        data.kinder || "0",
+        data.raclette_erwachsene || "0",
+        data.fondue_erwachsene || "0",
+        data.raclette_kinder || "0",
+        data.fondue_kinder || "0",
+        data["dessert-beitrag"] === "ja" ? (data["dessert-was"] || "Ja") : "Nein",
+        data.bemerkungen || "",
+        aenderungslink,
+    ];
+
+    try {
+        await sheets.spreadsheets.values.append({
+            spreadsheetId: SPREADSHEET_ID,
+            range: `${SHEET_NAME}!A1`, // Append after the last row in the sheet
+            valueInputOption: "USER_ENTERED",
+            resource: {
+                values: [row],
+            },
+        });
+        console.log("Successfully appended data to Google Sheet.");
+    } catch (err) {
+        console.error("Error appending data to Google Sheet:", err);
+        // We log the error but don't re-throw it to not block other operations
+    }
+}
+
 
 /**
  * Triggered when a new registration is created in Firestore.
- * It sends a confirmation or cancellation email.
+ * It now also appends the registration data to a Google Sheet.
  */
-exports.sendConfirmationEmail = functions.firestore
+exports.handleNewRegistration = functions.firestore
     .document("anmeldungen-fap-jubilaeum-25/{docId}")
-    .onCreate((snap, context) => {
-      const data = snap.data();
-      const docId = context.params.docId;
+    .onCreate(async (snap, context) => {
+        const data = snap.data();
+        const docId = context.params.docId;
 
-      // Email content
-      const to = data.email;
-      const from = SENDER_EMAIL;
-      let subject = "";
-      let html = "";
-
-      if (data.teilnahme === "ja") {
-        // --- Confirmation Email for Participants ---
-        subject = "Bestätigung deiner Anmeldung zum FAP Jubiläumsfest!";
-
-        // Create a clean summary of the food order
-        const essenItems = [];
-        if (parseInt(data.raclette_erwachsene) > 0) {
-          essenItems.push(`${data.raclette_erwachsene}x Raclette Erw.`);
+        // Only proceed for "yes" responses
+        if (data.teilnahme === "ja") {
+            try {
+                await appendToSheet(data, docId);
+            } catch (error) {
+                // The error is already logged in appendToSheet
+                // We can add more handling here if needed
+            }
         }
-        if (parseInt(data.fondue_erwachsene) > 0) {
-          essenItems.push(`${data.fondue_erwachsene}x Fondue Erw.`);
-        }
-        if (parseInt(data.raclette_kinder) > 0) {
-          essenItems.push(`${data.raclette_kinder}x Raclette Kind`);
-        }
-        if (parseInt(data.fondue_kinder) > 0) {
-          essenItems.push(`${data.fondue_kinder}x Fondue Kind`);
-        }
-        const essenText = essenItems.length > 0 ?
-          essenItems.join(", ") : "Keine Auswahl";
-
-        const aenderungslink = `https://fap-jubilaeum-25.web.app/index.html?id=${docId}`;
-
-        // Create iCalendar data
-        const icsData = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//FAP//NONSGML v1.0//EN
-BEGIN:VEVENT
-UID:${docId}@fap-jubilaeum-25.web.app
-DTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}Z
-DTSTART:20251018T120000Z
-DTEND:20251018T220000Z
-SUMMARY:FAP Jubiläumsfest
-DESCRIPTION:Jubiläumsfest der Fun Agility People. Details siehe unter ${aenderungslink}
-LOCATION:Schützenhaus Schönenbuch
-END:VEVENT
-END:VCALENDAR`;
-
-        const calLink = `data:text/calendar;charset=utf8,${encodeURIComponent(icsData)}`;
-
-        html = `
-          <p>Hallo ${data.name},</p>
-          <p>vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! 
-          Wir freuen uns riesig, mit dir zu feiern.</p>
-          <p><strong>Hier sind deine Angaben in der Übersicht:</strong></p>
-          <ul>
-            <li><strong>Name:</strong> ${data.name}</li>
-            <li><strong>Begleitung:</strong> ${data.erwachsene || 0} Erw., ${data.kinder || 0} Kind(er)</li>
-            <li><strong>Essen:</strong> ${essenText}</li>
-            <li><strong>Dessert:</strong> ${data["dessert-beitrag"] === "ja" ? (data["dessert-was"] || "Ja") : "Nein"}</li>
-            ${data.bemerkungen ? `<li><strong>Bemerkungen:</strong> ${data.bemerkungen}</li>` : ""}
-          </ul>
-          <hr>
-          <p><strong>Zur Erinnerung die Eckdaten:</strong></p>
-          <ul>
-            <li><strong>Datum:</strong> Samstag, 18. Oktober 2025</li>
-            <li><strong>Zeit:</strong> ab 14:00 Uhr</li>
-            <li><strong>Ort:</strong> Schützenhaus Schönenbuch</li>
-          </ul>
-          <p>
-            <a href="${calLink}">Kalendereintrag herunterladen</a> |
-            <a href="${aenderungslink}">Anmeldung bearbeiten</a>
-          </p>
-          <p>Herzliche Grüsse,<br>Das OK und der Vorstand der Fun Agility People</p>
-        `;
-      } else {
-        // --- "Sorry to see you go" Email for Cancellations ---
-        subject = "Schade, bist du nicht dabei | FAP Jubiläumsfest";
-        html = `
-          <p>Hallo ${data.name},</p>
-          <p>wir haben deine Abmeldung für unser Jubiläumsfest erhalten. 
-          Schade, dass du nicht dabei sein kannst!</p>
-          <p>Falls sich deine Pläne ändern, kannst du dich jederzeit 
-          einfach erneut über die Webseite anmelden.</p>
-          <p>Herzliche Grüsse,<br>Das OK und der Vorstand der Fun Agility People</p>
-        `;
-      }
-
-      const msg = {to, from, subject, html};
-
-      return sgMail.send(msg)
-          .then(() => console.log("Email sent to", to))
-          .catch((error) => {
-            console.error("Error sending email:", error.toString());
-          });
+        // Note: The email sending logic is removed as per the previous request.
+        // If you need it back, the code can be re-inserted here.
+        return null;
     });
+
+/**
+ * HTTP-triggered function to export all registrations as JSON.
+ * Protect with a secret query parameter.
+ */
+exports.exportAnmeldungen = functions.https.onRequest(async (req, res) => {
+    const SECRET = "bitte-aendern"; // Change this to a secure secret!
+
+    if (req.query.secret !== SECRET) {
+        res.status(403).send("Unauthorized");
+        return;
+    }
+
+    try {
+        const anmeldungenRef = admin.firestore().collection("anmeldungen-fap-jubilaeum-25");
+        const snapshot = await anmeldungenRef.orderBy("timestamp", "desc").get();
+        
+        if (snapshot.empty) {
+            res.status(404).send("No registrations found.");
+            return;
+        }
+        
+        const data = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+        res.status(200).json(data);
+
+    } catch (error) {
+        console.error("Error exporting data:", error);
+        res.status(500).send("Error exporting data.");
+    }
+});
