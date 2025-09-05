@@ -9,6 +9,8 @@
     
     <!-- Referenz zur Konfigurationsdatei, die vom Workflow erstellt wird -->
     <script src="firebase-config.js"></script>
+    <!-- Zentrale Event-Konfiguration -->
+    <script src="event-config.js"></script>
     
     <style>
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
@@ -82,12 +84,12 @@
     <div id="password-gate" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
         <div class="fap-teal text-white p-6 text-center">
             <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3">
-            <h1 class="text-3xl sm:text-4xl font-bold">Willkommen zur Anmeldung!</h1>
-            <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
+            <h1 id="welcome-title" class="text-3xl sm:text-4xl font-bold">Willkommen zur Anmeldung!</h1>
+            <p id="welcome-subtitle" class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
         </div>
         <div class="p-8 text-center">
             <img src="logo_blau.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-6">
-            <p class="text-lg text-gray-700 mb-4">Unser Verein wird <strong>stolze 25 Jahre</strong> alt. Das möchten wir gebührend mit euch feiern!</p>
+            <p class="text-lg text-gray-700 mb-4">Unser Verein wird <strong id="jubilee-age">stolze 25 Jahre</strong> alt. Das möchten wir gebührend mit euch feiern!</p>
             <p class="text-gray-600 mb-6">Bitte gib das Passwort aus der Einladung ein, um fortzufahren.</p>
             <form id="password-form" class="max-w-xs mx-auto">
                 <input type="password" id="password-input" placeholder="Passwort" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring mb-4 text-center">
@@ -102,7 +104,7 @@
         <div class="fap-teal text-white p-6 text-center">
             <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3">
             <h1 id="main-title" class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
-            <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
+            <p id="main-subtitle" class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
         </div>
 
         <div id="anmeldung-container" class="p-6 sm:p-10">
@@ -165,7 +167,7 @@
                                         </fieldset>
                                         <div id="begleitung-details" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div><label for="erwachsene" class="block text-sm font-medium">Anzahl zus. Erwachsene</label><input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
-                                            <div><label for="kinder" class="block text-sm font-medium">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
+                                            <div><label for="kinder" class="block text-sm font-medium" id="children-label">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg fap-focus-ring"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -199,10 +201,10 @@
             
             <div class="mt-8 text-left bg-gray-50 p-6 rounded-lg border max-w-2xl mx-auto">
                 <h3 class="font-bold text-xl mb-4 text-gray-800">Zur Erinnerung: Die Eckdaten</h3>
-                <div class="space-y-2 text-gray-700">
-                    <p><strong>Datum:</strong> Samstag, 18. Oktober 2025</p>
-                    <p><strong>Zeit:</strong> ab 14:00 Uhr</p>
-                    <p><strong>Ort:</strong> Schützenhaus Schönenbuch</p>
+                <div id="event-reminder" class="space-y-2 text-gray-700">
+                    <p><strong>Datum:</strong> <span id="reminder-date">Samstag, 18. Oktober 2025</span></p>
+                    <p><strong>Zeit:</strong> ab <span id="reminder-time">14:00 Uhr</span></p>
+                    <p><strong>Ort:</strong> <span id="reminder-location">Schützenhaus Schönenbuch</span></p>
                 </div>
             </div>
 
@@ -229,7 +231,51 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const CORRECT_PASSWORD = "Agility"; 
+        // Wait for both configs to load
+        function waitForConfigs() {
+            return new Promise((resolve) => {
+                const checkConfigs = () => {
+                    if (typeof firebaseConfig !== 'undefined' && typeof eventConfig !== 'undefined') {
+                        resolve();
+                    } else {
+                        setTimeout(checkConfigs, 100);
+                    }
+                };
+                checkConfigs();
+            });
+        }
+
+        // Initialize with configs
+        waitForConfigs().then(() => {
+            // Populate UI elements with config data
+            populateUIWithConfig();
+            
+            // Start app initialization
+            initializeApp();
+        });
+
+        function populateUIWithConfig() {
+            // Update titles and subtitles
+            document.getElementById('welcome-title').textContent = 'Willkommen zur Anmeldung!';
+            document.getElementById('welcome-subtitle').textContent = `Wir feiern ${eventConfig.event.jubilee} – sei dabei!`;
+            document.getElementById('jubilee-age').textContent = `stolze ${eventConfig.event.jubilee}`;
+            
+            document.getElementById('main-title').textContent = 'Anmeldung zum Jubiläumsfest';
+            document.getElementById('main-subtitle').textContent = `Wir feiern ${eventConfig.event.jubilee} – sei dabei!`;
+            
+            // Update children age limit
+            document.getElementById('children-label').textContent = `Anzahl Kinder (${eventConfig.pricing.childrenAgeLimit})`;
+            
+            // Update success screen reminder
+            document.getElementById('reminder-date').textContent = eventConfig.datetime.date;
+            document.getElementById('reminder-time').textContent = eventConfig.datetime.startTime;
+            document.getElementById('reminder-location').textContent = eventConfig.location.name;
+            
+            // Update page title
+            document.title = `Anmeldung zum ${eventConfig.event.jubilee} Jubiläum | ${eventConfig.sender.name}`;
+        }
+
+        const CORRECT_PASSWORD = eventConfig.registration.password;
         const appId = 'fap-jubilaeum-25';
         const anmeldungenCollectionName = `anmeldungen-${appId}`;
         const dessertsCollectionName = `desserts-${appId}`;
@@ -644,41 +690,43 @@
 
         function generateICS() {
             const event = {
-                title: "Jubiläumsfest Fun Agility People",
-                description: "25 Jahre FAP! Apéro, Spaziergang, Essen und gemütliches Beisammensein.",
-                location: "Schützenhaus Schönenbuch",
-                startTime: "20251018T120000Z", // 14:00 in CEST (UTC+2)
-                endTime: "20251018T200000Z",   // 22:00 in CEST (UTC+2)
+                title: eventConfig.event.title,
+                description: eventConfig.event.description,
+                location: eventConfig.location.name,
+                startTime: eventConfig.datetime.icsStart,
+                endTime: eventConfig.datetime.icsEnd,
             };
-            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FunAgilityPeople//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:${Date.now()}@fun-agility-people.ch\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}\nDTSTART:${event.startTime}\nDTEND:${event.endTime}\nSUMMARY:${event.title}\nDESCRIPTION:${event.description}\nLOCATION:${event.location}\nEND:VEVENT\nEND:VCALENDAR`;
+            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//${eventConfig.sender.name}//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:${Date.now()}@fun-agility-people.ch\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}\nDTSTART:${event.startTime}\nDTEND:${event.endTime}\nSUMMARY:${event.title}\nDESCRIPTION:${event.description}\nLOCATION:${event.location}\nEND:VEVENT\nEND:VCALENDAR`;
             return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
         }
 
         // --- APP INITIALIZATION ---
-        try {
-            if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith('__')) {
-                 throw new Error("Firebase config is not correctly loaded.");
-            }
-            const app = initializeApp(firebaseConfig); 
-            auth = getAuth(app);
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    initializeAppLogic(app);
-                    
-                    // If we have a registration ID, skip password gate
-                    if (registrationId) {
-                        showMainContent();
-                    }
-                } else {
-                    signInAnonymously(auth).catch((error) => {
-                        console.error("Anonymous sign-in failed:", error);
-                        document.body.innerHTML = '<div class="text-center p-8">Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.</div>';
-                    });
+        function initializeApp() {
+            try {
+                if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith('__')) {
+                     throw new Error("Firebase config is not correctly loaded.");
                 }
-            });
-        } catch (e) {
-            console.error("Firebase initialization failed:", e);
-            document.body.innerHTML = `<div class="text-center p-8">${e.message}</div>`;
+                const app = initializeApp(firebaseConfig); 
+                auth = getAuth(app);
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        initializeAppLogic(app);
+                        
+                        // If we have a registration ID, skip password gate
+                        if (registrationId) {
+                            showMainContent();
+                        }
+                    } else {
+                        signInAnonymously(auth).catch((error) => {
+                            console.error("Anonymous sign-in failed:", error);
+                            document.body.innerHTML = '<div class="text-center p-8">Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.</div>';
+                        });
+                    }
+                });
+            } catch (e) {
+                console.error("Firebase initialization failed:", e);
+                document.body.innerHTML = `<div class="text-center p-8">${e.message}</div>`;
+            }
         }
     </script>
 </body>

@@ -3,12 +3,24 @@ const admin = require("firebase-admin");
 const {google} = require("googleapis");
 const sgMail = require('@sendgrid/mail');
 
+// Import central configuration
+const eventConfig = require('./event-config');
+
 // Initialize Firebase Admin SDK
 admin.initializeApp();
 
-// --- SendGrid Configuration ---
-// The SendGrid API key will be loaded from Firebase environment variables
-sgMail.setApiKey(functions.config().sendgrid.apikey);
+// --- SendGrid Configuration with better error handling ---
+try {
+    const sendgridConfig = functions.config().sendgrid;
+    if (!sendgridConfig || !sendgridConfig.apikey) {
+        console.error("❌ SendGrid API key not configured! Run: firebase functions:config:set sendgrid.apikey=\"YOUR_KEY\"");
+    } else {
+        sgMail.setApiKey(sendgridConfig.apikey);
+        console.log("✅ SendGrid API key configured");
+    }
+} catch (error) {
+    console.error("❌ Error configuring SendGrid:", error);
+}
 
 // --- Google Sheets Configuration ---
 const SPREADSHEET_ID = "1ttmK64mZr1BZbZVrXUX7iztZE7DqZK68C49RoGi5bew";
@@ -20,6 +32,8 @@ const SHEET_NAME = "Anmeldungen";
  * @param {string} docId The ID of the Firestore document.
  */
 async function appendToSheet(data, docId) {
+    console.log("📊 Attempting to append to Google Sheet for:", data.name);
+    
     // Create a Google Auth client using Application Default Credentials
     const auth = new google.auth.GoogleAuth({
         scopes: ["https://www.googleapis.com/auth/spreadsheets"],
@@ -27,7 +41,7 @@ async function appendToSheet(data, docId) {
     const sheets = google.sheets({version: "v4", auth});
 
     const timestamp = new Date().toISOString();
-    const aenderungslink = `https://fap-jubilaeum-25.web.app/index.html?id=${docId}`;
+    const aenderungslink = `${eventConfig.registration.url}index.html?id=${docId}`;
 
     const row = [
         timestamp,
@@ -53,20 +67,29 @@ async function appendToSheet(data, docId) {
                 values: [row],
             },
         });
-        console.log("Successfully appended data to Google Sheet.");
+        console.log("✅ Successfully appended data to Google Sheet for:", data.name);
     } catch (err) {
-        console.error("Error appending data to Google Sheet:", err.message);
-        console.error(err);
+        console.error("❌ Error appending data to Google Sheet:", err.message);
+        console.error("Full error:", err);
     }
 }
 
 /**
- * Sends a confirmation email using SendGrid.
+ * Sends a confirmation email using SendGrid with enhanced debugging.
  * @param {object} data The registration data
  * @param {string} docId The document ID for edit links
  */
 async function sendConfirmationEmail(data, docId) {
-    const editLink = `https://fap-jubilaeum-25.web.app/index.html?id=${docId}`;
+    console.log("📧 Starting email send process for:", data.email);
+    
+    // Check if SendGrid is configured
+    const sendgridConfig = functions.config().sendgrid;
+    if (!sendgridConfig || !sendgridConfig.apikey) {
+        console.error("❌ SendGrid not configured, skipping email send");
+        return;
+    }
+
+    const editLink = `${eventConfig.registration.url}index.html?id=${docId}`;
     
     // Prepare food summary
     const essenItems = [];
@@ -79,32 +102,32 @@ async function sendConfirmationEmail(data, docId) {
     const begleitungText = `${parseInt(data.erwachsene) || 0} Erwachsene, ${parseInt(data.kinder) || 0} Kinder`;
     const dessertText = data['dessert-beitrag'] === 'ja' ? (data['dessert-was'] || 'Ja, Details folgen') : 'Nein';
 
-    // Email template - matching the FAP design
+    // Email template using central configuration
     const emailHtml = `
     <!DOCTYPE html>
     <html lang="de">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Anmeldebestätigung - 25 Jahre Fun Agility People</title>
+        <title>Anmeldebestätigung - ${eventConfig.event.title}</title>
         <style>
             body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
             .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            .header { background-color: #005a6a; color: white; padding: 30px 20px; text-align: center; }
+            .header { background-color: ${eventConfig.branding.primaryColor}; color: white; padding: 30px 20px; text-align: center; }
             .header h1 { margin: 0; font-size: 28px; font-weight: bold; }
             .header p { margin: 10px 0 0 0; opacity: 0.9; }
             .content { padding: 30px 20px; }
             .greeting { font-size: 18px; margin-bottom: 20px; color: #333; }
-            .event-details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #005a6a; }
-            .event-details h3 { margin: 0 0 15px 0; color: #005a6a; font-size: 20px; }
+            .event-details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${eventConfig.branding.primaryColor}; }
+            .event-details h3 { margin: 0 0 15px 0; color: ${eventConfig.branding.primaryColor}; font-size: 20px; }
             .event-details p { margin: 5px 0; color: #555; }
             .registration-summary { background-color: #f1f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; }
-            .registration-summary h3 { margin: 0 0 15px 0; color: #005a6a; }
+            .registration-summary h3 { margin: 0 0 15px 0; color: ${eventConfig.branding.primaryColor}; }
             .registration-summary p { margin: 8px 0; color: #333; }
-            .registration-summary strong { color: #005a6a; }
+            .registration-summary strong { color: ${eventConfig.branding.primaryColor}; }
             .edit-section { background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #ffeaa7; }
             .edit-section h3 { margin: 0 0 10px 0; color: #856404; }
-            .edit-button { display: inline-block; background-color: #005a6a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
+            .edit-button { display: inline-block; background-color: ${eventConfig.branding.primaryColor}; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
             .edit-button:hover { background-color: #004850; }
             .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; }
             .signature { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; }
@@ -119,7 +142,7 @@ async function sendConfirmationEmail(data, docId) {
         <div class="container">
             <div class="header">
                 <h1>🎉 Anmeldebestätigung</h1>
-                <p>25 Jahre Fun Agility People</p>
+                <p>${eventConfig.event.jubilee} ${eventConfig.sender.name}</p>
             </div>
             
             <div class="content">
@@ -131,10 +154,10 @@ async function sendConfirmationEmail(data, docId) {
                 
                 <div class="event-details">
                     <h3>📅 Die Eckdaten im Überblick</h3>
-                    <p><strong>Datum:</strong> Samstag, 18. Oktober 2025</p>
-                    <p><strong>Zeit:</strong> ab 14:00 Uhr</p>
-                    <p><strong>Ort:</strong> Schützenhaus Schönenbuch</p>
-                    <p><strong>Programm:</strong> Apéro, Spaziergang, Essen und gemütliches Beisammensein</p>
+                    <p><strong>Datum:</strong> ${eventConfig.datetime.date}</p>
+                    <p><strong>Zeit:</strong> ab ${eventConfig.datetime.startTime}</p>
+                    <p><strong>Ort:</strong> ${eventConfig.location.name}</p>
+                    <p><strong>Programm:</strong> ${eventConfig.event.description}</p>
                 </div>
                 
                 <div class="registration-summary">
@@ -160,12 +183,12 @@ async function sendConfirmationEmail(data, docId) {
                 
                 <div class="signature">
                     <p>Bis dahin freuen wir uns auf einen unvergesslichen Tag mit dir!</p>
-                    <p><strong>Dein Fun Agility People Team</strong> 🐕</p>
+                    <p><strong>${eventConfig.sender.signature}</strong> 🐕</p>
                 </div>
             </div>
             
             <div class="footer">
-                <p>Fun Agility People • 25 Jahre Hundesport mit Herz</p>
+                <p>${eventConfig.sender.name} • ${eventConfig.event.jubilee} Hundesport mit Herz</p>
                 <p>Diese E-Mail wurde automatisch generiert.</p>
             </div>
         </div>
@@ -176,21 +199,32 @@ async function sendConfirmationEmail(data, docId) {
     const msg = {
         to: data.email,
         from: {
-            email: 'grafpia@gmail.com', // Your verified SendGrid sender email
-            name: 'Fun Agility People'
+            email: eventConfig.sender.email,
+            name: eventConfig.sender.name
         },
-        subject: '🎉 Anmeldebestätigung - 25 Jahre FAP Jubiläumsfest',
+        subject: `🎉 Anmeldebestätigung - ${eventConfig.event.shortTitle} Jubiläumsfest`,
         html: emailHtml,
     };
 
+    console.log("📧 Email message prepared:");
+    console.log("  To:", msg.to);
+    console.log("  From:", msg.from.email);
+    console.log("  Subject:", msg.subject);
+
     try {
-        await sgMail.send(msg);
-        console.log(`Confirmation email sent successfully to ${data.email}`);
+        const response = await sgMail.send(msg);
+        console.log("✅ Confirmation email sent successfully to:", data.email);
+        console.log("📧 SendGrid response status:", response[0].statusCode);
     } catch (error) {
-        console.error('Error sending confirmation email:', error);
+        console.error("❌ Error sending confirmation email:", error.message);
+        
         if (error.response) {
-            console.error('SendGrid response body:', error.response.body);
+            console.error("❌ SendGrid response status:", error.response.status);
+            console.error("❌ SendGrid response body:", JSON.stringify(error.response.body, null, 2));
         }
+        
+        // Don't throw the error - we don't want email failures to break the registration
+        console.log("⚠️ Registration will continue despite email failure");
     }
 }
 
@@ -199,17 +233,26 @@ async function sendConfirmationEmail(data, docId) {
  * @param {object} data The registration data
  */
 async function sendCancellationEmail(data) {
+    console.log("📧 Sending cancellation email to:", data.email);
+    
+    // Check if SendGrid is configured
+    const sendgridConfig = functions.config().sendgrid;
+    if (!sendgridConfig || !sendgridConfig.apikey) {
+        console.error("❌ SendGrid not configured, skipping cancellation email");
+        return;
+    }
+
     const emailHtml = `
     <!DOCTYPE html>
     <html lang="de">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Abmeldung erhalten - Fun Agility People</title>
+        <title>Abmeldung erhalten - ${eventConfig.sender.name}</title>
         <style>
             body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
             .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            .header { background-color: #005a6a; color: white; padding: 30px 20px; text-align: center; }
+            .header { background-color: ${eventConfig.branding.primaryColor}; color: white; padding: 30px 20px; text-align: center; }
             .header h1 { margin: 0; font-size: 28px; font-weight: bold; }
             .content { padding: 30px 20px; }
             .greeting { font-size: 18px; margin-bottom: 20px; color: #333; }
@@ -228,18 +271,18 @@ async function sendCancellationEmail(data) {
                     Hallo ${data.name || 'Liebe/r Teilnehmer/in'},
                 </div>
                 
-                <p>schade, dass du nicht an unserem 25-jährigen Jubiläumsfest teilnehmen kannst. Wir haben deine Abmeldung erhalten und zur Kenntnis genommen.</p>
+                <p>schade, dass du nicht an unserem ${eventConfig.event.jubilee} Jubiläumsfest teilnehmen kannst. Wir haben deine Abmeldung erhalten und zur Kenntnis genommen.</p>
                 
                 <p>Falls sich doch noch etwas ändert und du teilnehmen möchtest, kannst du dich jederzeit wieder anmelden.</p>
                 
                 <div class="signature">
                     <p>Wir wünschen dir alles Gute!</p>
-                    <p><strong>Dein Fun Agility People Team</strong> 🐕</p>
+                    <p><strong>${eventConfig.sender.signature}</strong> 🐕</p>
                 </div>
             </div>
             
             <div class="footer">
-                <p>Fun Agility People • 25 Jahre Hundesport mit Herz</p>
+                <p>${eventConfig.sender.name} • ${eventConfig.event.jubilee} Hundesport mit Herz</p>
                 <p>Diese E-Mail wurde automatisch generiert.</p>
             </div>
         </div>
@@ -250,20 +293,20 @@ async function sendCancellationEmail(data) {
     const msg = {
         to: data.email,
         from: {
-            email: 'noreply@fun-agility-people.ch', // Replace with your verified SendGrid sender email
-            name: 'Fun Agility People'
+            email: eventConfig.sender.email,
+            name: eventConfig.sender.name
         },
-        subject: 'Abmeldung erhalten - FAP Jubiläumsfest',
+        subject: `Abmeldung erhalten - ${eventConfig.event.shortTitle} Jubiläumsfest`,
         html: emailHtml,
     };
 
     try {
         await sgMail.send(msg);
-        console.log(`Cancellation email sent successfully to ${data.email}`);
+        console.log("✅ Cancellation email sent successfully to:", data.email);
     } catch (error) {
-        console.error('Error sending cancellation email:', error);
+        console.error("❌ Error sending cancellation email:", error.message);
         if (error.response) {
-            console.error('SendGrid response body:', error.response.body);
+            console.error("❌ SendGrid response body:", JSON.stringify(error.response.body, null, 2));
         }
     }
 }
@@ -277,14 +320,25 @@ exports.handleNewRegistration = functions.firestore
         const data = snap.data();
         const docId = context.params.docId;
 
+        console.log("🎯 New registration created:", {
+            docId: docId,
+            name: data.name,
+            email: data.email,
+            teilnahme: data.teilnahme
+        });
+
         if (data.teilnahme === "ja") {
+            console.log("✅ Processing positive registration");
             // Handle positive registration
             await appendToSheet(data, docId);
             await sendConfirmationEmail(data, docId);
         } else {
+            console.log("❌ Processing cancellation");
             // Handle cancellation
             await sendCancellationEmail(data);
         }
+        
+        console.log("🏁 Registration processing completed for:", data.name);
         return null;
     });
 
@@ -297,15 +351,25 @@ exports.handleUpdatedRegistration = functions.firestore
         const newData = change.after.data();
         const docId = context.params.docId;
 
+        console.log("🔄 Registration updated:", {
+            docId: docId,
+            name: newData.name,
+            email: newData.email,
+            teilnahme: newData.teilnahme,
+            hasLastModified: !!newData.lastModified
+        });
+
         // Only send email for updates, not initial creation
         if (newData.lastModified) {
             if (newData.teilnahme === "ja") {
                 await sendConfirmationEmail(newData, docId);
-                console.log(`Update confirmation email sent for registration ${docId}`);
+                console.log("✅ Update confirmation email sent for registration:", docId);
             } else {
                 await sendCancellationEmail(newData);
-                console.log(`Update cancellation email sent for registration ${docId}`);
+                console.log("❌ Update cancellation email sent for registration:", docId);
             }
+        } else {
+            console.log("⏭️ Skipping email for initial registration (no lastModified field)");
         }
         return null;
     });

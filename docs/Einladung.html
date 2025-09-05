@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Einladung zum 25-jährigen Jubiläum | Fun Agility People</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="event-config.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
         body {
@@ -34,9 +35,9 @@
     <div class="w-full max-w-3xl print-container bg-white rounded-lg shadow-xl border border-gray-200">
         <!-- Header -->
         <div class="fap-teal text-white p-6 text-center rounded-t-lg">
-            <img src="https://fun-agility-people.ch/wp-content/uploads/2021/08/logo-fap.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
-            <h1 class="text-3xl sm:text-4xl font-bold">Einladung zum Jubiläumsfest</h1>
-            <p class="mt-2 opacity-90">Wir feiern 25 Jahre!</p>
+            <img id="logo-img" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
+            <h1 id="main-title" class="text-3xl sm:text-4xl font-bold">Einladung zum Jubiläumsfest</h1>
+            <p id="jubilee-subtitle" class="mt-2 opacity-90">Wir feiern 25 Jahre!</p>
         </div>
 
         <!-- Einladungstext -->
@@ -45,33 +46,30 @@
                 Liebe Mitglieder, liebe Freundinnen und Freunde,
             </p>
             <p class="text-gray-600 mb-8">
-                Wir haben einen Grund zu feiern! Unser Verein wird <strong>stolze 25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!
+                Wir haben einen Grund zu feiern! Unser Verein wird <strong id="jubilee-text">stolze 25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!
             </p>
             
             <div class="bg-gray-50 border-l-4 border-[#005a6a] p-4 rounded-r-lg mb-8">
                 <h3 class="text-xl font-bold fap-teal-text mb-3">Alle Eckdaten auf einen Blick</h3>
                 <ul class="space-y-2 text-gray-700">
-                    <li><strong>Datum:</strong> Samstag, 18. Oktober 2025, ab 14:00 Uhr</li>
-                    <li><strong>Ort:</strong> Schützenhaus Schönenbuch</li>
-                    <li><strong>Kosten:</strong> Mitglieder (Aktiv und Passiv) sind eingeladen.</li>
-                    <li><strong>Begleitpersonen:</strong> Erwachsene 40 CHF, Kinder (bis 14 Jahre) 15 CHF.</li>
-                    <li><strong>Bezahlung Gäste:</strong> Bar oder Twint vor Ort.</li>
+                    <li><strong>Datum:</strong> <span id="event-date">Samstag, 18. Oktober 2025</span>, ab <span id="start-time">14:00 Uhr</span></li>
+                    <li><strong>Ort:</strong> <span id="location-name">Schützenhaus Schönenbuch</span></li>
+                    <li><strong>Kosten:</strong> <span id="members-note">Mitglieder (Aktiv und Passiv) sind eingeladen.</span></li>
+                    <li><strong>Begleitpersonen:</strong> Erwachsene <span id="adults-price">40 CHF</span>, Kinder <span id="children-info">(bis 14 Jahre) 15 CHF</span>.</li>
+                    <li><strong>Bezahlung Gäste:</strong> <span id="payment-methods">Bar oder Twint vor Ort.</span></li>
                 </ul>
                  <div class="mt-4 pt-4 border-t">
                     <h4 class="font-semibold text-gray-800">Programm:</h4>
-                    <ul class="list-['–'] list-inside ml-4 mt-1 text-gray-700">
-                        <li><strong>14:00 Uhr:</strong> Offizielle Begrüssung und Apéro</li>
-                        <li><strong>15:00 Uhr:</strong> Gemeinsamer Spaziergang</li>
-                        <li><strong>18:00 Uhr:</strong> Fondue oder Raclette</li>
-                        <li><strong>Anschliessend:</strong> Dessertbuffet, Drinks und Musik</li>
+                    <ul id="program-list" class="list-['–'] list-inside ml-4 mt-1 text-gray-700">
+                        <!-- Program items will be populated by JavaScript -->
                     </ul>
                 </div>
                  <div class="mt-4 pt-4 border-t">
                     <h4 class="font-semibold text-gray-800">Organisatorisches:</h4>
                      <ul class="list-['–'] list-inside ml-4 mt-1 text-gray-700">
-                        <li><strong>Anmeldeschluss:</strong> Dienstag, 9. September 2025</li>
-                        <li><strong>Fragen an:</strong> Martin Thalmann (+41 78 684 11 17)</li>
-                        <li><strong>Parkplätze:</strong> Beim Schiessclub vorhanden.</li>
+                        <li><strong>Anmeldeschluss:</strong> <span id="deadline">Dienstag, 9. September 2025</span></li>
+                        <li><strong>Fragen an:</strong> <span id="contact-info">Martin Thalmann (+41 78 684 11 17)</span></li>
+                        <li><strong>Parkplätze:</strong> <span id="parking-info">Beim Schiessclub vorhanden.</span></li>
                     </ul>
                 </div>
             </div>
@@ -79,10 +77,10 @@
              <div>
                 <h3 class="text-xl font-bold fap-teal-text mb-3 text-center">Anfahrt</h3>
                  <div class="border rounded-lg overflow-hidden">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d9610.938578609515!2d7.508557953441143!3d47.53141500551722!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4791bf45c4ad2baf%3A0xcd59e1773464a61f!2sSch%C3%BCtzenhaus!5e1!3m2!1sde!2sch!4v1757004515397!5m2!1sde!2sch" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <iframe id="maps-iframe" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                  </div>
                  <p class="text-center text-sm mt-2">
-                    <a href="https://maps.app.goo.gl/9Txcm6CBV6H1cMkx9" target="_blank" class="text-blue-600 hover:underline">
+                    <a id="maps-link" target="_blank" class="text-blue-600 hover:underline">
                         Grössere Karte auf Google Maps öffnen
                     </a>
                 </p>
@@ -93,10 +91,10 @@
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-6 p-4 bg-gray-50 rounded-lg">
                     <div class="text-center">
                         <p class="font-semibold">Klicke auf den Link oder scanne den Code:</p>
-                        <a href="https://sphinx64.github.io/Jubifest25FAP/" class="text-blue-600 hover:underline break-all">https://sphinx64.github.io/Jubifest25FAP/</a>
-                        <p class="text-sm text-gray-600 mt-2">Das Passwort lautet: <strong class="fap-teal-text">Agility</strong></p>
+                        <a id="registration-link" class="text-blue-600 hover:underline break-all">https://fap-jubilaeum-25.web.app/</a>
+                        <p class="text-sm text-gray-600 mt-2">Das Passwort lautet: <strong id="password" class="fap-teal-text">Agility</strong></p>
                     </div>
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://sphinx64.github.io/Jubifest25FAP/" alt="QR-Code zur Anmeldung" class="border rounded-lg p-1">
+                    <img id="qr-code" alt="QR-Code zur Anmeldung" class="border rounded-lg p-1">
                 </div>
             </div>
 
@@ -105,7 +103,7 @@
             </p>
             <p class="text-center font-semibold mt-2 text-gray-800">
                 Herzliche Grüsse,<br>
-                Das OK und der Vorstand
+                <span id="signature">Das OK und der Vorstand</span>
             </p>
 
         </div>
@@ -117,5 +115,68 @@
             Seite Drucken
         </button>
     </div>
+
+    <script>
+        // Wait for DOM and config to load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof eventConfig !== 'undefined') {
+                populateContent();
+            } else {
+                // Fallback if config doesn't load
+                console.error('Event config not loaded');
+            }
+        });
+
+        function populateContent() {
+            // Update header and titles
+            document.getElementById('logo-img').src = eventConfig.branding.logoUrl;
+            document.getElementById('main-title').textContent = `Einladung zum Jubiläumsfest`;
+            document.getElementById('jubilee-subtitle').textContent = `Wir feiern ${eventConfig.event.jubilee}!`;
+            document.getElementById('jubilee-text').textContent = `stolze ${eventConfig.event.jubilee}`;
+
+            // Update event details
+            document.getElementById('event-date').textContent = eventConfig.datetime.date;
+            document.getElementById('start-time').textContent = eventConfig.datetime.startTime;
+            document.getElementById('location-name').textContent = eventConfig.location.name;
+            document.getElementById('members-note').textContent = eventConfig.pricing.membersNote;
+            document.getElementById('adults-price').textContent = eventConfig.pricing.adultsPrice;
+            document.getElementById('children-info').textContent = `(${eventConfig.pricing.childrenAgeLimit}) ${eventConfig.pricing.childrenPrice}`;
+            document.getElementById('payment-methods').textContent = eventConfig.pricing.paymentMethods;
+
+            // Update program
+            const programList = document.getElementById('program-list');
+            programList.innerHTML = '';
+            eventConfig.program.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${item.time}:</strong> ${item.activity}`;
+                programList.appendChild(li);
+            });
+
+            // Update organizational details
+            document.getElementById('deadline').textContent = eventConfig.registration.deadline;
+            document.getElementById('contact-info').textContent = `${eventConfig.contact.name} ${eventConfig.contact.formattedPhone}`;
+            document.getElementById('parking-info').textContent = eventConfig.logistics.parking;
+
+            // Update maps
+            const mapsIframe = document.getElementById('maps-iframe');
+            const lat = eventConfig.location.coordinates.lat;
+            const lng = eventConfig.location.coordinates.lng;
+            mapsIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d9610.938578609515!2d${lng - 0.01}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4791bf45c4ad2baf%3A0xcd59e1773464a61f!2sSch%C3%BCtzenhaus!5e1!3m2!1sde!2sch!4v1757004515397!5m2!1sde!2sch`;
+            
+            document.getElementById('maps-link').href = eventConfig.location.googleMapsLink;
+
+            // Update registration
+            document.getElementById('registration-link').href = eventConfig.registration.url;
+            document.getElementById('registration-link').textContent = eventConfig.registration.url;
+            document.getElementById('password').textContent = eventConfig.registration.password;
+            document.getElementById('qr-code').src = eventConfig.registration.qrCodeUrl;
+
+            // Update signature
+            document.getElementById('signature').textContent = eventConfig.sender.signature;
+
+            // Update page title
+            document.title = `Einladung zum ${eventConfig.event.jubilee} Jubiläum | ${eventConfig.sender.name}`;
+        }
+    </script>
 </body>
 </html>
