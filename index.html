@@ -16,29 +16,51 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* --- Grid Animation Technique --- */
-        #details-container {
-            display: grid;
-            grid-template-rows: 0fr; /* Start collapsed */
-            transition: grid-template-rows 0.5s ease-in-out;
+        
+        /* --- Styles for Multi-Step Form --- */
+        .form-step {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
-        #details-container.open {
-            grid-template-rows: 1fr; /* Expand to full content height */
-        }
-        /* The direct child handles the overflow */
-        #details-container > div {
-            overflow: hidden;
-        }
-
-        /* Simpler hide/show for sub-sections */
-        .sub-section {
-            display: none;
-        }
-        .sub-section.open {
-            display: grid; /* or 'block', depending on content */
+        .form-step.hidden {
+            position: absolute;
+            opacity: 0;
+            transform: translateX(20px);
+            pointer-events: none;
         }
         
+        /* Progress Bar */
+        .progress-step {
+            transition: all 0.3s ease;
+        }
+        .progress-step.active .step-circle {
+            background-color: #005a6a;
+            border-color: #005a6a;
+            color: white;
+        }
+        .progress-step.active .step-label {
+            color: #005a6a;
+            font-weight: 600;
+        }
+        .progress-step.completed .step-circle {
+            background-color: #005a6a;
+            border-color: #005a6a;
+            color: white;
+        }
+        /* Line between steps */
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 1.25rem; /* Center with circle */
+            left: 50%;
+            height: 2px;
+            width: calc(100% - 2.5rem);
+            background-color: #e5e7eb; /* gray-200 */
+            z-index: -1;
+            transform: translateX(1.25rem);
+        }
+        .progress-step.completed::after {
+            background-color: #005a6a;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-gray-100">
@@ -76,40 +98,71 @@
 
         <div id="anmeldung-container" class="p-6 sm:p-10">
             <form id="anmelde-formular">
-                <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Deine Anmeldung</h3>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
-                    <div>
-                        <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
-                        <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="Max Mustermann">
+                <!-- Progress Bar -->
+                <div class="w-full max-w-2xl mx-auto mb-10">
+                    <div class="flex justify-between items-start">
+                        <div class="progress-step text-center relative active" data-progress="1">
+                            <div class="step-circle w-10 h-10 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-lg text-gray-500">1</div>
+                            <div class="step-label mt-2 text-sm text-gray-500">Teilnahme</div>
+                        </div>
+                        <div class="progress-step text-center relative" data-progress="2">
+                            <div class="step-circle w-10 h-10 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-lg text-gray-500">2</div>
+                            <div class="step-label mt-2 text-sm text-gray-500">Details</div>
+                        </div>
+                        <div class="progress-step text-center relative" data-progress="3">
+                            <div class="step-circle w-10 h-10 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-lg text-gray-500">✓</div>
+                            <div class="step-label mt-2 text-sm text-gray-500">Bestätigung</div>
+                        </div>
                     </div>
-                    <div>
-                        <label for="email" class="block text-lg font-semibold text-gray-700 mb-2">Deine E-Mail</label>
-                        <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="max.mustermann@mail.com">
-                    </div>
-                    <div class="md:col-span-2">
-                        <fieldset>
-                            <legend class="block text-lg font-semibold text-gray-700 mb-2">Nimmst du teil?</legend>
-                            <div class="flex items-center gap-x-6 h-full">
-                                <label class="flex items-center cursor-pointer"><input type="radio" name="teilnahme" value="ja" required class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]"> <span class="ml-2 text-gray-800">Ja, ich bin dabei!</span></label>
-                                <label class="flex items-center cursor-pointer"><input type="radio" name="teilnahme" value="nein" class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]"> <span class="ml-2 text-gray-800">Nein, leider nicht.</span></label>
+                </div>
+
+                <!-- Form Steps Container -->
+                <div class="relative">
+                    <!-- Step 1: Participation -->
+                    <div class="form-step" data-step="1">
+                        <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Deine Anmeldung</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                            <div>
+                                <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
+                                <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="Max Mustermann">
                             </div>
-                        </fieldset>
+                            <div>
+                                <label for="email" class="block text-lg font-semibold text-gray-700 mb-2">Deine E-Mail</label>
+                                <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="max.mustermann@mail.com">
+                            </div>
+                            <div class="md:col-span-2">
+                                <fieldset>
+                                    <legend class="block text-lg font-semibold text-gray-700 mb-2">Nimmst du teil?</legend>
+                                    <div class="flex items-center gap-x-6 h-full">
+                                        <label class="flex items-center cursor-pointer"><input type="radio" name="teilnahme" value="ja" required class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]"> <span class="ml-2 text-gray-800">Ja, ich bin dabei!</span></label>
+                                        <label class="flex items-center cursor-pointer"><input type="radio" name="teilnahme" value="nein" class="h-4 w-4 text-[#005a6a] border-gray-300 focus:ring-[#005a6a]"> <span class="ml-2 text-gray-800">Nein, leider nicht.</span></label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex justify-end">
+                            <button type="button" id="next-to-step-2" class="fap-teal text-white font-bold py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors text-lg">Weiter</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Details -->
+                    <div class="form-step hidden" data-step="2">
+                        <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Details zur Feier</h3>
+                        <div class="space-y-8 pb-2">
+                           <!-- Dynamic content will be injected here -->
+                        </div>
+                         <div class="mt-8 flex justify-between">
+                            <button type="button" id="back-to-step-1" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors text-lg">Zurück</button>
+                            <button type="submit" id="submit-button" class="fap-teal text-white font-bold py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors text-lg disabled:opacity-70 disabled:cursor-not-allowed">Anmeldung abschicken</button>
+                        </div>
                     </div>
                 </div>
-                
-                <div id="details-container">
-                    <!-- Dynamic content will be wrapped in a direct child div -->
-                </div>
-
-                <div id="validation-error" class="hidden text-center p-3 my-4 bg-red-100 text-red-800 rounded-lg text-sm"></div>
-
-                <div class="mt-8">
-                    <button id="submit-button" type="submit" class="w-full fap-teal text-white font-bold py-3 px-4 rounded-lg hover:bg-opacity-90 transition-all duration-300 text-lg disabled:opacity-70 disabled:cursor-not-allowed">Anmeldung abschicken</button>
-                </div>
+                 <div id="validation-error" class="hidden text-center p-3 mt-4 bg-red-100 text-red-800 rounded-lg text-sm"></div>
             </form>
         </div>
         
+        <!-- Step 3 / Success Screen -->
         <div id="success-container" class="hidden p-6 sm:p-10 text-center">
             <h2 class="text-3xl font-bold fap-teal-text">Vielen Dank!</h2>
             <p class="text-gray-700 mt-2 text-lg">Deine Anmeldung ist bei uns eingegangen.</p>
@@ -117,6 +170,7 @@
             <div class="mt-6"><a id="ics-download-link" href="#" class="inline-block bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors">Kalendertermin (.ics) herunterladen</a></div>
         </div>
         
+        <!-- Cancellation Screen -->
         <div id="cancellation-container" class="hidden p-6 sm:p-10 text-center">
             <h2 class="text-3xl font-bold fap-teal-text">Abmeldung erhalten</h2>
             <p class="text-gray-700 mt-2 text-lg">Schade, dass du nicht dabei sein kannst!</p>
@@ -140,12 +194,12 @@
         const passwordForm = document.getElementById('password-form');
         const welcomePopup = document.getElementById('welcome-popup');
         const anmeldeFormular = document.getElementById('anmelde-formular');
-        const detailsContainer = document.getElementById('details-container');
         const anmeldungContainer = document.getElementById('anmeldung-container');
         const successContainer = document.getElementById('success-container');
         const cancellationContainer = document.getElementById('cancellation-container');
         const validationError = document.getElementById('validation-error');
-        const submitButton = document.getElementById('submit-button');
+        
+        let currentStep = 1;
 
         // --- PASSWORD & POPUP --- 
         passwordForm.addEventListener('submit', (e) => {
@@ -159,14 +213,12 @@
                         mainContent.classList.remove('opacity-0');
                         welcomePopup.classList.remove('hidden');
                         welcomePopup.classList.add('flex');
-                        welcomePopup.classList.remove('opacity-0');
                     }, 50);
                 }, 500);
             } else {
                 document.getElementById('password-error').textContent = 'Falsches Passwort.';
             }
         });
-
         function closeThePopup() {
             welcomePopup.classList.add('opacity-0');
             setTimeout(() => { welcomePopup.classList.add('hidden'); welcomePopup.classList.remove('flex'); }, 500);
@@ -174,30 +226,62 @@
         document.getElementById('close-popup').addEventListener('click', closeThePopup);
         document.getElementById('continue-to-form').addEventListener('click', closeThePopup);
 
-        // --- DYNAMIC FORM (REVISED WITH CSS GRID ANIMATION) --- 
-        anmeldeFormular.elements.teilnahme.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const isAttending = e.target.value === 'ja';
-                
-                if (isAttending) {
-                    if (detailsContainer.innerHTML.trim() === '') {
-                        renderDetailsContainer();
-                    }
-                    // Use requestAnimationFrame to ensure the class is added in the next paint cycle,
-                    // after the DOM has been updated by renderDetailsContainer(). This is the fix.
-                    requestAnimationFrame(() => {
-                        detailsContainer.classList.add('open');
-                    });
+        // --- MULTI-STEP LOGIC ---
+        function goToStep(stepNumber) {
+            const steps = document.querySelectorAll('.form-step');
+            const progressSteps = document.querySelectorAll('.progress-step');
+            
+            steps.forEach(step => {
+                if (step.dataset.step == stepNumber) {
+                    step.classList.remove('hidden');
                 } else {
-                    detailsContainer.classList.remove('open');
+                    step.classList.add('hidden');
                 }
             });
+
+            progressSteps.forEach((step, index) => {
+                const stepIndex = index + 1;
+                step.classList.remove('active', 'completed');
+                if (stepIndex < stepNumber) {
+                    step.classList.add('completed');
+                } else if (stepIndex === stepNumber) {
+                    step.classList.add('active');
+                }
+            });
+
+            currentStep = stepNumber;
+        }
+
+        document.getElementById('next-to-step-2').addEventListener('click', () => {
+            const name = anmeldeFormular.elements.name.value;
+            const email = anmeldeFormular.elements.email.value;
+            const teilnahme = anmeldeFormular.elements.teilnahme.value;
+            
+            validationError.classList.add('hidden');
+            if (!name || !email || !teilnahme) {
+                validationError.textContent = "Bitte fülle alle Felder aus, um fortzufahren.";
+                validationError.classList.remove('hidden');
+                return;
+            }
+
+            if (teilnahme === 'ja') {
+                const step2Container = document.querySelector('[data-step="2"] .space-y-8');
+                if(step2Container.innerHTML.trim() === '') {
+                     renderStep2Details(step2Container);
+                }
+                goToStep(2);
+            } else {
+                // Handle "no" case immediately
+                submitCancellation(name, email);
+            }
         });
 
-        function renderDetailsContainer() {
-            const contentWrapper = document.createElement('div');
-            contentWrapper.className = 'space-y-8 pb-2'; // Added pb-2 to prevent last element from being cut off
-            contentWrapper.innerHTML = `
+        document.getElementById('back-to-step-1').addEventListener('click', () => {
+            goToStep(1);
+        });
+
+        function renderStep2Details(container) {
+            container.innerHTML = `
                 <div class="p-4 bg-gray-50 rounded-lg border">
                     <fieldset>
                         <legend class="block text-md font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
@@ -206,7 +290,7 @@
                             <label class="flex items-center cursor-pointer"><input type="radio" name="begleitung" value="nein" checked class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein</span></label>
                         </div>
                     </fieldset>
-                    <div id="begleitung-details" class="sub-section mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div id="begleitung-details" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div><label for="erwachsene" class="block text-sm font-medium">Anzahl zus. Erwachsene</label><input type="number" id="erwachsene" name="erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="kinder" class="block text-sm font-medium">Anzahl Kinder (bis 14 J.)</label><input type="number" id="kinder" name="kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
@@ -215,10 +299,10 @@
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
                     <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir).</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
+                        <div><label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label><input type="number" id="raclette_erwachsene" name="raclette_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                         <div><label for="fondue_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Fondue</label><input type="number" id="fondue_erwachsene" name="fondue_erwachsene" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
-                    <div id="kinder-essen-details" class="sub-section mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div id="kinder-essen-details" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                          <div><label for="raclette_kinder" class="block text-sm font-medium">Anzahl Kinder für Raclette</label><input type="number" id="raclette_kinder" name="raclette_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                          <div><label for="fondue_kinder" class="block text-sm font-medium">Anzahl Kinder für Fondue</label><input type="number" id="fondue_kinder" name="fondue_kinder" min="0" value="0" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring"></div>
                     </div>
@@ -232,7 +316,7 @@
                                 <label class="flex items-center cursor-pointer"><input type="radio" name="dessert-beitrag" value="nein" class="h-4 w-4 text-[#005a6a] fap-focus-ring"> <span class="ml-2">Nein, danke.</span></label>
                             </div>
                         </fieldset>
-                        <div id="dessert-details" class="sub-section open mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
+                        <div id="dessert-details" class="mt-4"><label for="dessert-was" class="block text-sm font-medium">Was bringst du mit?</label><input type="text" id="dessert-was" name="dessert-was" class="mt-1 w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="z.B. Schokokuchen"></div>
                     </div>
                     <div class="bg-gray-50 rounded-lg border p-4"><h3 class="text-md font-semibold text-center mb-3">Live Dessert-Liste</h3><div id="dessert-liste" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div></div>
                 </div>
@@ -241,32 +325,26 @@
                     <textarea id="bemerkungen" name="bemerkungen" rows="3" class="w-full px-3 py-2 border-gray-300 rounded-lg fap-focus-ring" placeholder="Allergien, besondere Wünsche, etc."></textarea>
                 </div>
             `;
-            detailsContainer.innerHTML = ''; // Clear previous content
-            detailsContainer.appendChild(contentWrapper);
-            attachDynamicEventListeners();
+            attachStep2EventListeners();
         }
 
-        function attachDynamicEventListeners() {
+        function attachStep2EventListeners() {
             anmeldeFormular.elements.begleitung.forEach(radio => {
-                radio.addEventListener('change', e => {
-                    document.getElementById('begleitung-details').classList.toggle('open', e.target.value === 'ja');
-                });
+                radio.addEventListener('change', e => document.getElementById('begleitung-details').classList.toggle('hidden', e.target.value !== 'ja'));
             });
-
             document.getElementById('kinder').addEventListener('input', e => {
-                 document.getElementById('kinder-essen-details').classList.toggle('open', parseInt(e.target.value, 10) > 0);
+                 document.getElementById('kinder-essen-details').classList.toggle('hidden', parseInt(e.target.value, 10) <= 0);
             });
-            
             anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
-                radio.addEventListener('change', e => {
-                    document.getElementById('dessert-details').classList.toggle('open', e.target.value === 'ja');
-                });
+                radio.addEventListener('change', e => document.getElementById('dessert-details').classList.toggle('hidden', e.target.value !== 'ja'));
             });
         }
+        
+        let db, auth;
 
         // --- FIREBASE & SUBMISSION ---
         function initializeAppLogic(firebaseApp) {
-            const db = getFirestore(firebaseApp);
+            db = getFirestore(firebaseApp);
             const dessertsRef = collection(db, dessertsCollectionName);
 
             onSnapshot(query(dessertsRef), (snapshot) => {
@@ -278,47 +356,62 @@
                 });
             });
 
-            anmeldeFormular.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                validationError.classList.add('hidden');
-                submitButton.disabled = true;
-                submitButton.textContent = 'Wird gesendet...';
+            anmeldeFormular.addEventListener('submit', handleFormSubmit);
+        }
+        
+        async function submitCancellation(name, email) {
+            const submitButton = document.getElementById('next-to-step-2');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Wird gesendet...';
+            try {
+                const anmeldungenRef = collection(db, anmeldungenCollectionName);
+                await addDoc(anmeldungenRef, { name, email, teilnahme: 'nein', timestamp: new Date() });
+                anmeldungContainer.classList.add('hidden');
+                cancellationContainer.classList.remove('hidden');
+            } catch (error) {
+                validationError.textContent = 'Fehler: ' + error.message;
+                validationError.classList.remove('hidden');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Weiter';
+            }
+        }
 
-                const formData = new FormData(anmeldeFormular);
-                const data = Object.fromEntries(formData.entries());
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const submitButton = document.getElementById('submit-button');
+            validationError.classList.add('hidden');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Wird gesendet...';
 
-                try {
-                    const anmeldungenRef = collection(db, anmeldungenCollectionName);
+            const formData = new FormData(anmeldeFormular);
+            const data = Object.fromEntries(formData.entries());
 
-                    if (data.teilnahme === 'nein') {
-                        await addDoc(anmeldungenRef, { name: data.name, email: data.email, teilnahme: 'nein', timestamp: new Date() });
-                        anmeldungContainer.classList.add('hidden');
-                        cancellationContainer.classList.remove('hidden');
-                        return;
-                    }
+            try {
+                const teilnehmer = 1 + (parseInt(data.erwachsene) || 0);
+                const kinder = (parseInt(data.kinder) || 0);
+                const essenErwachsene = (parseInt(data.raclette_erwachsene) || 0) + (parseInt(data.fondue_erwachsene) || 0);
+                const essenKinder = (parseInt(data.raclette_kinder) || 0) + (parseInt(data.fondue_kinder) || 0);
 
-                    const teilnehmer = 1 + (parseInt(data.erwachsene) || 0);
-                    const kinder = (parseInt(data.kinder) || 0);
-                    const essenErwachsene = (parseInt(data.raclette_erwachsene) || 0) + (parseInt(data.fondue_erwachsene) || 0);
-                    const essenKinder = (parseInt(data.raclette_kinder) || 0) + (parseInt(data.fondue_kinder) || 0);
+                if (teilnehmer !== essenErwachsene) throw new Error(`Anzahl Erwachsene (${teilnehmer}) stimmt nicht mit Essensbestellungen (${essenErwachsene}) überein.`);
+                if (kinder !== essenKinder) throw new Error(`Anzahl Kinder (${kinder}) stimmt nicht mit Essensbestellungen (${essenKinder}) überein.`);
+                if (data['dessert-beitrag'] === 'ja' && !data['dessert-was']) throw new Error('Bitte gib an, welches Dessert du mitbringst.');
 
-                    if (teilnehmer !== essenErwachsene) throw new Error(`Anzahl Erwachsene (${teilnehmer}) stimmt nicht mit Essensbestellungen (${essenErwachsene}) überein.`);
-                    if (kinder !== essenKinder) throw new Error(`Anzahl Kinder (${kinder}) stimmt nicht mit Essensbestellungen (${essenKinder}) überein.`);
-                    if (data['dessert-beitrag'] === 'ja' && !data['dessert-was']) throw new Error('Bitte gib an, welches Dessert du mitbringst.');
+                const anmeldungenRef = collection(db, anmeldungenCollectionName);
+                const dessertsRef = collection(db, dessertsCollectionName);
 
-                    const docRef = await addDoc(anmeldungenRef, { ...data, timestamp: new Date() });
-                    if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
-                        await addDoc(dessertsRef, { name: data.name, dessert: data['dessert-was'], anmeldungId: docRef.id });
-                    }
-
-                    showSuccessScreen(data);
-                } catch (error) {
-                    validationError.textContent = 'Fehler: ' + error.message;
-                    validationError.classList.remove('hidden');
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Anmeldung abschicken';
+                const docRef = await addDoc(anmeldungenRef, { ...data, timestamp: new Date() });
+                if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
+                    await addDoc(dessertsRef, { name: data.name, dessert: data['dessert-was'], anmeldungId: docRef.id });
                 }
-            });
+
+                showSuccessScreen(data);
+
+            } catch (error) {
+                validationError.textContent = 'Fehler: ' + error.message;
+                validationError.classList.remove('hidden');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Anmeldung abschicken';
+            }
         }
 
         function showSuccessScreen(data) {
@@ -337,6 +430,7 @@
             document.getElementById('ics-download-link').href = generateICS();
             anmeldungContainer.classList.add('hidden');
             successContainer.classList.remove('hidden');
+            goToStep(3); // Update progress bar to final step
         }
 
         function generateICS() {
@@ -353,12 +447,11 @@
 
         // --- APP INITIALIZATION ---
         try {
-            // Check if the firebaseConfig object is available and properly populated
             if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey) {
                  throw new Error("Firebase config is not correctly loaded.");
             }
             const app = initializeApp(firebaseConfig); 
-            const auth = getAuth(app);
+            auth = getAuth(app);
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     initializeAppLogic(app);
