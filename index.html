@@ -92,7 +92,11 @@
         </div>
 
         <!-- Bot Protection Notice -->
-        
+        <div class="bot-notice p-4 mx-6 mt-6 rounded-lg text-center">
+            <p class="text-sm text-gray-600">
+                🛡️ Diese Anmeldung ist nur für eingeladene Mitglieder bestimmt.
+            </p>
+        </div>
 
         <div id="anmeldung-container" class="p-6 sm:p-10">
             <form id="anmelde-formular">
@@ -226,6 +230,7 @@
     </div>
 
     <script type="module">
+        // Import Firebase modules at the top
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -252,13 +257,18 @@
         
         let currentStep = 1;
         let editingId = null;
+        let db, auth;
 
         // Check URL parameters on load
         const urlParams = new URLSearchParams(window.location.search);
         const registrationId = urlParams.get('id');
 
+        console.log("🚀 Script loaded, registrationId:", registrationId);
+
         // Update UI with config (with fallbacks)
         function populateUIWithConfig() {
+            console.log("🎨 Populating UI with config...");
+            
             // Update titles and subtitles with fallbacks
             document.getElementById('main-title').textContent = 'Anmeldung zum Jubiläumsfest';
             document.getElementById('main-subtitle').textContent = `Wir feiern 25 Jahre – sei dabei!`;
