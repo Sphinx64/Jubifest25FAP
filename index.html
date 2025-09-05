@@ -232,6 +232,7 @@
         let currentStep = 1;
         let editingId = null;
         let db, auth;
+        let dessertUnsubscribe = null; // Store the unsubscribe function
 
         // Check URL parameters on load
         const urlParams = new URLSearchParams(window.location.search);
@@ -308,6 +309,47 @@
             }
         });
 
+        function setupDessertListener() {
+            console.log("🍰 Setting up dessert list listener for collection:", dessertsCollectionName);
+            
+            // If there's already a listener, unsubscribe first
+            if (dessertUnsubscribe) {
+                console.log("🍰 Unsubscribing from previous dessert listener");
+                dessertUnsubscribe();
+            }
+            
+            const dessertsRef = collection(db, dessertsCollectionName);
+
+            dessertUnsubscribe = onSnapshot(query(dessertsRef), (snapshot) => {
+                console.log("🍰 Dessert snapshot received, size:", snapshot.size);
+                
+                const dessertListe = document.getElementById('dessert-liste');
+                if (!dessertListe) {
+                    console.log("⚠️ Dessert list element not found in DOM");
+                    return;
+                }
+                
+                if (snapshot.empty) {
+                    console.log("🍰 No desserts found, showing placeholder");
+                    dessertListe.innerHTML = '<p class="text-xs text-gray-500 text-center">Sei der/die Erste!</p>';
+                } else {
+                    console.log("🍰 Found desserts, rendering list");
+                    dessertListe.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        console.log("🍰 Dessert:", data);
+                        dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-white p-2 rounded-md"><span class="font-medium text-gray-800">${data.dessert}</span><span class="text-xs text-gray-500">${data.name}</span></div>`;
+                    });
+                }
+            }, (error) => {
+                console.error("❌ Error in dessert listener:", error);
+                const dessertListe = document.getElementById('dessert-liste');
+                if (dessertListe) {
+                    dessertListe.innerHTML = '<p class="text-xs text-red-500 text-center">Fehler beim Laden der Desserts</p>';
+                }
+            });
+        }
+
         function renderStep2Details(container) {
             console.log("🍽️ Rendering step 2 details");
             container.innerHTML = `
@@ -342,6 +384,9 @@
                 </div>
             `;
             attachStep2EventListeners();
+            
+            // Setup dessert listener AFTER the DOM elements are created
+            setupDessertListener();
         }
 
         function attachStep2EventListeners() {
@@ -350,40 +395,6 @@
 
             anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
                 radio.addEventListener('change', e => document.getElementById('dessert-details').classList.toggle('hidden', e.target.value !== 'ja'));
-            });
-        }
-
-        function setupDessertListener() {
-            console.log("🍰 Setting up dessert list listener for collection:", dessertsCollectionName);
-            const dessertsRef = collection(db, dessertsCollectionName);
-
-            onSnapshot(query(dessertsRef), (snapshot) => {
-                console.log("🍰 Dessert snapshot received, size:", snapshot.size);
-                
-                const dessertListe = document.getElementById('dessert-liste');
-                if (!dessertListe) {
-                    console.log("⚠️ Dessert list element not found in DOM");
-                    return;
-                }
-                
-                if (snapshot.empty) {
-                    console.log("🍰 No desserts found, showing placeholder");
-                    dessertListe.innerHTML = '<p class="text-xs text-gray-500 text-center">Sei der/die Erste!</p>';
-                } else {
-                    console.log("🍰 Found desserts, rendering list");
-                    dessertListe.innerHTML = '';
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        console.log("🍰 Dessert:", data);
-                        dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-white p-2 rounded-md"><span class="font-medium text-gray-800">${data.dessert}</span><span class="text-xs text-gray-500">${data.name}</span></div>`;
-                    });
-                }
-            }, (error) => {
-                console.error("❌ Error in dessert listener:", error);
-                const dessertListe = document.getElementById('dessert-liste');
-                if (dessertListe) {
-                    dessertListe.innerHTML = '<p class="text-xs text-red-500 text-center">Fehler beim Laden der Desserts</p>';
-                }
             });
         }
 
@@ -481,39 +492,7 @@
         function initializeAppLogic(firebaseApp) {
             console.log("🔥 Initializing app logic");
             db = getFirestore(firebaseApp);
-            const dessertsRef = collection(db, dessertsCollectionName);
             
-            console.log("🍰 Setting up dessert list listener for collection:", dessertsCollectionName);
-
-            onSnapshot(query(dessertsRef), (snapshot) => {
-                console.log("🍰 Dessert snapshot received, size:", snapshot.size);
-                
-                const dessertListe = document.getElementById('dessert-liste');
-                if (!dessertListe) {
-                    console.log("⚠️ Dessert list element not found in DOM");
-                    return;
-                }
-                
-                if (snapshot.empty) {
-                    console.log("🍰 No desserts found, showing placeholder");
-                    dessertListe.innerHTML = '<p class="text-xs text-gray-500 text-center">Sei der/die Erste!</p>';
-                } else {
-                    console.log("🍰 Found desserts, rendering list");
-                    dessertListe.innerHTML = '';
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        console.log("🍰 Dessert:", data);
-                        dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-white p-2 rounded-md"><span class="font-medium text-gray-800">${data.dessert}</span><span class="text-xs text-gray-500">${data.name}</span></div>`;
-                    });
-                }
-            }, (error) => {
-                console.error("❌ Error in dessert listener:", error);
-                const dessertListe = document.getElementById('dessert-liste');
-                if (dessertListe) {
-                    dessertListe.innerHTML = '<p class="text-xs text-red-500 text-center">Fehler beim Laden der Desserts</p>';
-                }
-            });
-
             anmeldeFormular.addEventListener('submit', handleFormSubmit);
             
             // If we have a registration ID, load the data
