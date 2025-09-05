@@ -50,13 +50,13 @@
         .progress-step:not(:last-child)::after {
             content: '';
             position: absolute;
-            top: 1.25rem; /* Center with circle (h-10 is 2.5rem, so half is 1.25rem) */
+            top: 1rem; /* Adjusted for smaller circle */
             left: 50%;
             height: 2px;
-            width: calc(100% - 2.5rem); /* Full width minus the circle's diameter */
+            width: calc(100% - 2rem); 
             background-color: #e5e7eb; /* gray-200 */
             z-index: -1;
-            transform: translateX(1.25rem); /* Start after the circle */
+            transform: translateX(1rem);
         }
         .progress-step.completed::after {
             background-color: #005a6a;
@@ -81,7 +81,7 @@
     <!-- Password Gate (Now with integrated Welcome Message) -->
     <div id="password-gate" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
         <div class="fap-teal text-white p-6 text-center">
-            <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
+            <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3">
             <h1 class="text-3xl sm:text-4xl font-bold">Willkommen zur Anmeldung!</h1>
             <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
         </div>
@@ -98,9 +98,9 @@
     </div>
 
     <!-- Main Content (Form) -->
-    <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden">
+    <div id="main-content" class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden hidden opacity-0">
         <div class="fap-teal text-white p-6 text-center">
-            <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3 invert brightness-0">
+            <img src="logo.png" alt="Fun Agility People Logo" class="mx-auto h-16 w-auto mb-3">
             <h1 class="text-3xl sm:text-4xl font-bold">Anmeldung zum Jubiläumsfest</h1>
             <p class="mt-2 opacity-90">Wir feiern 25 Jahre – sei dabei!</p>
         </div>
@@ -109,19 +109,19 @@
             <form id="anmelde-formular">
                 
                 <!-- Progress Bar -->
-                <div class="w-full max-w-2xl mx-auto mb-10">
+                <div class="w-full max-w-xl mx-auto mb-8">
                     <div class="flex justify-between items-start">
                         <div class="progress-step text-center relative active" data-progress="1">
-                            <div class="step-circle w-10 h-10 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-lg text-gray-500">1</div>
-                            <div class="step-label mt-2 text-sm text-gray-500">Teilnahme</div>
+                            <div class="step-circle w-8 h-8 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-md text-gray-500">1</div>
+                            <div class="step-label mt-2 text-xs text-gray-500">Teilnahme</div>
                         </div>
                         <div class="progress-step text-center relative" data-progress="2">
-                            <div class="step-circle w-10 h-10 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-lg text-gray-500">2</div>
-                            <div class="step-label mt-2 text-sm text-gray-500">Essen</div>
+                            <div class="step-circle w-8 h-8 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-md text-gray-500">2</div>
+                            <div class="step-label mt-2 text-xs text-gray-500">Essen</div>
                         </div>
                         <div class="progress-step text-center relative" data-progress="3">
-                            <div class="step-circle w-10 h-10 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-lg text-gray-500">✓</div>
-                            <div class="step-label mt-2 text-sm text-gray-500">Bestätigung</div>
+                            <div class="step-circle w-8 h-8 mx-auto rounded-full border-2 bg-white border-gray-300 flex items-center justify-center font-bold text-md text-gray-500">✓</div>
+                            <div class="step-label mt-2 text-xs text-gray-500">Bestätigung</div>
                         </div>
                     </div>
                 </div>
@@ -131,8 +131,8 @@
                     <!-- Step 1: Participation & Companions -->
                     <div class="form-step" data-step="1">
                         <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Deine Anmeldung</h3>
-                        <div class="space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                 <div>
                                     <label for="name" class="block text-lg font-semibold text-gray-700 mb-2">Dein Name</label>
                                     <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 fap-focus-ring" placeholder="Max Mustermann">
@@ -154,7 +154,7 @@
                             <!-- Companions section, shown conditionally -->
                             <div id="companions-container" class="sub-section-container">
                                 <div class="sub-section-content">
-                                     <div class="mt-2">
+                                     <div class="pt-2">
                                         <fieldset>
                                             <legend class="block text-lg font-semibold text-gray-700 mb-2">Bringst du Begleitpersonen mit?</legend>
                                             <div class="flex items-center gap-x-6">
@@ -178,7 +178,7 @@
                     <!-- Step 2: Details -->
                     <div class="form-step hidden" data-step="2">
                         <h3 class="text-2xl font-bold fap-teal-text mb-6 text-center">Essen & Dessert</h3>
-                        <div class="space-y-8 pb-2">
+                        <div class="space-y-6 pb-2">
                            <!-- Dynamic content is injected here -->
                         </div>
                          <div class="mt-8 flex justify-between">
@@ -257,6 +257,7 @@
                     passwordGate.classList.add('hidden');
                     // Show main content and fade it in
                     mainContent.classList.remove('hidden');
+                    mainContent.style.transition = 'opacity 0.5s';
                     setTimeout(() => mainContent.style.opacity = '1', 20);
                 }, 500);
             } else {
@@ -300,7 +301,7 @@
             }
 
             if (teilnahme === 'ja') {
-                const step2Container = document.querySelector('[data-step="2"] .space-y-8');
+                const step2Container = document.querySelector('[data-step="2"] .space-y-6');
                 renderStep2Details(step2Container);
                 goToStep(2);
             } else {
@@ -444,12 +445,19 @@
         }
 
         function showSuccessScreen(data) {
+            const essenItems = [];
+            if (parseInt(data.raclette_erwachsene) > 0) essenItems.push(`${data.raclette_erwachsene}x Raclette Erw.`);
+            if (parseInt(data.fondue_erwachsene) > 0) essenItems.push(`${data.fondue_erwachsene}x Fondue Erw.`);
+            if (parseInt(data.raclette_kinder) > 0) essenItems.push(`${data.raclette_kinder}x Raclette Kind`);
+            if (parseInt(data.fondue_kinder) > 0) essenItems.push(`${data.fondue_kinder}x Fondue Kind`);
+            const essenText = essenItems.length > 0 ? essenItems.join(', ') : 'Keine Auswahl';
+
              let factsheetHTML = `
                 <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
                 <p><strong>E-Mail:</strong> ${data.email || 'N/A'}</p>
                 <p><strong>Teilnahme:</strong> Ja</p>
                 <p><strong>Begleitung:</strong> ${parseInt(data.erwachsene) || 0} Erw., ${parseInt(data.kinder) || 0} Kind(er)</p>
-                <p><strong>Essen:</strong> ${parseInt(data.raclette_erwachsene) || 0}x Raclette Erw., ${parseInt(data.fondue_erwachsene) || 0}x Fondue Erw., ${parseInt(data.raclette_kinder) || 0}x Raclette Kind, ${parseInt(data.fondue_kinder) || 0}x Fondue Kind</p>
+                <p><strong>Essen:</strong> ${essenText}</p>
                 <p><strong>Dessert:</strong> ${data['dessert-beitrag'] === 'ja' ? (data['dessert-was'] || 'Ja') : 'Nein'}</p>
             `;
             if (data.bemerkungen) {
