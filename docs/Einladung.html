@@ -194,39 +194,69 @@
     
     /* Print optimizations */
     @media print {
+      @page {
+        size: A4;
+        margin: 12mm 12mm 0 12mm;
+      }
+      
       body {
         font-size: 12px;
         min-height: auto;
+        margin: 0;
+        padding: 0;
       }
+      
       .button-print {
         display: none !important;
       }
+      
       header {
         padding: 0.8rem;
       }
+      
       h1 {
         font-size: 1.6rem;
       }
+      
       main {
         padding: 1rem;
+        flex: none;
+        margin-bottom: 3rem;
       }
+      
       .intro {
         padding: 1rem;
         margin-bottom: 1rem;
       }
+      
       .content-grid {
         gap: 1.2rem;
       }
+      
       section {
         padding: 1rem;
         break-inside: avoid;
       }
+      
       iframe {
         height: 140px;
       }
+      
       footer {
-        padding: 0.5rem;
-        margin-top: 0.5rem;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        padding: 1rem 1rem 2rem 1rem;
+        margin: 0;
+        background: #f8f9fa !important;
+        border-top: 1px solid #e9ecef;
+        font-size: 0.8rem;
+        text-align: center;
+        color: #666;
+        box-sizing: border-box;
+        z-index: 1000;
       }
     }
     
