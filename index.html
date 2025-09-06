@@ -560,6 +560,11 @@
             
             // Set initial food input limits based on current person counts
             updateFoodInputLimits();
+            
+            // Set initial button states
+            setTimeout(() => {
+                updateDynamicLimits();
+            }, 100);
         }
 
         // --- LOAD EXISTING REGISTRATION ---
