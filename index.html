@@ -348,6 +348,31 @@
         // Initialize number input buttons
         setupNumberInputButtons();
 
+        function updateFoodInputLimits() {
+            const erwachseneCount = 1 + (parseInt(document.getElementById('erwachsene').value) || 0);
+            const kinderCount = parseInt(document.getElementById('kinder').value) || 0;
+            
+            // Update max attributes for food inputs
+            const foodInputs = [
+                { id: 'raclette_erwachsene', max: erwachseneCount },
+                { id: 'fondue_erwachsene', max: erwachseneCount },
+                { id: 'raclette_kinder', max: kinderCount },
+                { id: 'fondue_kinder', max: kinderCount }
+            ];
+            
+            foodInputs.forEach(({ id, max }) => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.setAttribute('max', max);
+                    // Adjust current value if it exceeds new max
+                    const currentValue = parseInt(input.value) || 0;
+                    if (currentValue > max) {
+                        input.value = max;
+                    }
+                }
+            });
+        }
+
         // --- MULTI-STEP LOGIC ---
         function goToStep(stepNumber) {
             console.log("📋 Going to step:", stepNumber);
