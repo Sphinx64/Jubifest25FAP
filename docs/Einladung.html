@@ -113,14 +113,14 @@
 <body>
   <header>
     <img src="logo.png" alt="Fun Agility People Logo">
-    <h1 id="title"></h1>
-    <p id="subtitle"></p>
+    <h1 id="title">Einladung zum Jubiläumsfest</h1>
+    <p id="subtitle">Ein Vierteljahrhundert Vereinskultur</p>
   </header>
 
   <main>
     <section class="intro">
-      <p>Liebes Vereinsmitglied, liebe Freunde</p>
-      <p>Wir freuen uns, dich zu unserem <strong>25-jährigen Jubiläum</strong> einzuladen! Gemeinsam wollen wir feiern, erinnern und ein unvergessliches Fest verbringen.</p>
+      <p>Liebe Mitglieder, liebe Freundinnen und Freunde,</p>
+      <p>Wir haben einen besonderen Grund zu feiern! Unser Verein feiert sein Jubiläum – ein Vierteljahrhundert voller Agility-Leidenschaft, Vereinskultur und unzähliger toller Momente mit euch und euren Hunden. Diese besonderen Jahre möchten wir gebührend mit euch feiern!</p>
     </section>
 
     <div class="grid">
@@ -161,14 +161,12 @@
   </main>
 
   <footer>
-    <p>Fun Agility People · Wir freuen uns auf Euch!</p>
+    <p>Fun Agility People · Gemeinsam seit 2000</p>
   </footer>
 
   <script>
     window.addEventListener('DOMContentLoaded', () => {
       const e = eventConfig;
-      document.getElementById('title').textContent = e.event.title;
-      document.getElementById('subtitle').textContent = e.event.description;
       document.getElementById('datetime').textContent = `${e.datetime.date} · ab ${e.datetime.startTime}`;
       document.getElementById('location').textContent = e.location.fullName;
 
