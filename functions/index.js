@@ -226,99 +226,127 @@ async function sendConfirmationEmail(data, docId) {
     const begleitungText = `${parseInt(data.erwachsene) || 0} Erwachsene, ${parseInt(data.kinder) || 0} Kinder`;
     const dessertText = data['dessert-beitrag'] === 'ja' ? (data['dessert-was'] || 'Ja, Details folgen') : 'Nein';
 
-    // Email template using central configuration
-    const emailHtml = `
-    <!DOCTYPE html>
-    <html lang="de">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Anmeldebestätigung - ${eventConfig.event.title}</title>
-        <style>
-            body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-            .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            .header { background-color: ${eventConfig.branding.primaryColor}; color: white; padding: 30px 20px; text-align: center; }
-            .header h1 { margin: 0; font-size: 28px; font-weight: bold; }
-            .header p { margin: 10px 0 0 0; opacity: 0.9; }
-            .content { padding: 30px 20px; }
-            .greeting { font-size: 18px; margin-bottom: 20px; color: #333; }
-            .event-details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${eventConfig.branding.primaryColor}; }
-            .event-details h3 { margin: 0 0 15px 0; color: ${eventConfig.branding.primaryColor}; font-size: 20px; }
-            .event-details p { margin: 5px 0; color: #555; }
-            .registration-summary { background-color: #f1f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; }
-            .registration-summary h3 { margin: 0 0 15px 0; color: ${eventConfig.branding.primaryColor}; }
-            .registration-summary p { margin: 8px 0; color: #333; }
-            .registration-summary strong { color: ${eventConfig.branding.primaryColor}; }
-            .edit-section { background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #ffeaa7; }
-            .edit-section h3 { margin: 0 0 10px 0; color: #856404; }
-            .edit-button { display: inline-block; background-color: ${eventConfig.branding.primaryColor}; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
-            .edit-button:hover { background-color: #004850; }
-            .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; }
-            .signature { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; }
-            @media (max-width: 600px) {
-                .content { padding: 20px 15px; }
-                .header { padding: 20px 15px; }
-                .header h1 { font-size: 24px; }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>🎉 Anmeldebestätigung</h1>
-                <p>${eventConfig.event.jubilee} ${eventConfig.sender.name}</p>
+    // Email template using authentic F.A.P. language
+const emailHtml = `
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anmeldebestätigung - ${eventConfig.event.title}</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background-color: ${eventConfig.branding.primaryColor}; color: white; padding: 30px 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: bold; }
+        .header p { margin: 10px 0 0 0; opacity: 0.9; }
+        .content { padding: 30px 20px; }
+        .greeting { font-size: 18px; margin-bottom: 20px; color: #333; }
+        .event-details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${eventConfig.branding.primaryColor}; }
+        .event-details h3 { margin: 0 0 15px 0; color: ${eventConfig.branding.primaryColor}; font-size: 20px; }
+        .event-details p { margin: 5px 0; color: #555; }
+        .registration-summary { background-color: #f1f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .registration-summary h3 { margin: 0 0 15px 0; color: ${eventConfig.branding.primaryColor}; }
+        .registration-summary p { margin: 8px 0; color: #333; }
+        .registration-summary strong { color: ${eventConfig.branding.primaryColor}; }
+        .edit-section { background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #ffeaa7; }
+        .edit-section h3 { margin: 0 0 10px 0; color: #856404; }
+        .edit-button { display: inline-block; background-color: ${eventConfig.branding.primaryColor}; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
+        .edit-button:hover { background-color: #004850; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; }
+        .signature { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; }
+        @media (max-width: 600px) {
+            .content { padding: 20px 15px; }
+            .header { padding: 20px 15px; }
+            .header h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Anmeldebestätigung</h1>
+            <p>Jubiläumsfest ${eventConfig.sender.name}</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Hallo ${data.name || 'Liebe/r Teilnehmer/in'},
             </div>
             
-            <div class="content">
-                <div class="greeting">
-                    Hallo ${data.name || 'Liebe/r Teilnehmer/in'},
-                </div>
-                
-                <p>vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! Wir freuen uns riesig, dass du dabei bist. 🎊</p>
-                
-                <div class="event-details">
-                    <h3>📅 Die Eckdaten im Überblick</h3>
-                    <p><strong>Datum:</strong> ${eventConfig.datetime.date}</p>
-                    <p><strong>Zeit:</strong> ab ${eventConfig.datetime.startTime}</p>
-                    <p><strong>Ort:</strong> ${eventConfig.location.name}</p>
-                    <p><strong>Programm:</strong> ${eventConfig.event.description}</p>
-                </div>
-                
-                <div class="registration-summary">
-                    <h3>📝 Deine Anmeldedaten</h3>
-                    <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
-                    <p><strong>E-Mail:</strong> ${data.email || 'N/A'}</p>
-                    <p><strong>Begleitung:</strong> ${begleitungText}</p>
-                    <p><strong>Essen:</strong><br>${essenText}</p>
-                    <p><strong>Dessert-Beitrag:</strong> ${dessertText}</p>
-                    ${data.bemerkungen ? `<p><strong>Bemerkungen:</strong> ${data.bemerkungen}</p>` : ''}
-                </div>
-                
-                <div class="edit-section">
-                    <h3>✏️ Änderungen möglich</h3>
-                    <p>Falls du deine Angaben noch anpassen möchtest, kannst du das jederzeit über den folgenden Link tun:</p>
-                    <a href="${editLink}" class="edit-button">Anmeldung bearbeiten</a>
-                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                        💡 <strong>Tipp:</strong> Speichere diesen Link - so kannst du deine Anmeldung später noch ändern, falls sich etwas ändert.
-                    </p>
-                </div>
-                
-                <p>Wir melden uns in den nächsten Wochen noch mit weiteren Details zum Ablauf und eventuellen Mitbring-Infos.</p>
-                
-                <div class="signature">
-                    <p>Bis dahin freuen wir uns auf einen unvergesslichen Tag mit dir!</p>
-                    <p><strong>${eventConfig.sender.signature}</strong> 🐕</p>
-                </div>
+            <p>vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! Wir freuen uns riesig, dass du dabei bist und gemeinsam mit uns unsere Vereinskultur feierst.</p>
+            
+            <div class="event-details">
+                <h3>📅 Die Eckdaten im Überblick</h3>
+                <p><strong>Datum:</strong> ${eventConfig.datetime.date}</p>
+                <p><strong>Zeit:</strong> ab ${eventConfig.datetime.startTime}</p>
+                <p><strong>Ort:</strong> ${eventConfig.location.name}</p>
+                <p><strong>Programm:</strong> Gemeinsame Feier mit Apéro, Spaziergang und gemütlichem Beisammensein</p>
             </div>
             
-            <div class="footer">
-                <p>${eventConfig.sender.name} • ${eventConfig.event.jubilee} Hundesport mit Herz</p>
-                <p>Diese E-Mail wurde automatisch generiert.</p>
+            <div class="registration-summary">
+                <h3>📝 Deine Anmeldedaten</h3>
+                <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+                <p><strong>E-Mail:</strong> ${data.email || 'N/A'}</p>
+                <p><strong>Begleitung:</strong> ${begleitungText}</p>
+                <p><strong>Essen:</strong><br>${essenText}</p>
+                <p><strong>Dessert-Beitrag:</strong> ${dessertText}</p>
+                ${data.bemerkungen ? `<p><strong>Bemerkungen:</strong> ${data.bemerkungen}</p>` : ''}
+            </div>
+            
+            <div class="edit-section">
+                <h3>✏️ Änderungen möglich</h3>
+                <p>Falls du deine Angaben noch anpassen möchtest, kannst du das jederzeit über den folgenden Link tun:</p>
+                <a href="${editLink}" class="edit-button">Anmeldung bearbeiten</a>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                    💡 <strong>Tipp:</strong> Speichere diesen Link - so kannst du deine Anmeldung später noch ändern, falls sich etwas ändert.
+                </p>
+            </div>
+            
+            <p>Wir melden uns in den nächsten Wochen noch mit weiteren Details zum Ablauf und eventuellen Mitbring-Infos.</p>
+            
+            <div class="signature">
+                <p>Bis dahin freuen wir uns auf einen unvergesslichen Tag mit dir!</p>
+                <p><strong>${eventConfig.sender.signature}</strong></p>
             </div>
         </div>
-    </body>
-    </html>
-    `;
+        
+        <div class="footer">
+            <p>${eventConfig.sender.name} • Gemeinsam seit 2000</p>
+            <p>Diese E-Mail wurde automatisch generiert.</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
+
+// Text version for better deliverability
+text: `
+Hallo ${data.name || 'Liebe/r Teilnehmer/in'},
+
+vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! Wir freuen uns riesig, dass du dabei bist und gemeinsam mit uns unsere Vereinskultur feierst.
+
+ECKDATEN:
+Datum: ${eventConfig.datetime.date}
+Zeit: ab ${eventConfig.datetime.startTime}
+Ort: ${eventConfig.location.name}
+
+DEINE ANMELDEDATEN:
+Name: ${data.name || 'N/A'}
+E-Mail: ${data.email || 'N/A'}
+Begleitung: ${begleitungText}
+Essen: ${essenText.replace(/<br>/g, ', ')}
+Dessert-Beitrag: ${dessertText}${data.bemerkungen ? `
+Bemerkungen: ${data.bemerkungen}` : ''}
+
+ÄNDERUNGEN MÖGLICH:
+Falls du deine Angaben noch anpassen möchtest: ${editLink}
+
+Bis dahin freuen wir uns auf einen unvergesslichen Tag mit dir!
+
+${eventConfig.sender.signature}
+${eventConfig.sender.name} • 25 Jahre Vereinskultur
+`
 
     const msg = {
         to: data.email,
