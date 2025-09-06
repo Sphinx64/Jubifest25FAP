@@ -265,7 +265,7 @@ const emailHtml = `
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎉 Anmeldebestätigung</h1>
+            <h1>Anmeldebestätigung</h1>
             <p>Jubiläumsfest ${eventConfig.sender.name}</p>
         </div>
         
@@ -274,10 +274,10 @@ const emailHtml = `
                 Hallo ${data.name || 'Liebe/r Teilnehmer/in'},
             </div>
             
-            <p>vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! Wir freuen uns riesig, dass du dabei bist und gemeinsam mit uns unsere Vereinskultur feierst.</p>
+            <p>vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! Wir freuen uns riesig, dass du dabei bist!</p>
             
             <div class="event-details">
-                <h3>📅 Die Eckdaten im Überblick</h3>
+                <h3>Die Eckdaten im Überblick</h3>
                 <p><strong>Datum:</strong> ${eventConfig.datetime.date}</p>
                 <p><strong>Zeit:</strong> ab ${eventConfig.datetime.startTime}</p>
                 <p><strong>Ort:</strong> ${eventConfig.location.name}</p>
@@ -285,7 +285,7 @@ const emailHtml = `
             </div>
             
             <div class="registration-summary">
-                <h3>📝 Deine Anmeldedaten</h3>
+                <h3>Deine Anmeldedaten</h3>
                 <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
                 <p><strong>E-Mail:</strong> ${data.email || 'N/A'}</p>
                 <p><strong>Begleitung:</strong> ${begleitungText}</p>
@@ -295,18 +295,15 @@ const emailHtml = `
             </div>
             
             <div class="edit-section">
-                <h3>✏️ Änderungen möglich</h3>
+                <h3>Änderungen möglich</h3>
                 <p>Falls du deine Angaben noch anpassen möchtest, kannst du das jederzeit über den folgenden Link tun:</p>
                 <a href="${editLink}" class="edit-button">Anmeldung bearbeiten</a>
-                <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                    💡 <strong>Tipp:</strong> Speichere diesen Link - so kannst du deine Anmeldung später noch ändern, falls sich etwas ändert.
-                </p>
+                
             </div>
             
-            <p>Wir melden uns in den nächsten Wochen noch mit weiteren Details zum Ablauf und eventuellen Mitbring-Infos.</p>
             
             <div class="signature">
-                <p>Bis dahin freuen wir uns auf einen unvergesslichen Tag mit dir!</p>
+                <p>Bis dahin freuen wir uns auf ein unvergessliches Fest mit dir!</p>
                 <p><strong>${eventConfig.sender.signature}</strong></p>
             </div>
         </div>
@@ -324,7 +321,7 @@ const emailHtml = `
 text: `
 Hallo ${data.name || 'Liebe/r Teilnehmer/in'},
 
-vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! Wir freuen uns riesig, dass du dabei bist und gemeinsam mit uns unsere Vereinskultur feierst.
+vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! Wir freuen uns riesig, dass du dabei bist!
 
 ECKDATEN:
 Datum: ${eventConfig.datetime.date}
