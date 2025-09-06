@@ -532,6 +532,9 @@
             anmeldeFormular.elements['dessert-beitrag'].forEach(radio => {
                 radio.addEventListener('change', e => document.getElementById('dessert-details').classList.toggle('hidden', e.target.value !== 'ja'));
             });
+            
+            // Set initial food input limits based on current person counts
+            updateFoodInputLimits();
         }
 
         // --- LOAD EXISTING REGISTRATION ---
