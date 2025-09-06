@@ -12,70 +12,68 @@
     
     <style>
         /* Custom Number Input Styles */
-.number-input-container {
-    display: flex;
-    align-items: center;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    background: white;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
+        .number-input-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .number-input-container:focus-within {
+            border-color: #005a6a;
+            box-shadow: 0 0 0 3px rgba(0, 90, 106, 0.1);
+        }
+        .number-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+            background: transparent;
+            -moz-appearance: textfield; /* Firefox */
+        }
+        .number-input::-webkit-outer-spin-button,
+        .number-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .number-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            flex-shrink: 0;
+            background: #f9fafb;
+            border: none;
+            color: #374151;
+            font-weight: 600;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .number-btn:hover:not(:disabled) {
+            background: #005a6a;
+            color: white;
+        }
+        .number-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+        .number-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .number-btn.minus {
+            border-radius: 0.5rem 0 0 0.5rem;
+        }
+        .number-btn.plus {
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
 
-.number-input-container:focus-within {
-    border-color: #005a6a;
-    box-shadow: 0 0 0 3px rgba(0, 90, 106, 0.1);
-}
-
-.number-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    padding: 0.5rem;
-    text-align: center;
-    font-weight: 500;
-    background: transparent;
-    -moz-appearance: textfield; /* Firefox */
-}
-
-.number-input::-webkit-outer-spin-button,
-.number-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.number-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    background: #f9fafb;
-    border: none;
-    color: #374151;
-    font-weight: 600;
-    font-size: 1.25rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.number-btn:hover {
-    background: #005a6a;
-    color: white;
-}
-
-.number-btn:active {
-    transform: scale(0.95);
-}
-
-.number-btn.minus {
-    border-radius: 0.5rem 0 0 0.5rem;
-}
-
-.number-btn.plus {
-    border-radius: 0 0.5rem 0.5rem 0;
-}
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -288,14 +286,10 @@
     </div>
 
     <script type="module">
-        console.log("🚀 Script starting...");
-        
         // Import Firebase modules
         const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
         const { getAuth, signInAnonymously, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
         const { getFirestore, collection, addDoc, onSnapshot, query, doc, getDoc, updateDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-
-        console.log("📦 Firebase modules imported");
 
         const appId = 'fap-jubilaeum-25';
         const anmeldungenCollectionName = `anmeldungen-${appId}`;
@@ -311,107 +305,81 @@
         let currentStep = 1;
         let editingId = null;
         let db, auth;
-        let dessertUnsubscribe = null; // Store the unsubscribe function
+        let dessertUnsubscribe = null;
 
         // Check URL parameters on load
         const urlParams = new URLSearchParams(window.location.search);
         const registrationId = urlParams.get('id');
 
-        console.log("🔗 Registration ID from URL:", registrationId);
+        // --- DYNAMIC FOOD LOGIC ---
+        function updateFoodLogic() {
+            const totalAdults = 1 + (parseInt(document.getElementById('erwachsene').value) || 0);
+            const totalChildren = parseInt(document.getElementById('kinder').value) || 0;
+
+            const racletteAdultsInput = document.getElementById('raclette_erwachsene');
+            const fondueAdultsInput = document.getElementById('fondue_erwachsene');
+            const racletteChildrenInput = document.getElementById('raclette_kinder');
+            const fondueChildrenInput = document.getElementById('fondue_kinder');
+
+            const racletteAdults = parseInt(racletteAdultsInput.value) || 0;
+            const fondueAdults = parseInt(fondueAdultsInput.value) || 0;
+            const racletteChildren = parseInt(racletteChildrenInput.value) || 0;
+            const fondueChildren = parseInt(fondueChildrenInput.value) || 0;
+
+            racletteAdultsInput.max = totalAdults - fondueAdults;
+            fondueAdultsInput.max = totalAdults - racletteAdults;
+            racletteChildrenInput.max = totalChildren - fondueChildren;
+            fondueChildrenInput.max = totalChildren - racletteChildren;
+            
+            // Update button states
+            updateNumberButtonStates();
+        }
+
+        function updateNumberButtonStates() {
+            document.querySelectorAll('.number-input-container').forEach(container => {
+                const input = container.querySelector('.number-input');
+                const plusBtn = container.querySelector('.plus');
+                const minusBtn = container.querySelector('.minus');
+                const val = parseInt(input.value);
+                const max = parseInt(input.max);
+                const min = parseInt(input.min);
+                
+                plusBtn.disabled = val >= max;
+                minusBtn.disabled = val <= min;
+            });
+        }
 
         // --- NUMBER INPUT BUTTON HANDLERS ---
-        function setupNumberInputButtons() {
-            document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('number-btn')) {
-                    const targetId = e.target.dataset.target;
-                    const action = e.target.dataset.action;
-                    const input = document.getElementById(targetId);
-                    
-                    if (input) {
-                        let currentValue = parseInt(input.value) || 0;
-                        const min = parseInt(input.getAttribute('min')) || 0;
-                        const max = parseInt(input.getAttribute('max')) || 999;
-                        
-                        if (action === 'plus' && currentValue < max) {
-                            input.value = currentValue + 1;
-                        } else if (action === 'minus' && currentValue > min) {
-                            input.value = currentValue - 1;
-                        }
-                        
-                        // Trigger change event for any listeners
-                        input.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                }
-            });
-        }
-        
-        function updateDynamicLimits() {
-            // Update button states based on current values
-            const foodInputs = ['raclette_erwachsene', 'fondue_erwachsene', 'raclette_kinder', 'fondue_kinder'];
-            
-            foodInputs.forEach(inputId => {
-                const input = document.getElementById(inputId);
-                if (!input) return;
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('number-btn')) {
+                const targetId = e.target.dataset.target;
+                const action = e.target.dataset.action;
+                const input = document.getElementById(targetId);
                 
-                const currentValue = parseInt(input.value) || 0;
-                const maxValue = getDynamicMaxForFood(inputId);
-                const minValue = parseInt(input.getAttribute('min')) || 0;
-                
-                // Find plus and minus buttons for this input
-                const plusBtn = document.querySelector(`[data-target="${inputId}"][data-action="plus"]`);
-                const minusBtn = document.querySelector(`[data-target="${inputId}"][data-action="minus"]`);
-                
-                if (plusBtn) {
-                    plusBtn.disabled = currentValue >= maxValue;
-                    plusBtn.style.opacity = currentValue >= maxValue ? '0.5' : '1';
-                    plusBtn.style.cursor = currentValue >= maxValue ? 'not-allowed' : 'pointer';
-                }
-                
-                if (minusBtn) {
-                    minusBtn.disabled = currentValue <= minValue;
-                    minusBtn.style.opacity = currentValue <= minValue ? '0.5' : '1';
-                    minusBtn.style.cursor = currentValue <= minValue ? 'not-allowed' : 'pointer';
-                }
-            });
-        }
-
-        // Initialize number input buttons
-        setupNumberInputButtons();
-
-        function updateFoodInputLimits() {
-            const erwachseneCount = 1 + (parseInt(document.getElementById('erwachsene').value) || 0);
-            const kinderCount = parseInt(document.getElementById('kinder').value) || 0;
-            
-            // Update max attributes for food inputs
-            const foodInputs = [
-                { id: 'raclette_erwachsene', max: erwachseneCount },
-                { id: 'fondue_erwachsene', max: erwachseneCount },
-                { id: 'raclette_kinder', max: kinderCount },
-                { id: 'fondue_kinder', max: kinderCount }
-            ];
-            
-            foodInputs.forEach(({ id, max }) => {
-                const input = document.getElementById(id);
                 if (input) {
-                    input.setAttribute('max', max);
-                    // Adjust current value if it exceeds new max
-                    const currentValue = parseInt(input.value) || 0;
-                    if (currentValue > max) {
-                        input.value = max;
+                    let currentValue = parseInt(input.value) || 0;
+                    const min = parseInt(input.getAttribute('min')) || 0;
+                    
+                    if (action === 'plus') {
+                        const max = parseInt(input.getAttribute('max')) || 99;
+                        if (currentValue < max) input.value = currentValue + 1;
+                    } else if (action === 'minus' && currentValue > min) {
+                        input.value = currentValue - 1;
                     }
+                    
+                    // Trigger change event to update other fields
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
                 }
-            });
-        }
+            }
+        });
 
         // --- MULTI-STEP LOGIC ---
         function goToStep(stepNumber) {
-            console.log("📋 Going to step:", stepNumber);
             const steps = document.querySelectorAll('.form-step');
             const progressSteps = document.querySelectorAll('.progress-step');
             
             steps.forEach(step => {
-                const stepIsTarget = step.dataset.step == stepNumber;
-                step.classList.toggle('hidden', !stepIsTarget);
+                step.classList.toggle('hidden', step.dataset.step != stepNumber);
             });
 
             progressSteps.forEach((step, index) => {
@@ -428,12 +396,9 @@
         }
 
         document.getElementById('next-to-step-2').addEventListener('click', () => {
-            console.log("▶️ Next button clicked");
             const name = anmeldeFormular.elements.name.value;
             const email = anmeldeFormular.elements.email.value;
             const teilnahme = anmeldeFormular.elements.teilnahme.value;
-            
-            console.log("📝 Form data:", { name, email, teilnahme });
             
             validationError.classList.add('hidden');
             if (!name || !email || !teilnahme) {
@@ -447,7 +412,7 @@
                 renderStep2Details(step2Container);
                 goToStep(2);
             } else {
-                if (editingId) {
+                 if (editingId) {
                     updateCancellation(name, email);
                 } else {
                     submitCancellation(name, email);
@@ -461,8 +426,7 @@
 
         anmeldeFormular.elements.teilnahme.forEach(radio => {
             radio.addEventListener('change', e => {
-                const companionsContainer = document.getElementById('companions-container');
-                companionsContainer.classList.toggle('open', e.target.value === 'ja');
+                document.getElementById('companions-container').classList.toggle('open', e.target.value === 'ja');
             });
         });
 
@@ -473,52 +437,30 @@
         });
 
         function setupDessertListener() {
-            console.log("🍰 Setting up dessert list listener for collection:", dessertsCollectionName);
-            
-            // If there's already a listener, unsubscribe first
-            if (dessertUnsubscribe) {
-                console.log("🍰 Unsubscribing from previous dessert listener");
-                dessertUnsubscribe();
-            }
+            if (dessertUnsubscribe) dessertUnsubscribe();
             
             const dessertsRef = collection(db, dessertsCollectionName);
-
             dessertUnsubscribe = onSnapshot(query(dessertsRef), (snapshot) => {
-                console.log("🍰 Dessert snapshot received, size:", snapshot.size);
-                
                 const dessertListe = document.getElementById('dessert-liste');
-                if (!dessertListe) {
-                    console.log("⚠️ Dessert list element not found in DOM");
-                    return;
-                }
+                if (!dessertListe) return;
                 
                 if (snapshot.empty) {
-                    console.log("🍰 No desserts found, showing placeholder");
                     dessertListe.innerHTML = '<p class="text-xs text-gray-500 text-center">Sei der/die Erste!</p>';
                 } else {
-                    console.log("🍰 Found desserts, rendering list");
                     dessertListe.innerHTML = '';
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        console.log("🍰 Dessert:", data);
                         dessertListe.innerHTML += `<div class="text-sm flex justify-between items-center bg-white p-2 rounded-md"><span class="font-medium text-gray-800">${data.dessert}</span><span class="text-xs text-gray-500">${data.name}</span></div>`;
                     });
-                }
-            }, (error) => {
-                console.error("❌ Error in dessert listener:", error);
-                const dessertListe = document.getElementById('dessert-liste');
-                if (dessertListe) {
-                    dessertListe.innerHTML = '<p class="text-xs text-red-500 text-center">Fehler beim Laden der Desserts</p>';
                 }
             });
         }
 
         function renderStep2Details(container) {
-            console.log("🍽️ Rendering step 2 details");
             container.innerHTML = `
                 <div class="p-4 bg-gray-50 rounded-lg border">
                     <p class="block text-md font-semibold text-gray-700 mb-2">Was möchtet ihr essen?</p>
-                    <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen (inkl. dir und Begleitpersonen).</p>
+                    <p class="text-sm text-gray-500 mb-3">Bitte Gesamtzahl der Personen pro Gericht eintragen.</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="raclette_erwachsene" class="block text-sm font-medium">Anzahl Erw. für Raclette</label>
@@ -575,8 +517,6 @@
                 </div>
             `;
             attachStep2EventListeners();
-            
-            // Setup dessert listener AFTER the DOM elements are created
             setupDessertListener();
         }
 
@@ -588,120 +528,63 @@
                 radio.addEventListener('change', e => document.getElementById('dessert-details').classList.toggle('hidden', e.target.value !== 'ja'));
             });
             
-            // Set initial food input limits based on current person counts
-            updateFoodInputLimits();
-            
-            // Set initial button states
-            setTimeout(() => {
-                updateDynamicLimits();
-            }, 100);
+            // Add listeners to update food logic
+            const inputsToWatch = ['erwachsene', 'kinder', 'raclette_erwachsene', 'fondue_erwachsene', 'raclette_kinder', 'fondue_kinder'];
+            inputsToWatch.forEach(id => {
+                 const input = document.getElementById(id);
+                 if(input) input.addEventListener('input', updateFoodLogic);
+            });
+            updateFoodLogic();
         }
 
         // --- LOAD EXISTING REGISTRATION ---
         async function loadRegistrationData(id) {
-            console.log("📖 Loading registration data for ID:", id);
             try {
                 const docRef = doc(db, anmeldungenCollectionName, id);
                 const docSnap = await getDoc(docRef);
                 
-                if (!docSnap.exists()) {
-                    throw new Error('Anmeldung nicht gefunden');
-                }
+                if (!docSnap.exists()) throw new Error('Anmeldung nicht gefunden');
                 
                 const data = docSnap.data();
-                console.log("📄 Registration data loaded:", data);
                 
                 // Fill form with existing data
-                document.getElementById('name').value = data.name || '';
-                document.getElementById('email').value = data.email || '';
-                
-                // Set radio buttons
-                if (data.teilnahme) {
-                    const teilnahmeRadio = document.querySelector(`input[name="teilnahme"][value="${data.teilnahme}"]`);
-                    if (teilnahmeRadio) teilnahmeRadio.checked = true;
+                for (const key in data) {
+                    const el = anmeldeFormular.elements[key];
+                    if (el) {
+                        if (el.type === 'radio') {
+                             document.querySelector(`input[name="${key}"][value="${data[key]}"]`).checked = true;
+                        } else {
+                            el.value = data[key];
+                        }
+                        // Trigger change to update UI
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
                 }
-                
-                if (data.begleitung) {
-                    const begleitungRadio = document.querySelector(`input[name="begleitung"][value="${data.begleitung}"]`);
-                    if (begleitungRadio) begleitungRadio.checked = true;
-                }
-                
-                // Set numbers
-                document.getElementById('erwachsene').value = data.erwachsene || '0';
-                document.getElementById('kinder').value = data.kinder || '0';
-                
-                // Trigger visibility changes
-                const companionsContainer = document.getElementById('companions-container');
-                companionsContainer.classList.toggle('open', data.teilnahme === 'ja');
-                
-                const begleitungDetails = document.getElementById('begleitung-details');
-                begleitungDetails.classList.toggle('hidden', data.begleitung !== 'ja');
                 
                 // Update UI for editing mode
                 document.getElementById('main-title').textContent = 'Anmeldung bearbeiten';
                 document.getElementById('submit-button').textContent = 'Änderungen speichern';
-                
                 editingId = id;
-                
-                // If we have more data to fill (from step 2), we need to render step 2 first
-                if (data.teilnahme === 'ja') {
-                    const step2Container = document.querySelector('[data-step="2"] .space-y-6');
-                    renderStep2Details(step2Container);
-                    
-                    // Fill step 2 data
-                    setTimeout(() => {
-                        document.getElementById('raclette_erwachsene').value = data.raclette_erwachsene || '0';
-                        document.getElementById('fondue_erwachsene').value = data.fondue_erwachsene || '0';
-                        document.getElementById('raclette_kinder').value = data.raclette_kinder || '0';
-                        document.getElementById('fondue_kinder').value = data.fondue_kinder || '0';
-                        
-                        if (data['dessert-beitrag']) {
-                            const dessertRadio = document.querySelector(`input[name="dessert-beitrag"][value="${data['dessert-beitrag']}"]`);
-                            if (dessertRadio) dessertRadio.checked = true;
-                        }
-                        
-                        if (data['dessert-was']) {
-                            document.getElementById('dessert-was').value = data['dessert-was'];
-                        }
-                        
-                        if (data.bemerkungen) {
-                            document.getElementById('bemerkungen').value = data.bemerkungen;
-                        }
-                        
-                        // Update dessert details visibility
-                        const dessertDetails = document.getElementById('dessert-details');
-                        dessertDetails.classList.toggle('hidden', data['dessert-beitrag'] !== 'ja');
-                        
-                        // Update children food visibility
-                        const kinderEssenDetails = document.getElementById('kinder-essen-details');
-                        const kinderCount = parseInt(data.kinder, 10) || 0;
-                        kinderEssenDetails.classList.toggle('hidden', kinderCount <= 0);
-                    }, 100);
-                }
-                
+
             } catch (error) {
-                console.error('❌ Error loading registration:', error);
-                alert('Anmeldung konnte nicht geladen werden. Bitte versuche es erneut oder erstelle eine neue Anmeldung.');
+                console.error('Error loading registration:', error);
+                alert('Anmeldung konnte nicht geladen werden. Bitte versuche es erneut.');
                 window.history.replaceState({}, document.title, window.location.pathname);
-                location.reload();
             }
         }
 
         // --- FIREBASE & SUBMISSION ---
-        function initializeAppLogic(firebaseApp) {
-            console.log("🔥 Initializing app logic");
+        async function initializeAppLogic(firebaseApp) {
             db = getFirestore(firebaseApp);
             
             anmeldeFormular.addEventListener('submit', handleFormSubmit);
             
-            // If we have a registration ID, load the data
             if (registrationId) {
-                loadRegistrationData(registrationId);
+                await loadRegistrationData(registrationId);
             }
         }
         
         async function submitCancellation(name, email) {
-            console.log("❌ Submitting cancellation");
             const submitButton = document.getElementById('next-to-step-2');
             submitButton.disabled = true;
             submitButton.textContent = 'Wird gesendet...';
@@ -718,25 +601,19 @@
                 submitButton.textContent = 'Weiter';
             }
         }
-
+        
         async function updateCancellation(name, email) {
-            console.log("🔄 Updating cancellation");
-            const submitButton = document.getElementById('next-to-step-2');
+             const submitButton = document.getElementById('next-to-step-2');
             submitButton.disabled = true;
             submitButton.textContent = 'Wird gespeichert...';
             try {
                 const docRef = doc(db, anmeldungenCollectionName, editingId);
-                await updateDoc(docRef, { 
-                    name, 
-                    email, 
-                    teilnahme: 'nein', 
-                    lastModified: new Date() 
-                });
+                await updateDoc(docRef, { name, email, teilnahme: 'nein', lastModified: new Date() });
                 
                 anmeldungContainer.classList.add('hidden');
                 cancellationContainer.classList.remove('hidden');
             } catch (error) {
-                validationError.textContent = 'Fehler: ' + error.message;
+                 validationError.textContent = 'Fehler: ' + error.message;
                 validationError.classList.remove('hidden');
                 submitButton.disabled = false;
                 submitButton.textContent = 'Weiter';
@@ -744,7 +621,6 @@
         }
 
         async function handleFormSubmit(e) {
-            console.log("📤 Form submitted");
             e.preventDefault();
             const submitButton = document.getElementById('submit-button');
             validationError.classList.add('hidden');
@@ -767,34 +643,12 @@
                 if (data['dessert-beitrag'] === 'ja' && !data['dessert-was']) throw new Error('Bitte gib an, welches Dessert du mitbringst.');
 
                 const anmeldungenRef = collection(db, anmeldungenCollectionName);
-                const dessertsRef = collection(db, dessertsCollectionName);
-
+                
                 if (isEditing) {
-                    // Update existing registration
                     const docRef = doc(db, anmeldungenCollectionName, editingId);
-                    await updateDoc(docRef, { 
-                        ...data, 
-                        lastModified: new Date() 
-                    });
-
-                    // Handle dessert update
-                    if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
-                        await addDoc(dessertsRef, { 
-                            name: data.name, 
-                            dessert: data['dessert-was'], 
-                            anmeldungId: editingId 
-                        });
-                    }
+                    await updateDoc(docRef, { ...data, lastModified: new Date() });
                 } else {
-                    // Create new registration
-                    const docRef = await addDoc(anmeldungenRef, { ...data, timestamp: new Date() });
-                    if (data['dessert-beitrag'] === 'ja' && data['dessert-was']) {
-                        await addDoc(dessertsRef, { 
-                            name: data.name, 
-                            dessert: data['dessert-was'], 
-                            anmeldungId: docRef.id 
-                        });
-                    }
+                    await addDoc(anmeldungenRef, { ...data, timestamp: new Date() });
                 }
 
                 showSuccessScreen(data, isEditing);
@@ -808,7 +662,6 @@
         }
 
         function showSuccessScreen(data, isEditing = false) {
-            console.log("✅ Showing success screen");
             const essenItems = [];
             if (parseInt(data.raclette_erwachsene) > 0) essenItems.push(`${data.raclette_erwachsene}x Raclette Erw.`);
             if (parseInt(data.fondue_erwachsene) > 0) essenItems.push(`${data.fondue_erwachsene}x Fondue Erw.`);
@@ -816,23 +669,12 @@
             if (parseInt(data.fondue_kinder) > 0) essenItems.push(`${data.fondue_kinder}x Fondue Kind`);
             const essenText = essenItems.length > 0 ? essenItems.join(', ') : 'Keine Auswahl';
 
-            // Update success screen text based on whether we're editing
             const successTitle = document.getElementById('success-title');
             const successMessage = document.getElementById('success-message');
             
             if (isEditing) {
                 successTitle.textContent = 'Änderungen gespeichert!';
                 successMessage.textContent = 'Deine Anmeldung wurde erfolgreich aktualisiert.';
-                
-                // Update email notice for editing
-                const emailNotice = document.querySelector('.bg-blue-50');
-                if (emailNotice) {
-                    emailNotice.querySelector('h3').textContent = '📧 Update-Bestätigung';
-                    emailNotice.querySelector('p').innerHTML = 'Wir haben dir eine Bestätigung der Änderungen per E-Mail gesendet.<br><strong>Falls sie nicht im Posteingang ankommt, schaue bitte auch im Spam-Ordner nach.</strong>';
-                }
-            } else {
-                successTitle.textContent = 'Vielen Dank!';
-                successMessage.textContent = 'Deine Anmeldung ist bei uns eingegangen.';
             }
 
              let factsheetHTML = `
@@ -858,32 +700,34 @@
                 title: "25-jähriges Jubiläum Fun Agility People",
                 description: "Apéro, Spaziergang, Essen und gemütliches Beisammensein",
                 location: "Schützenhaus Schönenbuch",
-                startTime: "20251018T120000Z", // 14:00 CEST = 12:00 UTC
-                endTime: "20251018T200000Z",   // 22:00 CEST = 20:00 UTC
+                startTime: "20251018T120000Z",
+                endTime: "20251018T200000Z",
             };
             const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FunAgilityPeople//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:${Date.now()}@fun-agility-people.ch\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}\nDTSTART:${event.startTime}\nDTEND:${event.endTime}\nSUMMARY:${event.title}\nDESCRIPTION:${event.description}\nLOCATION:${event.location}\nEND:VEVENT\nEND:VCALENDAR`;
             return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
         }
 
         // --- APP INITIALIZATION ---
-        console.log("🔥 Initializing Firebase...");
-        const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("✅ User authenticated, initializing app logic");
-                initializeAppLogic(app);
-            } else {
-                console.log("🔑 No user, signing in anonymously...");
-                signInAnonymously(auth).catch((error) => {
-                    console.error("❌ Anonymous sign-in failed:", error);
-                    document.body.innerHTML = '<div class="text-center p-8">Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.</div>';
-                });
+        try {
+            if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey) {
+                 throw new Error("Firebase config not loaded");
             }
-        });
-
-        console.log("🎯 Script initialization complete");
+            const app = initializeApp(firebaseConfig); 
+            auth = getAuth(app);
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    initializeAppLogic(app);
+                } else {
+                    signInAnonymously(auth).catch((error) => {
+                        console.error("Anonymous sign-in failed:", error);
+                        document.body.innerHTML = '<div class="text-center p-8">Authentifizierung fehlgeschlagen. Bitte laden Sie die Seite neu.</div>';
+                    });
+                }
+            });
+        } catch(e) {
+            console.error("Firebase init failed:", e);
+        }
     </script>
 </body>
 </html>
+
