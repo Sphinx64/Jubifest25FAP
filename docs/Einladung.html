@@ -1,34 +1,225 @@
-/**
- * ZENTRALE KONFIGURATION FÜR DAS JUBILÄUMSFEST
- * ----------------------------------------------------
- * Ändere die Werte hier, um sie auf der Einladungsseite
- * und potenziell in zukünftigen Dokumenten zu aktualisieren.
- */
-const eventConfig = {
-    // --- DATEN & FRISTEN ---
-    anmeldeschluss: "9. September 2025",
-    datum: "Samstag, 18. Oktober 2025",
-    uhrzeit: "ab 14:00 Uhr",
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einladung zum 25-jährigen Jubiläum | Fun Agility People</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Lädt die zentrale Konfigurationsdatei aus dem Hauptverzeichnis -->
+    <script src="../event-config.js"></script>
 
-    // --- ORT ---
-    ort: "Schützenhaus Schönenbuch",
-    parkplaetze: "Beim Schiessclub vorhanden.",
-    googleMapsLink: "https://maps.app.goo.gl/9Txcm6CBV6H1cMkx9",
-    kartenbildLink: "https://staticmap.openstreetmap.de/staticmap.php?center=47.5255,7.5095&zoom=14&size=750x300&maptype=mapnik&markers=47.5255,7.5095,red-pushpin",
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #eef2f5;
+        }
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        .fap-teal { background-color: #005a6a; }
+        .fap-teal-text { color: #005a6a; }
 
-    // --- KOSTEN ---
-    kostenErwachsene: "40 CHF",
-    kostenKinder: "15 CHF",
+        @page {
+            size: A4;
+            margin: 0;
+        }
 
-    // --- ANMELDUNG ---
-    anmeldeLink: "https://sphinx64.github.io/Jubifest25FAP/",
-    qrCodeLink: "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://sphinx64.github.io/Jubifest25FAP/",
+        @media print {
+            html, body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: #ffffff;
+                padding: 0;
+                margin: 0;
+                width: 210mm;
+                height: 297mm;
+                font-size: 11pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .a4-container {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100%;
+                max-width: 100%;
+                height: 100%;
+                border-radius: 0 !important;
+                display: flex;
+                flex-direction: column;
+            }
+            .print-content-wrapper {
+                padding: 1.5cm;
+            }
+            .print-header {
+                 padding: 1.5cm;
+            }
+            .avoid-break {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4 sm:p-8">
 
-    // --- PROGRAMM ---
-    programm: [
-        { zeit: "14:00 Uhr", text: "Offizielle Begrüssung & Apéro" },
-        { zeit: "15:00 Uhr", text: "Gemeinsamer Spaziergang" },
-        { zeit: "18:00 Uhr", text: "Fondue oder Raclette" },
-        { zeit: "Anschl.", text: "Dessertbuffet, Drinks & Musik" }
-    ]
-};
+    <div class="a4-container bg-white rounded-lg shadow-xl border border-gray-200">
+        <!-- Header Section -->
+        <div class="fap-teal text-white p-8 text-center rounded-t-lg relative overflow-hidden print-header">
+             <div class="absolute -top-10 -right-10 w-40 h-40 border-4 border-white/20 rounded-full"></div>
+             <div class="absolute -bottom-16 -left-10 w-32 h-32 border-2 border-white/20 rounded-full"></div>
+            <img src="../logo.png" alt="Fun Agility People Logo" class="mx-auto h-20 w-auto mb-4">
+            <h1 class="font-display text-5xl sm:text-6xl font-bold">Einladung</h1>
+            <p class="mt-2 text-2xl opacity-90">zum 25-jährigen Jubiläumsfest</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="p-6 sm:p-10 print-content-wrapper">
+            <!-- Intro Text -->
+            <div class="text-center mb-10 avoid-break">
+                <h2 class="font-display text-3xl fap-teal-text mb-4">Wir feiern 25 Jahre!</h2>
+                <p class="text-lg text-gray-700 mb-2">
+                    Liebe Mitglieder, liebe Freundinnen und Freunde,
+                </p>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    wir haben einen Grund zu feiern! Unser Verein wird <strong>stolze 25 Jahre</strong> alt. Ein Vierteljahrhundert voller Spass, Sport und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!
+                </p>
+            </div>
+            
+            <!-- Event Details Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-b border-gray-200 py-8 avoid-break">
+                <!-- Left Column: When & Where -->
+                <div class="space-y-6">
+                    <h3 class="font-display text-2xl fap-teal-text border-b-2 border-gray-200 pb-2">Eckdaten</h3>
+                    <div class="flex items-start gap-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Datum & Zeit</h4>
+                            <p class="text-gray-600" id="event-datum-zeit"></p>
+                        </div>
+                    </div>
+                     <div class="flex items-start gap-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Ort</h4>
+                            <p class="text-gray-600" id="event-ort"></p>
+                        </div>
+                    </div>
+                     <div class="flex items-start gap-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2 2h8a1 1 0 001-1z" />
+                        </svg>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Parkplätze</h4>
+                            <p class="text-gray-600" id="event-parkplaetze"></p>
+                        </div>
+                    </div>
+                     <div class="flex items-start gap-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Kosten</h4>
+                            <p class="text-gray-600" id="event-kosten"></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Column: Program -->
+                <div class="space-y-6">
+                     <h3 class="font-display text-2xl fap-teal-text border-b-2 border-gray-200 pb-2">Programm</h3>
+                     <ul id="event-programm" class="space-y-3 text-gray-600">
+                        <!-- Content will be injected by JavaScript -->
+                     </ul>
+                </div>
+            </div>
+
+            <!-- Map Section -->
+            <div class="mt-10 avoid-break">
+                <h3 class="font-display text-3xl fap-teal-text mb-4 text-center">Anfahrt</h3>
+                <div class="border rounded-lg overflow-hidden shadow-sm">
+                    <a id="map-link-container" href="#" target="_blank">
+                        <img id="map-image" src="" alt="Karte zum Veranstaltungsort" class="w-full h-auto block">
+                    </a>
+                </div>
+                 <p class="text-center text-sm mt-2">
+                    <a id="map-link-text" href="#" target="_blank" class="text-blue-600 hover:underline">
+                        Grössere Karte auf Google Maps öffnen
+                    </a>
+                </p>
+            </div>
+
+            <!-- Registration Section -->
+            <div class="mt-10 text-center avoid-break">
+                 <h3 class="font-display text-3xl fap-teal-text mb-4">Anmeldung</h3>
+                 <p id="anmelde-text" class="text-gray-600 mb-6 max-w-xl mx-auto"></p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-6 p-4 bg-gray-50 rounded-lg max-w-lg mx-auto">
+                    <div class="text-center">
+                        <a id="anmelde-link" href="#" class="text-blue-600 hover:underline break-all font-semibold"></a>
+                    </div>
+                    <img id="qr-code" src="" alt="QR-Code zur Anmeldung" class="border rounded-lg p-1 bg-white">
+                </div>
+            </div>
+
+            <!-- Closing -->
+            <div class="text-center mt-12 pt-6 border-t avoid-break">
+                <p class="text-lg font-semibold text-gray-800">
+                    Wir freuen uns riesig darauf, dieses besondere Jubiläum mit euch zu feiern!
+                </p>
+                <p class="mt-2 text-gray-700">
+                    Herzliche Grüsse,<br>
+                    Das OK und der Vorstand der Fun Agility People
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <div class="mt-6 text-center no-print">
+        <button onclick="window.print()" class="bg-white text-gray-800 font-bold py-3 px-6 rounded-lg shadow-md hover:bg-gray-200 transition-colors border border-gray-300">
+            Seite Drucken
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof eventConfig === 'undefined') {
+                console.error('event-config.js wurde nicht geladen oder ist fehlerhaft.');
+                return;
+            }
+
+            // --- Populate Eckdaten ---
+            document.getElementById('event-datum-zeit').innerHTML = `${eventConfig.datum}<br>${eventConfig.uhrzeit}`;
+            document.getElementById('event-ort').textContent = eventConfig.ort;
+            document.getElementById('event-parkplaetze').textContent = eventConfig.parkplaetze;
+            document.getElementById('event-kosten').innerHTML = `Mitglieder sind eingeladen.<br>Begleitpersonen: Erw. ${eventConfig.kostenErwachsene}, Kinder ${eventConfig.kostenKinder}`;
+            
+            // --- Populate Programm ---
+            const programmListe = document.getElementById('event-programm');
+            programmListe.innerHTML = ''; // Clear existing content
+            eventConfig.programm.forEach(punkt => {
+                const li = document.createElement('li');
+                li.className = 'flex gap-4';
+                li.innerHTML = `<strong class="w-20 text-right">${punkt.zeit}</strong> <span>${punkt.text}</span>`;
+                programmListe.appendChild(li);
+            });
+
+            // --- Populate Anfahrt ---
+            document.getElementById('map-link-container').href = eventConfig.googleMapsLink;
+            document.getElementById('map-image').src = eventConfig.kartenbildLink;
+            document.getElementById('map-link-text').href = eventConfig.googleMapsLink;
+            
+            // --- Populate Anmeldung ---
+            document.getElementById('anmelde-text').innerHTML = `Bitte melde dich und deine Begleitpersonen bis zum <strong>${eventConfig.anmeldeschluss}</strong> an, damit wir besser planen können. Scanne den QR-Code oder besuche den Link:`;
+            const anmeldeLinkElement = document.getElementById('anmelde-link');
+            anmeldeLinkElement.href = eventConfig.anmeldeLink;
+            // Zeigt den Link ohne "https://" an, um ihn sauberer darzustellen.
+            anmeldeLinkElement.textContent = eventConfig.anmeldeLink.replace(/^https?:\/\//, ''); 
+            document.getElementById('qr-code').src = eventConfig.qrCodeLink;
+        });
+    </script>
+</body>
+</html>
