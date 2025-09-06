@@ -50,7 +50,7 @@ const eventConfig = {
     // === PREISE ===
     pricing: {
         members: "kostenlos",
-        membersNote: "Mitglieder (Aktiv und Passiv) sind eingeladen",
+        membersNote: "Mitglieder sind eingeladen",
         adultsPrice: "40 CHF",
         childrenPrice: "15 CHF", 
         childrenAgeLimit: "bis 14 Jahre",
