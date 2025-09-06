@@ -212,13 +212,19 @@
                 
                 // --- Populate Programm ---
                 const programmListe = document.getElementById('event-programm');
-                programmListe.innerHTML = ''; // Clear existing content
-                eventConfig.programm.forEach(punkt => {
-                    const li = document.createElement('li');
-                    li.className = 'flex gap-4';
-                    li.innerHTML = `<strong class="w-20 text-right">${punkt.zeit}</strong> <span>${punkt.text}</span>`;
-                    programmListe.appendChild(li);
-                });
+                // CORRECTED: Check if eventConfig.programm exists and is an array
+                if (eventConfig.programm && Array.isArray(eventConfig.programm)) {
+                    programmListe.innerHTML = ''; // Clear existing content
+                    eventConfig.programm.forEach(punkt => {
+                        const li = document.createElement('li');
+                        li.className = 'flex gap-4';
+                        li.innerHTML = `<strong class="w-20 text-right">${punkt.zeit}</strong> <span>${punkt.text}</span>`;
+                        programmListe.appendChild(li);
+                    });
+                } else {
+                    console.error("eventConfig.programm ist nicht definiert oder kein Array. Stelle sicher, dass die event-config.js aktuell ist.");
+                    programmListe.innerHTML = '<li>Programm wird geladen...</li>';
+                }
 
                 // --- Populate Anfahrt ---
                 document.getElementById('map-link-container').href = eventConfig.googleMapsLink;
