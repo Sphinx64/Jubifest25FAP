@@ -23,21 +23,22 @@
         .fap-teal { background-color: #005a6a; }
         .fap-teal-text { color: #005a6a; }
 
+        /* --- PRINT STYLES --- */
         @page {
             size: A4;
-            margin: 0;
+            margin: 0; /* Anweisung an den Browser, keine Ränder zu drucken */
         }
 
         @media print {
             html, body {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-                background-color: #ffffff;
+                background-color: #ffffff !important;
                 padding: 0;
                 margin: 0;
                 width: 210mm;
                 height: 297mm;
-                font-size: 11pt;
+                font-size: 10pt; /* Schriftgröße für Druck optimieren */
             }
             .no-print {
                 display: none !important;
@@ -54,12 +55,21 @@
                 display: flex;
                 flex-direction: column;
             }
-            .print-content-wrapper {
-                padding: 1.5cm;
-            }
+            /* Feste Paddings für den Druck, um den Rand zu simulieren */
             .print-header {
-                 padding: 1.5cm;
+                 padding: 1.5cm 2cm 1cm 2cm;
             }
+            .print-content-wrapper {
+                padding: 1cm 2cm 1.5cm 2cm;
+            }
+            /* Kleinere Abstände für den Druck */
+            .print-mb-6 { margin-bottom: 1.5rem; }
+            .print-py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+            .print-gap-6 { gap: 1.5rem; }
+            .print-mt-8 { margin-top: 2rem; }
+            .print-mt-10 { margin-top: 2.5rem; }
+            .print-pt-4 { padding-top: 1rem; }
+
             .avoid-break {
                 page-break-inside: avoid;
             }
@@ -81,7 +91,7 @@
         <!-- Main Content -->
         <div class="p-6 sm:p-10 print-content-wrapper">
             <!-- Intro Text -->
-            <div class="text-center mb-10 avoid-break">
+            <div class="text-center mb-10 avoid-break print-mb-6">
                 <h2 class="font-display text-3xl fap-teal-text mb-4">Wir feiern 25 Jahre!</h2>
                 <p class="text-lg text-gray-700 mb-2">
                     Liebe Mitglieder, liebe Freundinnen und Freunde,
@@ -92,26 +102,26 @@
             </div>
             
             <!-- Event Details Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-b border-gray-200 py-8 avoid-break">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 print-gap-6 border-t border-b border-gray-200 py-8 print-py-6 avoid-break">
                 <!-- Left Column: When & Where -->
                 <div class="space-y-6">
                     <h3 class="font-display text-2xl fap-teal-text border-b-2 border-gray-200 pb-2">Eckdaten</h3>
                     <div class="flex items-start gap-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         <div>
                             <h4 class="font-bold text-gray-800">Datum & Zeit</h4>
                             <p class="text-gray-600" id="event-datum-zeit"></p>
                         </div>
                     </div>
                      <div class="flex items-start gap-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         <div>
                             <h4 class="font-bold text-gray-800">Ort</h4>
                             <p class="text-gray-600" id="event-ort"></p>
                         </div>
                     </div>
                      <div class="flex items-start gap-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
                           <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2 2h8a1 1 0 001-1z" />
                         </svg>
@@ -121,7 +131,7 @@
                         </div>
                     </div>
                      <div class="flex items-start gap-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                         <div>
                             <h4 class="font-bold text-gray-800">Kosten</h4>
                             <p class="text-gray-600" id="event-kosten"></p>
@@ -137,37 +147,40 @@
                 </div>
             </div>
 
-            <!-- Map Section -->
-            <div class="mt-10 avoid-break">
-                <h3 class="font-display text-3xl fap-teal-text mb-4 text-center">Anfahrt</h3>
-                <div class="border rounded-lg overflow-hidden shadow-sm">
-                    <a id="map-link-container" href="#" target="_blank">
-                        <img id="map-image" src="" alt="Karte zum Veranstaltungsort" class="w-full h-auto block">
-                    </a>
-                </div>
-                 <p class="text-center text-sm mt-2">
-                    <a id="map-link-text" href="#" target="_blank" class="text-blue-600 hover:underline">
-                        Grössere Karte auf Google Maps öffnen
-                    </a>
-                </p>
-            </div>
-
-            <!-- Registration Section -->
-            <div class="mt-10 text-center avoid-break">
-                 <h3 class="font-display text-3xl fap-teal-text mb-4">Anmeldung</h3>
-                 <p id="anmelde-text" class="text-gray-600 mb-6 max-w-xl mx-auto"></p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-6 p-4 bg-gray-50 rounded-lg max-w-lg mx-auto">
-                    <div class="text-center">
-                        <a id="anmelde-link" href="#" class="text-blue-600 hover:underline break-all font-semibold"></a>
+            <!-- Map & Registration Wrapper -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 print-gap-6 mt-10 print-mt-8 avoid-break">
+                <!-- Map Section -->
+                <div>
+                    <h3 class="font-display text-2xl fap-teal-text mb-4 text-center">Anfahrt</h3>
+                    <div class="border rounded-lg overflow-hidden shadow-sm">
+                        <a id="map-link-container" href="#" target="_blank">
+                            <img id="map-image" src="" alt="Karte zum Veranstaltungsort" class="w-full h-auto block">
+                        </a>
                     </div>
-                    <img id="qr-code" src="" alt="QR-Code zur Anmeldung" class="border rounded-lg p-1 bg-white">
+                     <p class="text-center text-sm mt-2">
+                        <a id="map-link-text" href="#" target="_blank" class="text-blue-600 hover:underline">
+                            Grössere Karte öffnen
+                        </a>
+                    </p>
+                </div>
+
+                <!-- Registration Section -->
+                <div class="text-center">
+                     <h3 class="font-display text-2xl fap-teal-text mb-4">Anmeldung</h3>
+                     <p id="anmelde-text" class="text-gray-600 mb-4"></p>
+                    <div class="flex flex-col items-center justify-center gap-4 p-4 bg-gray-50 rounded-lg">
+                        <img id="qr-code" src="" alt="QR-Code zur Anmeldung" class="border rounded-lg p-1 bg-white max-w-[100px]">
+                        <div class="text-center">
+                            <a id="anmelde-link" href="#" class="text-blue-600 hover:underline break-all font-semibold"></a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Closing -->
-            <div class="text-center mt-12 pt-6 border-t avoid-break">
+            <div class="text-center mt-10 print-mt-10 pt-6 print-pt-4 border-t">
                 <p class="text-lg font-semibold text-gray-800">
-                    Wir freuen uns riesig darauf, dieses besondere Jubiläum mit euch zu feiern!
+                    Wir freuen uns riesig auf dieses besondere Jubiläum mit euch!
                 </p>
                 <p class="mt-2 text-gray-700">
                     Herzliche Grüsse,<br>
@@ -186,40 +199,44 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof eventConfig === 'undefined') {
-                console.error('event-config.js wurde nicht geladen oder ist fehlerhaft.');
-                return;
+            try {
+                if (typeof eventConfig === 'undefined') {
+                    throw new Error('event-config.js wurde nicht geladen oder ist fehlerhaft.');
+                }
+
+                // --- Populate Eckdaten ---
+                document.getElementById('event-datum-zeit').innerHTML = `${eventConfig.datum}<br>${eventConfig.uhrzeit}`;
+                document.getElementById('event-ort').textContent = eventConfig.ort;
+                document.getElementById('event-parkplaetze').textContent = eventConfig.parkplaetze;
+                document.getElementById('event-kosten').innerHTML = `Mitglieder sind eingeladen.<br>Begleitpersonen: Erw. ${eventConfig.kostenErwachsene}, Kinder ${eventConfig.kostenKinder}`;
+                
+                // --- Populate Programm ---
+                const programmListe = document.getElementById('event-programm');
+                programmListe.innerHTML = ''; // Clear existing content
+                eventConfig.programm.forEach(punkt => {
+                    const li = document.createElement('li');
+                    li.className = 'flex gap-4';
+                    li.innerHTML = `<strong class="w-20 text-right">${punkt.zeit}</strong> <span>${punkt.text}</span>`;
+                    programmListe.appendChild(li);
+                });
+
+                // --- Populate Anfahrt ---
+                document.getElementById('map-link-container').href = eventConfig.googleMapsLink;
+                document.getElementById('map-image').src = eventConfig.kartenbildLink;
+                document.getElementById('map-link-text').href = eventConfig.googleMapsLink;
+                
+                // --- Populate Anmeldung ---
+                document.getElementById('anmelde-text').innerHTML = `Bitte melde dich und deine Begleitpersonen bis zum <strong>${eventConfig.anmeldeschluss}</strong> an.`;
+                const anmeldeLinkElement = document.getElementById('anmelde-link');
+                anmeldeLinkElement.href = eventConfig.anmeldeLink;
+                anmeldeLinkElement.textContent = eventConfig.anmeldeLink.replace(/^https?:\/\//, ''); 
+                document.getElementById('qr-code').src = eventConfig.qrCodeLink;
+            } catch (error) {
+                console.error('Fehler beim Befüllen der Einladung:', error);
+                document.body.innerHTML = `<div class="p-8 text-red-700">Fehler: Die Konfigurationsdatei konnte nicht geladen werden. Details: ${error.message}</div>`;
             }
-
-            // --- Populate Eckdaten ---
-            document.getElementById('event-datum-zeit').innerHTML = `${eventConfig.datum}<br>${eventConfig.uhrzeit}`;
-            document.getElementById('event-ort').textContent = eventConfig.ort;
-            document.getElementById('event-parkplaetze').textContent = eventConfig.parkplaetze;
-            document.getElementById('event-kosten').innerHTML = `Mitglieder sind eingeladen.<br>Begleitpersonen: Erw. ${eventConfig.kostenErwachsene}, Kinder ${eventConfig.kostenKinder}`;
-            
-            // --- Populate Programm ---
-            const programmListe = document.getElementById('event-programm');
-            programmListe.innerHTML = ''; // Clear existing content
-            eventConfig.programm.forEach(punkt => {
-                const li = document.createElement('li');
-                li.className = 'flex gap-4';
-                li.innerHTML = `<strong class="w-20 text-right">${punkt.zeit}</strong> <span>${punkt.text}</span>`;
-                programmListe.appendChild(li);
-            });
-
-            // --- Populate Anfahrt ---
-            document.getElementById('map-link-container').href = eventConfig.googleMapsLink;
-            document.getElementById('map-image').src = eventConfig.kartenbildLink;
-            document.getElementById('map-link-text').href = eventConfig.googleMapsLink;
-            
-            // --- Populate Anmeldung ---
-            document.getElementById('anmelde-text').innerHTML = `Bitte melde dich und deine Begleitpersonen bis zum <strong>${eventConfig.anmeldeschluss}</strong> an, damit wir besser planen können. Scanne den QR-Code oder besuche den Link:`;
-            const anmeldeLinkElement = document.getElementById('anmelde-link');
-            anmeldeLinkElement.href = eventConfig.anmeldeLink;
-            // Zeigt den Link ohne "https://" an, um ihn sauberer darzustellen.
-            anmeldeLinkElement.textContent = eventConfig.anmeldeLink.replace(/^https?:\/\//, ''); 
-            document.getElementById('qr-code').src = eventConfig.qrCodeLink;
         });
     </script>
 </body>
 </html>
+
