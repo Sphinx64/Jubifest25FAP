@@ -344,6 +344,36 @@
                 }
             });
         }
+        
+        function updateDynamicLimits() {
+            // Update button states based on current values
+            const foodInputs = ['raclette_erwachsene', 'fondue_erwachsene', 'raclette_kinder', 'fondue_kinder'];
+            
+            foodInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (!input) return;
+                
+                const currentValue = parseInt(input.value) || 0;
+                const maxValue = getDynamicMaxForFood(inputId);
+                const minValue = parseInt(input.getAttribute('min')) || 0;
+                
+                // Find plus and minus buttons for this input
+                const plusBtn = document.querySelector(`[data-target="${inputId}"][data-action="plus"]`);
+                const minusBtn = document.querySelector(`[data-target="${inputId}"][data-action="minus"]`);
+                
+                if (plusBtn) {
+                    plusBtn.disabled = currentValue >= maxValue;
+                    plusBtn.style.opacity = currentValue >= maxValue ? '0.5' : '1';
+                    plusBtn.style.cursor = currentValue >= maxValue ? 'not-allowed' : 'pointer';
+                }
+                
+                if (minusBtn) {
+                    minusBtn.disabled = currentValue <= minValue;
+                    minusBtn.style.opacity = currentValue <= minValue ? '0.5' : '1';
+                    minusBtn.style.cursor = currentValue <= minValue ? 'not-allowed' : 'pointer';
+                }
+            });
+        }
 
         // Initialize number input buttons
         setupNumberInputButtons();
