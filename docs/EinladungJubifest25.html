@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Einladung – 25 Jahre Fun Agility People</title>
+  <!-- Die externe Konfigurationsdatei wird nicht mehr benötigt -->
+  <style>
+    @page {
+      size: A4;
+      margin: 12mm 12mm 0 12mm;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fdfdfd;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+      font-size: 14px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header: ~80px */
+    header {
+      background: #005f6b;
+      color: white;
+      text-align: center;
+      padding: 1.2rem 0.8rem;
+      flex-shrink: 0;
+    }
+    header img {
+      max-height: 50px;
+      margin-bottom: 0.6rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.9rem;
+      line-height: 1.2;
+    }
+    header p {
+      margin: 0.4rem 0 0 0;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+    
+    /* Main content: fills remaining space */
+    main {
+      flex: 1;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Intro: ~100px */
+    .intro {
+      font-size: 1rem;
+      text-align: center;
+      padding: 1.3rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .intro p {
+      margin: 0.5rem 0;
+    }
+    
+    /* Grid: fills remaining space efficiently */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      flex: 1;
+    }
+    
+    section {
+      padding: 1.3rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    h2 {
+      color: #005f6b;
+      margin: 0 0 0.8rem 0;
+      border-bottom: 2px solid #005f6b;
+      padding-bottom: 0.3rem;
+      font-size: 1.2rem;
+    }
+    
+    h2:not(:first-child) {
+      margin-top: 1.2rem;
+    }
+    
+    /* Map optimiert für verfügbaren Platz */
+    .map-container {
+      margin: 0.8rem 0 1rem 0;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    iframe {
+      width: 100%;
+      height: 160px;
+      border: 0;
+      display: block;
+    }
+    
+    /* Lists with proper spacing */
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0;
+    }
+    li {
+      margin: 0.4rem 0;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    
+    p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+    
+    strong {
+      font-weight: 600;
+    }
+    
+    /* QR Code Section */
+    .qr-section {
+      text-align: center;
+      margin: 0.8rem 0;
+    }
+    
+    #qrcode {
+      max-width: 95px;
+      height: auto;
+      border: 1px solid #eee;
+      border-radius: 4px;
+    }
+    
+    /* Links */
+    a {
+      color: #005f6b;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Print Button */
+    .button-print {
+      background: #005f6b;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 2rem auto 1rem auto;
+      align-self: center;
+      transition: background-color 0.2s;
+    }
+    .button-print:hover {
+      background: #004352;
+    }
+    
+    /* Footer: ~30px */
+    footer {
+      background: #f8f9fa;
+      text-align: center;
+      padding: 0.8rem;
+      font-size: 0.85rem;
+      color: #666;
+      border-top: 1px solid #e9ecef;
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+    
+    /* Print optimizations */
+    @media print {
+      @page {
+        size: A4;
+        margin: 12mm 12mm 0 12mm;
+      }
+      
+      body {
+        font-size: 12px;
+        min-height: auto;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .button-print {
+        display: none !important;
+      }
+      
+      header {
+        padding: 0.8rem;
+      }
+      
+      h1 {
+        font-size: 1.6rem;
+      }
+      
+      main {
+        padding: 1rem;
+        flex: none;
+        padding-bottom: 4rem;
+      }
+      
+      .intro {
+        padding: 1rem 2rem;
+        margin-bottom: 1rem;
+      }
+      
+      .content-grid {
+        gap: 1.2rem;
+      }
+      
+      section {
+        padding: 1rem;
+        break-inside: avoid;
+      }
+      
+      iframe {
+        height: 140px;
+      }
+      
+      footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        padding: 0.8rem 1rem 1.5rem 1rem;
+        margin: 0;
+        background: #f8f9fa !important;
+        border-top: 1px solid #e9ecef;
+        font-size: 0.8rem;
+        text-align: center;
+        color: #666;
+        box-sizing: border-box;
+      }
+    }
+    
+    /* Responsive for smaller screens */
+    @media (max-width: 768px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+      }
+      main {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Fun Agility People Logo">
+    <h1>Einladung zum Jubiläumsfest</h1>
+    <p>Ein Vierteljahrhundert Vereinskultur</p>
+  </header>
+
+  <main>
+    <div class="intro">
+      <p><strong>Liebe Mitglieder, liebe Freundinnen und Freunde,</strong></p>
+      <p>Wir haben einen besonderen Grund zu feiern! Unser Verein wird 25 Jahre alt – ein Vierteljahrhundert voller Agility-Leidenschaft, Vereinskultur und unzähliger toller Momente mit euch und euren Hunden. Das möchten wir gebührend mit euch feiern!</p>
+    </div>
+
+    <div class="content-grid">
+      <section>
+        <h2>Wann & Wo</h2>
+        <p><strong id="datetime"></strong></p>
+        <p id="location"></p>
+        
+        <div class="map-container">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11267.409694397285!2d7.51124480147484!3d47.5313719243814!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4791bf45c4ad2baf%3A0xcd59e1773464a61f!2sSch%C3%BCtzenhaus!5e0!3m2!1sde!2sch!4v1757111884720!5m2!1sde!2sch" 
+                  allowfullscreen 
+                  loading="lazy" 
+                  referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+
+        <h2>Ablauf</h2>
+        <ul id="programm"></ul>
+      </section>
+
+      <section>
+        <h2>Anmeldung</h2>
+        <p>Bitte bis <strong id="deadline"></strong> anmelden:</p>
+        <p><a id="anmeldelink" href="#" target="_blank">Zur Anmeldung</a></p>
+        
+        <div class="qr-section">
+          <img id="qrcode" src="" alt="QR-Code zur Anmeldung">
+        </div>
+
+        <h2>Kosten</h2>
+        <ul>
+          <li id="members"></li>
+          <li id="adults"></li>
+          <li id="children"></li>
+        </ul>
+        <p id="payment"></p>
+
+        <h2>Kontakt</h2>
+        <p id="contact"></p>
+      </section>
+    </div>
+
+    <button class="button-print" onclick="window.print()">📄 Einladung drucken</button>
+  </main>
+
+  <footer>
+    <p>Fun Agility People · 25 Jahre Vereinskultur</p>
+  </footer>
+
+  <script>
+    // ✅ DATEN DIREKT EINGEFÜGT
+    const eventConfig = {
+        event: {
+            title: "25-jähriges Jubiläum Fun Agility People",
+            shortTitle: "25 Jahre FAP",
+            jubilee: "25 Jahre",
+            description: "Apéro, Spaziergang, Essen und gemütliches Beisammensein"
+        },
+        datetime: {
+            date: "Samstag, 18. Oktober 2025",
+            shortDate: "18.10.2025",
+            startTime: "14:00 Uhr",
+            endTime: "22:00 Uhr"
+        },
+        location: {
+            name: "Schützenhaus Schönenbuch",
+            fullName: "Schützenhaus Schönenbuch",
+            address: "Schönenbuch"
+        },
+        registration: {
+            deadline: "Sonntag, 28. September 2025",
+            shortDeadline: "28.09.2025",
+            url: "https://sphinx64.github.io/Jubifest25FAP",
+            qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://sphinx64.github.io/Jubifest25FAP/"
+        },
+        pricing: {
+            members: "kostenlos",
+            membersNote: "Mitglieder sind eingeladen",
+            adultsPrice: "40 CHF",
+            childrenPrice: "15 CHF",
+            childrenAgeLimit: "bis 14 Jahre",
+            paymentMethods: "Bar oder Twint vor Ort"
+        },
+        program: [
+            { time: "14:00 Uhr", activity: "Apéro" },
+            { time: "15:00 Uhr", activity: "Spaziergang mit Hunden (evtl. mit Posten)" },
+            { time: "17:00 Uhr", activity: "Vereinsquiz" },
+            { time: "18:00 Uhr", activity: "Nachtessen" },
+            { time: "20:00 Uhr", activity: "Offizieller Teil (Worte, Video, Infos zum Jubi.)" },
+            { time: "20:45 Uhr", activity: "Dessert" },
+            { time: "21:45 Uhr", activity: "Gemütliches Beisammensein mit Musik & Barbetrieb" }
+        ],
+        contact: {
+            name: "Martin Thalmann",
+            phone: "+41 78 684 11 17"
+        }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const e = eventConfig;
+      
+      // Basic info
+      document.getElementById('datetime').textContent = `${e.datetime.date} · ab ${e.datetime.startTime}`;
+      document.getElementById('location').textContent = e.location.fullName;
+      document.getElementById('deadline').textContent = e.registration.deadline;
+      document.getElementById('contact').textContent = `${e.contact.name} · ${e.contact.phone}`;
+
+      // Registration
+      document.getElementById('anmeldelink').href = e.registration.url;
+      document.getElementById('qrcode').src = e.registration.qrCodeUrl;
+
+      // Program
+      const programList = document.getElementById('programm');
+      e.program.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${item.time}</strong> – ${item.activity}`;
+        programList.appendChild(li);
+      });
+
+      // Pricing
+      document.getElementById('members').textContent = `Mitglieder: ${e.pricing.members} (${e.pricing.membersNote})`;
+      document.getElementById('adults').textContent = `Erwachsene: ${e.pricing.adultsPrice}`;
+      document.getElementById('children').textContent = `Kinder ${e.pricing.childrenAgeLimit}: ${e.pricing.childrenPrice}`;
+      document.getElementById('payment').textContent = `Zahlung: ${e.pricing.paymentMethods}`;
+    });
+  </script>
+</body>
+</html>
+
