@@ -33,26 +33,37 @@ const SHEET_NAME = "Anmeldungen";
  * @param {boolean} isUpdate Whether this is an update (default: false)
  */
 async function addOrUpdateSheet(data, docId, isUpdate = false) {
-    console.log("📊 Processing Google Sheet for:", data.name, isUpdate ? "(UPDATE)" : "(NEW)");
+    console.log(`[SHEETS_START] Processing for: ${data.name}, isUpdate: ${isUpdate}`);
     
-    const auth = new google.auth.GoogleAuth({
-        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    });
-    const sheets = google.sheets({version: "v4", auth});
+    let auth;
+    try {
+        console.log("[SHEETS_AUTH] Authenticating with Google...");
+        auth = new google.auth.GoogleAuth({
+            scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+        });
+        console.log("[SHEETS_AUTH_SUCCESS] Google authentication object created.");
+    } catch (err) {
+        console.error("❌ [SHEETS_AUTH_ERROR] Failed to create GoogleAuth object.", err);
+        return; // Stop execution if auth fails
+    }
 
+    const sheets = google.sheets({version: "v4", auth});
     const aenderungslink = `${eventConfig.registration.url}/?id=${docId}`;
 
     try {
         if (isUpdate) {
-            // ✅ UPDATE: Suche nach existierender Zeile und update sie
             await updateExistingRow(sheets, data, docId, aenderungslink);
         } else {
-            // ✅ NEW: Füge neue Zeile hinzu
             await appendNewRow(sheets, data, docId, aenderungslink);
         }
     } catch (err) {
-        console.error("❌ Error processing Google Sheet:", err.message);
-        console.error("Full error:", err);
+        console.error("❌ [SHEETS_API_ERROR] A critical error occurred while interacting with the Google Sheets API.");
+        console.error("Error Message:", err.message);
+        if (err.response && err.response.data && err.response.data.error) {
+           console.error("Detailed Google API Error:", JSON.stringify(err.response.data.error, null, 2));
+        } else {
+           console.error("Full Error Object:", err);
+        }
     }
 }
 
@@ -60,98 +71,85 @@ async function addOrUpdateSheet(data, docId, isUpdate = false) {
  * Appends a new row to the Google Sheet.
  */
 async function appendNewRow(sheets, data, docId, aenderungslink) {
+    console.log(`[SHEETS_APPEND] Preparing to append new row for docId: ${docId}`);
     const timestamp = new Date().toISOString();
     
     const row = [
-        timestamp,
-        docId,
-        data.name || "",
-        data.erwachsene || "0",
-        data.kinder || "0",
-        data.raclette_erwachsene || "0",
-        data.fondue_erwachsene || "0",
-        data.raclette_kinder || "0",
-        data.fondue_kinder || "0",
+        timestamp, docId, data.name || "", data.erwachsene || "0", data.kinder || "0",
+        data.raclette_erwachsene || "0", data.fondue_erwachsene || "0",
+        data.raclette_kinder || "0", data.fondue_kinder || "0",
         data["dessert-beitrag"] === "ja" ? (data["dessert-was"] || "Ja") : "Nein",
-        data.bemerkungen || "",
-        aenderungslink,
+        data.bemerkungen || "", aenderungslink,
     ];
+
+    console.log("[SHEETS_APPEND] Row data prepared:", row);
 
     await sheets.spreadsheets.values.append({
         spreadsheetId: SPREADSHEET_ID,
         range: SHEET_NAME,
         valueInputOption: "USER_ENTERED",
-        resource: {
-            values: [row],
-        },
+        resource: { values: [row] },
     });
     
-    console.log("✅ Successfully added new row to Google Sheet for:", data.name);
+    console.log(`✅ [SHEETS_APPEND_SUCCESS] Successfully added new row for: ${data.name}`);
 }
 
 /**
  * Updates an existing row in the Google Sheet by finding the docId.
  */
 async function updateExistingRow(sheets, data, docId, aenderungslink) {
-    console.log("🔍 Searching for existing row with docId:", docId);
+    console.log(`[SHEETS_UPDATE] Starting update process for docId: ${docId}`);
     
-    // Schritt 1: Alle Daten aus dem Sheet lesen
+    console.log("[SHEETS_UPDATE_GET] Reading all sheet data to find row index...");
     const response = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
         range: SHEET_NAME,
     });
     
     const rows = response.data.values || [];
+    console.log(`[SHEETS_UPDATE_GET] Found ${rows.length} total rows.`);
     
-    // Schritt 2: Zeile mit matching docId finden (Spalte B = Index 1)
     let rowIndex = -1;
     for (let i = 0; i < rows.length; i++) {
-        if (rows[i][1] === docId) { // Spalte B (Index 1) enthält docId
-            rowIndex = i + 1; // Google Sheets ist 1-basiert
+        if (rows[i][1] === docId) { // Column B (index 1) contains docId
+            rowIndex = i + 1; // Google Sheets is 1-based
             break;
         }
     }
     
     if (rowIndex === -1) {
-        console.log("⚠️ No existing row found for docId:", docId, "- adding as new row");
+        console.warn(`[SHEETS_UPDATE_NOT_FOUND] No existing row found for docId: ${docId}. Adding as a new row instead.`);
         await appendNewRow(sheets, data, docId, aenderungslink);
         return;
     }
     
-    console.log("✅ Found existing row at index:", rowIndex);
+    console.log(`[SHEETS_UPDATE_FOUND] Found existing row at index: ${rowIndex}`);
     
-    // Schritt 3: Update der gefundenen Zeile
     const updateTimestamp = new Date().toISOString();
-    
     const updatedRow = [
-        updateTimestamp, // A: Timestamp (updated)
-        docId, // B: docId (unchanged)
-        data.name || "", // C: Name
-        data.erwachsene || "0", // D: Erwachsene
-        data.kinder || "0", // E: Kinder
-        data.raclette_erwachsene || "0", // F: Raclette Erwachsene
-        data.fondue_erwachsene || "0", // G: Fondue Erwachsene
-        data.raclette_kinder || "0", // H: Raclette Kinder
-        data.fondue_kinder || "0", // I: Fondue Kinder
-        data["dessert-beitrag"] === "ja" ? (data["dessert-was"] || "Ja") : "Nein", // J: Dessert
-        data.bemerkungen || "", // K: Bemerkungen
-        aenderungslink, // L: Änderungslink
+        updateTimestamp, docId, data.name || "", data.erwachsene || "0", data.kinder || "0",
+        data.raclette_erwachsene || "0", data.fondue_erwachsene || "0",
+        data.raclette_kinder || "0", data.fondue_kinder || "0",
+        data["dessert-beitrag"] === "ja" ? (data["dessert-was"] || "Ja") : "Nein",
+        data.bemerkungen || "", aenderungslink,
     ];
     
-    // Update die spezifische Zeile
     const range = `${SHEET_NAME}!A${rowIndex}:L${rowIndex}`;
+    console.log(`[SHEETS_UPDATE_EXECUTE] Preparing to update range: ${range}`);
     
     await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
         range: range,
         valueInputOption: "USER_ENTERED",
-        resource: {
-            values: [updatedRow],
-        },
+        resource: { values: [updatedRow] },
     });
     
-    console.log("✅ Successfully updated existing row in Google Sheet for:", data.name);
+    console.log(`✅ [SHEETS_UPDATE_SUCCESS] Successfully updated row for: ${data.name}`);
 }
+
+// ... rest of the file (sendConfirmationEmail, handleNewRegistration, etc.) remains unchanged
+// ... I'm omitting it here for brevity, but you should keep the rest of your original code.
+// --- Make sure to copy the unchanged functions from your original file below this line ---
 
 /**
  * Marks a registration as cancelled in Google Sheets.
@@ -316,34 +314,6 @@ const emailHtml = `
 </body>
 </html>
 `;
-
-// Text version for better deliverability
-text: `
-Hallo ${data.name || 'Liebe/r Teilnehmer/in'},
-
-vielen Dank für deine Anmeldung zu unserem Jubiläumsfest! Wir freuen uns riesig, dass du dabei bist!
-
-ECKDATEN:
-Datum: ${eventConfig.datetime.date}
-Zeit: ab ${eventConfig.datetime.startTime}
-Ort: ${eventConfig.location.name}
-
-DEINE ANMELDEDATEN:
-Name: ${data.name || 'N/A'}
-E-Mail: ${data.email || 'N/A'}
-Begleitung: ${begleitungText}
-Essen: ${essenText.replace(/<br>/g, ', ')}
-Dessert-Beitrag: ${dessertText}${data.bemerkungen ? `
-Bemerkungen: ${data.bemerkungen}` : ''}
-
-ÄNDERUNGEN MÖGLICH:
-Falls du deine Angaben noch anpassen möchtest: ${editLink}
-
-Bis dahin freuen wir uns auf einen unvergesslichen Tag mit dir!
-
-${eventConfig.sender.signature}
-${eventConfig.sender.name} • 25 Jahre Vereinskultur
-`
 
     const msg = {
         to: data.email,
