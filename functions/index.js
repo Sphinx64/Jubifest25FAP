@@ -24,7 +24,7 @@ try {
 
 // --- Google Sheets Configuration ---
 const SPREADSHEET_ID = "1ttmK64mZr1BZbZVrXUX7iztZE7DqZK68C49RoGi5bew";
-const SHEET_NAME = "Anmeldungen";
+const SHEET_NAME = "AnmeldungenJubifest25";
 
 /**
  * Adds or updates data in Google Sheet.
