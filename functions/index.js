@@ -23,8 +23,10 @@ try {
 }
 
 // --- Google Sheets Configuration ---
-const SPREADSHEET_ID = "1ttmK64mZr1BZbZVrXUX7iztZE7DqZK68C49RoGi5bew";
-const SHEET_NAME = "AnmeldungenJubifest25";
+// ✅ NEUE SPREADSHEET ID EINGEFÜGT
+const SPREADSHEET_ID = "1CtO6pkW2i943_cDZ2MN4MAhIzBkcrryE3iajRc896r4";
+// ✅ NAME DES TABELLENBLATTS WIEDER AUF "Anmeldungen" GESETZT
+const SHEET_NAME = "Anmeldungen";
 
 /**
  * Adds or updates data in Google Sheet.
@@ -570,3 +572,4 @@ exports.exportAnmeldungen = functions
         res.status(500).send("Error exporting data.");
     }
 });
+
