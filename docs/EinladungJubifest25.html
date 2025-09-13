@@ -244,11 +244,11 @@
       
       footer {
         position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        padding: 0.1rem 1rem 1.5rem 1rem;
+        bottom: 12mm;
+        left: 12mm;
+        right: 12mm;
+        width: calc(100% - 24mm);
+        padding: 0.1rem 1rem 0.5rem 1rem;
         margin: 0;
         background: #f8f9fa !important;
         border-top: 1px solid #e9ecef;
@@ -256,7 +256,6 @@
         text-align: center;
         color: #666;
         box-sizing: border-box;
-        
       }
     }
     
@@ -380,7 +379,7 @@
             childrenAgeLimit: "bis 14 Jahre",
             paymentMethods: "Bar oder Twint vor Ort"
         },
-        program: [
+        program: [footer
             { time: "14:00 Uhr", activity: "Apéro" },
             { time: "15:00 Uhr", activity: "Gemeinsamer Spaziergang mit Hunden" },
             { time: "17:00 Uhr", activity: "Vereinsquiz" },
